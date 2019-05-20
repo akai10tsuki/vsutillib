@@ -68,6 +68,5 @@ sources/
 *.nsi
 *.iss
 test.py
-MediaInfo.dll
 .DS_Store
 .gitchangelog.rc

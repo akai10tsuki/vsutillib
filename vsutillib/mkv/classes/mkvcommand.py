@@ -18,7 +18,7 @@ import logging
 
 from pathlib import Path
 
-from .. import fileutil
+from ... import fileutil
 
 
 MODULELOG = logging.getLogger(__name__)
