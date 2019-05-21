@@ -1,0 +1,24 @@
+mkvmerge v34.0.0 ('Sight and Seen') 64-bit
+'S:\Plex\Series\Anime\TV\Abenobashi Mahou Shoutengai (2002)\Abenobashi Mahou Shoutengai - S01E01.mkv': Using the demultiplexer for the format 'Matroska'.
+'S:\Plex\Series\Anime\TV\Abenobashi Mahou Shoutengai (2002)\Abenobashi Mahou Shoutengai - S01E01.mkv' track 0: Using the output module for the format 'AVC/h.264'.
+'S:\Plex\Series\Anime\TV\Abenobashi Mahou Shoutengai (2002)\Abenobashi Mahou Shoutengai - S01E01.mkv' track 1: Using the output module for the format 'FLAC'.
+'S:\Plex\Series\Anime\TV\Abenobashi Mahou Shoutengai (2002)\Abenobashi Mahou Shoutengai - S01E01.mkv' track 2: Using the output module for the format 'AC-3'.
+'S:\Plex\Series\Anime\TV\Abenobashi Mahou Shoutengai (2002)\Abenobashi Mahou Shoutengai - S01E01.mkv' track 3: Using the output module for the format 'VobSub'.
+'S:\Plex\Series\Anime\TV\Abenobashi Mahou Shoutengai (2002)\Abenobashi Mahou Shoutengai - S01E01.mkv' track 4: Using the output module for the format 'VobSub'.
+The file 'C:\Projects\Python\Develop\test\tmp\Abenobashi Mahou Shoutengai - S01E01.mkv' has been opened for writing.
+Progress: 2%
+Progress: 11%
+Progress: 19%
+Progress: 27%
+Progress: 35%
+Progress: 45%
+Progress: 53%
+Progress: 63%
+Progress: 72%
+Progress: 80%
+Progress: 89%
+Progress: 99%
+Progress: 100%
+
+The cue entries (the index) are being written...
+Multiplexing took 6 seconds.

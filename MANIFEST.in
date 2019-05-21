@@ -1,0 +1,12 @@
+include AUTHORS
+include LICENSE.txt
+include READEME.rst
+
+graft docs
+graft vsutillib
+graft tests
+
+prune docs/build
+
+global-exclude __pycache__
+global-exclude *.py[co]

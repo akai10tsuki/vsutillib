@@ -3,7 +3,9 @@ Get file structure information from media file
 """
 
 
+import ctypes
 import logging
+import platform
 
 from pymediainfo import MediaInfo
 
@@ -198,3 +200,29 @@ class _MediaTrackInfo(object):
             + "\nCodec: " + self.codec \
             + "\nFormat: " + self.format \
             + "\n"
+
+
+def isMediaInfoLib():
+    """find MediaInfo library on system"""
+
+    currentOS = platform.system()
+    libNames = ()
+
+    if currentOS == "Windows":
+        libraryType = ctypes.WinDLL
+        libNames = ["MediaInfo.dll"]
+    else:
+        libraryType = ctypes.CDLL
+
+    if currentOS == "Darwin":
+        libNames = ["libmediainfo.0.dylib", "libmediainfo.dylib"]
+    elif currentOS == "Linux":
+        libNames = ["libmediainfo.so.0", "libzen.so.0"]
+
+    for library in libNames:
+        try:
+            libFile = libraryType(library) # pylint: disable=W0612
+        except OSError:
+            return False
+
+    return True
