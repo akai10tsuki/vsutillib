@@ -5,7 +5,6 @@ related to mkv application functionality
 
 """
 
-import ctypes
 import glob
 import logging
 import os
@@ -14,7 +13,7 @@ import shlex
 
 from pathlib import Path
 
-from ..fileutil import findFile, getFileList
+from ..fileutil import findFileInPath
 from ..classes import RunCommand
 
 
@@ -58,12 +57,13 @@ def getMKVMerge():
 
     elif currentOS == "Linux":
 
-        search = findFile("mkvmerge")
+        search = findFileInPath("mkvmerge")
 
-        if search is not None:
-            mkvmerge = Path(search)
-            if mkvmerge.is_file():
-                return mkvmerge
+        if search:
+            for s in search:
+                mkvmerge = Path(s)
+                if mkvmerge.is_file():
+                    return mkvmerge
 
     return None
 

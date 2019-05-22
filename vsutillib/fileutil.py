@@ -7,9 +7,10 @@ import os
 import platform
 from pathlib import Path, PurePath
 
-
-def findFile(element, dirPath=None):
+def findFileInPath(element, dirPath=None):
     """find file in the path"""
+
+    filesFound = []
 
     if dirPath is None:
         dirPath = os.getenv('PATH')
@@ -22,9 +23,10 @@ def findFile(element, dirPath=None):
     for dirname in dirs:
         candidate = Path(PurePath(dirname).joinpath(element))
         if candidate.is_file():
-            return candidate
+            filesFound.append(candidate)
 
-    return None
+    return filesFound
+
 
 def getFileList(strPath, wildcard=None, fullpath=False, recursive=False, strName=False):
     """
@@ -63,8 +65,11 @@ def getFileList(strPath, wildcard=None, fullpath=False, recursive=False, strName
 
     return lstObjFileNames
 
+
 def getExecutable(search):
-    """get executable"""
+    """
+    search for executable for macOS and
+    """
 
     fileToSearch = search
 
@@ -103,11 +108,12 @@ def getExecutable(search):
                 if executable.is_file():
                     return executable
 
-    search = findFile(fileToSearch)
+    searchFile = findFileInPath(fileToSearch)
 
-    if search is not None:
-        executable = Path(search)
-        if executable.is_file():
-            return executable
+    if searchFile:
+        for e in searchFile:
+            executable = Path(e)
+            if executable.is_file():
+                return executable
 
     return None

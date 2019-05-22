@@ -1,5 +1,5 @@
 """
-Simple symmetric encryption base on rc4
+Simple symmetric encryption based on rc4
 """
 
 import base64
