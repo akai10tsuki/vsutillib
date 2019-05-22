@@ -79,12 +79,14 @@ setup(
 
     entry_points={  # Optional
         'console_scripts': [
+            'apply2files=vsutillib:apply2files'
             'dsf2wv=vsutillib:dsf2wv',
+            'mkvrun=vsutillib:mkvrun',
         ],
     },
 
     project_urls={  # Optional
-        'Bug Reports': 'https://github.com/akai10tsuki/mkvbatchmultiplex/issues',
-        'Source': 'https://github.com/akai10tsuki/mkvbatchmultiplex/',
+        'Bug Reports': 'https://github.com/akai10tsuki/vsutillib/issues',
+        'Source': 'https://github.com/akai10tsuki/vsutillib/',
     },
 )
