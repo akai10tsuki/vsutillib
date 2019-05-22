@@ -1,10 +1,9 @@
 include AUTHORS
 include LICENSE.txt
-include READEME.rst
+include README.rst
 
 graft docs
 graft vsutillib
-graft tests
 
 prune docs/build
 
