@@ -1,4 +1,4 @@
 """VS module names"""
 
-from .classes import MKVCommand
-from .mkvUtils import getMKVMerge, getMKVMergeVersion
+from .classes import MKVCommand, VerifyStructure
+from .mkvutils import getMKVMerge, getMKVMergeVersion
