@@ -16,3 +16,5 @@ from .xml import xmlPretty
 
 # scripts
 from .scripts import dsf2wv, mkvrun, apply2files
+
+from .config import __version__
