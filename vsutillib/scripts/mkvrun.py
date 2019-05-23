@@ -9,7 +9,8 @@ import argparse
 
 
 from ..mkv import MKVCommand
-from ..classes import MediaFileInfo, RunCommand
+from ..media import MediaFileInfo
+from ..classes import RunCommand
 
 
 VERSION = "1.0"
@@ -51,7 +52,7 @@ def mkvVerifyStructure(lstBaseFiles, lstFiles, msgs):
     return True
 
 
-def runMKVCommandBatch():
+def mkvrun():
     """
     run mkvmerge-gui generated cli command and
     applied to all files in directory
@@ -125,8 +126,11 @@ def runMKVCommandBatch():
 
         print("Bummer...{}".format(mkv.error))
 
-def mkvrun():
-    """Run mkvmerge-gui generated command line"""
+def mkvrunOld():
+    """
+    run mkvmerge-gui generated cli command and
+    applied to all files in directory
+    """
 
     cmd = r"'C:/Program Files/MKVToolNix\mkvmerge.exe' --ui-language en --output 'C:\Projects\Python\Develop\test\tmp\Abenobashi Mahou Shoutengai - S01E01 (1).mkv' --language 0:jpn --track-name '0:Abenobashi Mahou Shoutengai 01 [Yousei]' --default-track 0:yes --language 1:jpn --track-name '1:Japanese 2.0 FLAC [Yousei]' --default-track 1:yes --language 2:eng --track-name '2:English 5.1 AC3 [gerdhanse]' --language 3:eng --track-name '3:English Subtitles (Sub) [gerdhanse]' --default-track 3:yes --language 4:eng --track-name '4:English ED/Titles (Sub) [gerdhanse]' '(' 'S:\Plex\Series\Anime\TV\Abenobashi Mahou Shoutengai (2002)\Abenobashi Mahou Shoutengai - S01E01.mkv' ')' --title 'Abenobashi Magical Shopping Arcade 01 [BDrip 1280x720 x264] [アベノ橋魔法☆商店街]' --track-order 0:0,0:1,0:2,0:3,0:4"
 
@@ -135,6 +139,11 @@ def mkvrun():
     parser.add_argument(
         'command',
         help='mkvmerge-gui command line'
+    )
+    parser.add_argument(
+        '--version',
+        action='version',
+        version='%(prog)s ' + VERSION
     )
     args = parser.parse_args()
 
