@@ -17,3 +17,5 @@ REQUIRED = [
     'lxml>=4.0'
 ]
 URL = 'https://github.com/akai10tsuki/vsutillib'
+
+__version__ = VERSION
