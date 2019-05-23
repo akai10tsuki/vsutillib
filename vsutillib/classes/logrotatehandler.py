@@ -22,6 +22,7 @@ class LogRotateHandler(logging.Handler):
 
     def __init__(self, logFile, backupCount=0):
         super(LogRotateHandler, self).__init__()
+
         self.logFile = logFile
         self.backupCount = backupCount
         self._rollover()
@@ -71,7 +72,6 @@ class LogRotateHandler(logging.Handler):
     def emit(self, record):
         """
         Write record entry to log file
-        use QMutexLocker to make it thread safe
         """
 
         # Python 3.5 open not compatible with pathlib
