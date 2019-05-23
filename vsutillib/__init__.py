@@ -1,11 +1,12 @@
 """VS module names"""
 
 from . import mkv
+from . import media
 
 from .cipher import encrypt, decrypt
 from .classes import (
-    ConfigurationSettings, LogRotateHandler, RunCommand, XmlDB,
-    MediaFileInfo
+    ConfigurationSettings, LogRotateHandler,
+    RunCommand, XmlDB
 )
 from .fileutil import findFileInPath, getFileList, getExecutable
 from .network import isConnected, urlSearch
