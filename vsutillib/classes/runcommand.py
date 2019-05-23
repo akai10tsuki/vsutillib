@@ -207,7 +207,7 @@ class RunCommand:
                             line = l.decode('utf-8')
 
                         self.__output.append(line)
-                        self.__regexmatch(line)
+                        self._regexMatch(line)
 
                         if self.__process is not None:
                             self.__process(
@@ -282,7 +282,7 @@ class RunCommand:
                         line = l.decode('utf-8')
 
                         self.__output.append(line)
-                        self.__regexmatch(line)
+                        self._regexMatch(line)
 
                         if self.__process is not None:
                             self.__process(
