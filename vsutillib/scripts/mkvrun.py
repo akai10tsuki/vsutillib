@@ -12,6 +12,9 @@ from ..mkv import MKVCommand
 from ..classes import MediaFileInfo, RunCommand
 
 
+VERSION = "1.0"
+
+
 def displayMKVRun(line):
     """used to display lines of the mkvmerge run"""
 
@@ -62,6 +65,12 @@ def runMKVCommandBatch():
         'command',
         help='mkvmerge-gui "command" line - used Linux/Unix shell enclose it in double quotes'
     )
+    parser.add_argument(
+        '--version',
+        action='version',
+        version='%(prog)s ' + VERSION
+    )
+
     args = parser.parse_args()
 
     if args.command:

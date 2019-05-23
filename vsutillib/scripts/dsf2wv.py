@@ -1,17 +1,23 @@
 """Compress DSF files into WavPack"""
 
+
 import argparse
 import sys
 import shlex
 from pathlib import Path
 
+
 from ..classes import RunCommand
 from ..fileutil import getFileList
+
+
+VERSION = "1.0"
+
 
 def parserArguments():
     """construct parser"""
 
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(description='compress dsf audio file to WavPack container')
 
     parser.add_argument(
         'directory',
@@ -57,8 +63,14 @@ def parserArguments():
         '--wildcard',
         help='wildcard to select files to process'
     )
+    parser.add_argument(
+        '--version',
+        action='version',
+        version='%(prog)s ' + VERSION
+    )
 
     return parser
+
 
 def printToConsoleAndFile(oFile, msg):
     """print to console and write to logfile"""
@@ -66,10 +78,11 @@ def printToConsoleAndFile(oFile, msg):
         oFile.write(msg.encode())
     print(msg)
 
+
 def dsf2wv():
     """Main"""
 
-    command = "c:/bin/wavpack.exe -y --allow-huge-tags --import-id3"
+    command = "wavpack -y --allow-huge-tags --import-id3"
     wildcard = '*.dsf'
 
     parser = parserArguments()
@@ -203,6 +216,7 @@ def dsf2wv():
             for f in noMatchFiles:
                 msg = 'Check file \'{}\'\n'.format(f)
                 logFile.write(msg.encode())
+
 
 if __name__ == "__main__":
     dsf2wv()
