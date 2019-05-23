@@ -1,4 +1,4 @@
-"""Compress DSF files into WavPack"""
+"""Compress DSF audio files into WavPack"""
 
 import argparse
 import sys

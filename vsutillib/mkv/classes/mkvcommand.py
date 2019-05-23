@@ -25,7 +25,7 @@ MODULELOG = logging.getLogger(__name__)
 MODULELOG.addHandler(logging.NullHandler())
 
 
-class MKVCommand(object):
+class MKVCommand():
     """
     Class to work with mkvmerge command
 
