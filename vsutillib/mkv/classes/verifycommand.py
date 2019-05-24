@@ -17,7 +17,6 @@ from pathlib import Path
 
 from ..mkvutils import numberOfTracksInCommand, stripEncaseQuotes
 
-
 class VerifyMKVCommand():
     """
     Sanity check on command any failure results in no action whatsoever
@@ -52,7 +51,7 @@ class VerifyMKVCommand():
 
     def __analyse(self):
 
-        strCommand = _strStripEscapeChars(self.__strCommand)  # Comvert line to bash style
+        strCommand = _convertToBashStyle(self.__strCommand)  # Comvert line to bash style
 
         self.__lstAnalysis = []
 
@@ -75,6 +74,7 @@ class VerifyMKVCommand():
 
         bOk = True
         trackOrder = None
+
         # To look Ok must match the 5 group in the command line that
         # are expected
         # 1: mkvmerge name with fullpath
@@ -102,7 +102,12 @@ class VerifyMKVCommand():
                     bOk = False
 
                 if not bOk:
-                    self.__lstAnalysis.append("err: Number of tracks {} and track order of {} don't match.".format(trackTotal, len(d)))
+                    self.__lstAnalysis.append(
+                        "err: Number of tracks {} and track order of {} don't match.".format(
+                            trackTotal,
+                            len(d)
+                        )
+                    )
 
             except SyntaxError:
                 self.__lstAnalysis.append("err: Command track order bad format.")
@@ -112,24 +117,33 @@ class VerifyMKVCommand():
             f = stripEncaseQuotes(matchExecutable.group(1))
             p = Path(f)
             if not p.is_file():
-                self.__lstAnalysis.append("err: mkvmerge not found - {}.".format(str(p)))
+                self.__lstAnalysis.append(
+                    "err: mkvmerge not found - {}.".format(str(p))
+                )
                 bOk = False
             else:
-                self.__lstAnalysis.append("chk: mkvmerge ok - {}".format(str(p)))
+                self.__lstAnalysis.append(
+                    "chk: mkvmerge ok - {}".format(str(p))
+                )
         else:
             self.__lstAnalysis.append("err: mkvmerge not found.")
             bOk = False
 
         if matchOutputFile:
+
             f = stripEncaseQuotes(matchOutputFile.group(1))
             f = f.replace(r"'\''", "'")
             p = Path(f)
 
             if not Path(p.parent).is_dir():
-                self.__lstAnalysis.append("err: Destination directory not found - {}.".format(str(p.parent)))
+                self.__lstAnalysis.append(
+                    "err: Destination directory not found - {}.".format(str(p.parent))
+                )
                 bOk = False
             else:
-                self.__lstAnalysis.append("chk: Destination directory ok = {}".format(str(p.parent)))
+                self.__lstAnalysis.append(
+                    "chk: Destination directory ok = {}".format(str(p.parent))
+                )
 
         else:
             self.__lstAnalysis.append("err: Destination directory not found.")
@@ -137,23 +151,32 @@ class VerifyMKVCommand():
 
         if matchSources:
             n = 1
+
             for match in matchSources:
+
                 f = stripEncaseQuotes(match.group(1))
                 f = f.replace(r"'\''", "'")
                 p = Path(f)
 
                 if not Path(p.parent).is_dir():
-                    self.__lstAnalysis.append("err: Source directory {} not found {}".format(n, str(p.parent)))
+                    self.__lstAnalysis.append(
+                        "err: Source directory {} not found {}".format(n, str(p.parent))
+                    )
                     bOk = False
                 else:
-                    self.__lstAnalysis.append("chk: Source directory {} ok = {}".format(n, str(p.parent)))
+                    self.__lstAnalysis.append(
+                        "chk: Source directory {} ok = {}".format(n, str(p.parent))
+                    )
 
                 if not Path(p).is_file():
-                    self.__lstAnalysis.append("err: Source file {} not found {}".format(n, str(p)))
+                    self.__lstAnalysis.append(
+                        "err: Source file {} not found {}".format(n, str(p))
+                    )
                     bOk = False
                 else:
-                    self.__lstAnalysis.append("chk: Source file {} ok = {}".format(n, str(p)))
-
+                    self.__lstAnalysis.append(
+                        "chk: Source file {} ok = {}".format(n, str(p))
+                    )
 
                 n += 1
 
@@ -172,21 +195,26 @@ class VerifyMKVCommand():
             f = f.replace(r"'\''", "'")
             p = Path(p)
             if not p.is_file():
-                self.__lstAnalysis.append("err: Attachment {} not found - {}".format(n, str(p)))
+                self.__lstAnalysis.append(
+                    "err: Attachment {} not found - {}".format(n, str(p))
+                )
                 bOk = False
             else:
-                self.__lstAnalysis.append("chk: Attachment {} ok = {}".format(n, str(p)))
+                self.__lstAnalysis.append(
+                    "chk: Attachment {} ok = {}".format(n, str(p))
+                )
             n += 1
 
         self.__errorFound = not bOk
 
     @property
     def analysis(self):
-
+        """analisis"""
         return self.__lstAnalysis
 
     @property
     def command(self):
+        """command"""
         return self.__strCommand
 
     @command.setter
@@ -196,7 +224,7 @@ class VerifyMKVCommand():
             self.__strCommand = value
             self.__analyse()
 
-def _strStripEscapeChars(strCommand):
+def _convertToBashStyle(strCommand):
     """
     Strip escape windows chars for the command line
     in the end they won't be used in a shell

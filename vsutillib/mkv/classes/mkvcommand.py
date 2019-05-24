@@ -10,12 +10,10 @@ path for executable and target options are parsed from the command line
 """
 
 
-import ast
 import re
 import shlex
 import logging
 
-import pprint
 
 from pathlib import Path
 
@@ -45,6 +43,7 @@ class MKVCommand():
         self.__strError = ""
         self.__bErrorFound = False
         self.__workFiles = _WorkFiles()
+        self.__commandTemplate = None
 
         # for iterator
         self.__index = 0
@@ -128,6 +127,8 @@ class MKVCommand():
 
             newCommandTemplate = newCommandTemplate.replace(strOutputFile, '<OUTPUTFILE>', 1)
 
+            self.__commandTemplate = newCommandTemplate
+
             lstTmp = []
             lstTmp1 = []
 
@@ -205,6 +206,7 @@ class MKVCommand():
         self.__strError = ""
         self.__index = 0
         self.__workFiles.clear()
+        self.__commandTemplate = None
 
     def __bool__(self):
         return not self.__bErrorFound
@@ -250,8 +252,28 @@ class MKVCommand():
             self._initHelper(value, bRemoveTitle=True)
 
     @property
+    def baseFiles(self):
+        """baseFiles"""
+        return self.__workFiles.baseFiles
+
+    @property
+    def sourceFiles(self):
+        """sourceFile"""
+        return self.__workFiles.sourceFiles
+
+    @property
+    def destinationFiles(self):
+        """destinationFile"""
+        return self.__workFiles.destinationFiles
+
+    @property
+    def template(self):
+        """template to construct the commands"""
+        return self.__commandTemplate
+
+    @property
     def error(self):
-        """return error description"""
+        """error description"""
         return self.__strError
 
 class _WorkFiles:
