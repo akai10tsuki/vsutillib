@@ -1,7 +1,7 @@
 .. include:: introduction.rst
 
 .. toctree::
-   :caption: mkvbatchmultiplex Documentation
+   :caption: vsutillib Documentation
    :maxdepth: 2
 
    installation
@@ -10,9 +10,11 @@
    LICENSE
    acknowledgements
    CHANGELOG
+   reference/modules
 
 Indices and tables
 ==================
 
 * :ref:`genindex`
+* :ref:`modindex`
 * :ref:`search`

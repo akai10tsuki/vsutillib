@@ -3,8 +3,12 @@
 Introduction
 ************
 
-This started of the necessity to multiplex a few hundreds episodes of series
-that where encoded using AVI container and SRT for subtitles.  In order to
-be maintained by a media server and present better information for audio and
-subtitle language.  And as the saying goes look for solutions did not find
-any that suits me so I programmed one.
+This library is published as support for MKVBatchMultiplex_ installation.  As I
+get ideas and work on more applications it became complicated to maintain the
+library private and release the applications without requiring to much effort.
+There are many functions and classes not bound to the application that will be
+documented over time.  Everything is as is there is no warranty that the
+library is fit for any particular use.
+
+
+.. _MKVBatchMultiplex: https://pypi.org/project/mkvbatchmultiplex/
