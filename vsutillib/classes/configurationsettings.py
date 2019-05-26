@@ -7,7 +7,7 @@ Args:
 
 Raises:
     ValueError: Raised when the xml file can not be created
-        when first run and the file still don't exist
+                when first run and the file still don't exist
 
 Examples:
 
@@ -30,21 +30,22 @@ keys have to be strings
 
 It works with basic data types:
 
-    basic data types
+    basic data types and lists, dictionaries,
+    tuples or sets of these data types
+
     - bool, byes, numbers: int, float, complex, strings, set
 
-    theese types can be saved but not in lists, dictionaries or
+    theese types can be saved but not in lists, dictionaries,
     tuples or sets
-    - range, bytearray, frozenset
 
-and dictionaries, lists and tuples of basic data types
+    - range, bytearray, frozenset
 
 binary data that can converted to base64 and save as bytes
 can work the conversion from byres to binary is not
 manage by the class
-
-CM0002
 """
+
+#CM0002
 
 import ast
 import logging
@@ -286,8 +287,14 @@ def test():
     configuration.set('bytearray', bytearray(b'Itsue'))
     configuration.set('frozenset', frozenset('Itsue'))
     configuration.set('bool', True)
-    configuration.set('base64sting', 'AdnQywACAAAAAAHmAAAAoAAACM4AAAR5AAAB7wAAAMYAAAjFAAAEcAAAAAAAAAAACgA=')
-    configuration.set('base86bytes', 'AdnQywACAAAAAAHmAAAAoAAACM4AAAR5AAAB7wAAAMYAAAjFAAAEcAAAAAAAAAAACgA='.encode())
+    configuration.set(
+        'base64sting',
+        'AdnQywACAAAAAAHmAAAAoAAACM4AAAR5AAAB7wAAAMYAAAjFAAAEcAAAAAAAAAAACgA='
+    )
+    configuration.set(
+        'base86bytes',
+        'AdnQywACAAAAAAHmAAAAoAAACM4AAAR5AAAB7wAAAMYAAAjFAAAEcAAAAAAAAAAACgA='.encode()
+    )
     configuration.set('dict', {'key1': 1, 'key2': 2, 3: b})
     configuration.set('list', [2, 3, 'list', {'key1': 1, 2: [2]}])
     configuration.set('int', 13)

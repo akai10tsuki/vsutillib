@@ -7,5 +7,6 @@ from .classess import (
     ProcessWorker,
     QueueProcessWorker,
     QueueThreadWorker,
-    ThreadWorker,
+    RunCommand,
+    ThreadWorker
 )

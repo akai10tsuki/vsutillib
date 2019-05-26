@@ -6,3 +6,4 @@ Import names for mprocess
 
 from .multithreading import GenericThreadWorker, QueueThreadWorker, ThreadWorker
 from .multiprocessing import ProcessWorker, QueueProcessWorker
+from .runcommand import RunCommand

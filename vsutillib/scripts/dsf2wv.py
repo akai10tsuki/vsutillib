@@ -7,8 +7,8 @@ import shlex
 from pathlib import Path
 
 
-from ..classes import RunCommand
-from ..fileutil import getFileList
+from ..process import RunCommand
+from ..file import getFileList
 
 
 VERSION = "1.0"

@@ -15,8 +15,9 @@ import shlex
 
 from pathlib import Path
 
-from ..fileutil import findFileInPath
-from ..classes import RunCommand
+
+from ..file import findFileInPath
+from ..process import RunCommand
 
 
 MODULELOG = logging.getLogger(__name__)
