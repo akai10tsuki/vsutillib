@@ -5,6 +5,7 @@ __VERSION = (1, 0, '0', 'dev1')
 VERSION = ".".join(map(str, __VERSION))
 AUTHOR = "Efrain Vergara"
 EMAIL = "akai10tsuki@gmail.com"
+COPYRIGHT = "2018-2019, Efrain Vergara"
 IMAGEFILESPATH = ""
 LOCALFILESPATH = ".vsutillib"
 LOGFILE = LOCALFILESPATH + "/vsutillib.log"

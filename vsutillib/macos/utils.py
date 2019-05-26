@@ -5,7 +5,7 @@ import platform
 import sys
 
 
-from .classes import RunCommand
+from ..process import RunCommand
 
 
 def isMacDarkMode():

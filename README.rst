@@ -22,35 +22,43 @@ A range of functions and classes with a variety of uses for
 example:
 
  - functions
-   * getFileList - return the files on a directory in
+
+   * **getFileList** - return the files on a directory in
      **list** of pathlib.Path objects
-   * findFile - find a file in the system Path
-     return a pahtlib.Path object if found
-   * getExecutable - find executable file
+   * **findFile** - find a file in the system Path
+     return a pathlib.Path object if found
+   * **getExecutable** - find executable file
      in PATH and the normal installation paths for Windows
      and macOS for linux is like findFile
+
  - classes
-   * RunCommand - execute command in subprocess and capture
+
+   * **RunCommand** - execute command in subprocess and capture
      output optionally apply regular expression searches
      and apply a supplied function to receive every line
      read and process them as needed
-   * ConfigurationSettings - maintain a set of ConfigurationSettings
+   * **ConfigurationSettings** - maintain a set of ConfigurationSettings
      in a **dictionary** and saved it in xml file
+
  - utilities
-   * dsf2wv - compresses DSF audio files to WavPack compressed
+
+   * **dsf2wv** - compresses DSF audio files to WavPack compressed
      files
-   * mkvbatchrun - CLI utility to execute MKVToolNix_ generated
+   * **mkvrun** - CLI utility to execute MKVToolNix_ generated
      command line.  MKVBatchMultiplex_ is a GUI implementation
      of this and the main reason this module goes public.
+   * **apply2files** - apply a command to all files in the directory
+     specified in recursive by default
 
 and so on...
 
 Installation
 ============
 
-.. code:: bash
+::
 
-    pip install vsutillib
+  pip install vsutillib
+  or download the source
 
 Main development platform is Windows but the majority of functions
 work on Linux and macOS.  Some are OS specific like isDarkMode that
@@ -64,53 +72,35 @@ Dependencies
       XmlDB simple xml database
     * pymediainfo_ 4.0 or greater
       MediaFileInfo depends on it
-    * Python_ 3.5 or greater
-    * MediaInfo_ tested with versions 17.10->18.12
-      this only for Linux a dependecy of pymediainfo
-    * WavPackMKVToolNix_ tested with versions 17.00->34.0.0
-      mkvbatchrun depends on it
+    * Python_ 3.5->3.7
+    * MediaInfo_ tested with versions 17.10->18.12.
+      This is only for Linux a dependency of pymediainfo.
+    * MKVToolNix_ tested with versions 17.00->34.0.0
+      mkvrun depends on it.
     * WavPack_ file compressor 5.1.0 or greater
-      dsf2wv depends on it
+      dsf2wv depends on it.
 
-For now is a python package it can be installed:
+lxml and pymediainfo are installed automatically they are the only
+python libraries used.  The other programs follow website instructions.
+Besides lxml all dependencies are for very specific uses if you don't
+have them on your system not much functionality is lost.
 
-::
-
-    pip install vsutillib
-    or download the source
-
-
-macOS 10.14 Dark theme MKVToolNix has to be version 30.0.0+
+On macOS 10.14 Dark Mode MKVToolNix has to be version 30.0.0+
 
 Usage
 =====
 
-Mainly for programmers there are some utility modules like DSF to WavPack.
-So python knowledge is needed:
+Import the the library in your program:
+::
 
-file make any operations needed copy command to clipboard:
-
-    *Multiplexer->Show command line*
-
-Paste command on mkvbatchmultiplex push Process button and wait.
-Remember to select and output directory.
+  from vsutillib import mkv
+  from vsutillib import media
+  from vsutillib import mprocess
 
 Roadmap
 =======
 
-This is just the base for the project.  The roadmap is:
-
-    * Work on a stable release.
-    * Easier installation for different operating systems
-    * Documentation
-    * Work on job queue management
-
-The application works for me as is. If the the program generates any interest
-any further changes and additions will depend on user base needs.
-
-Work on binaries started.
-
-See https://mkvbatchmultiplex.readthedocs.io for more information.
+Document all classes and functions.
 
 .. Hyperlinks.
 
@@ -123,3 +113,9 @@ See https://mkvbatchmultiplex.readthedocs.io for more information.
 .. _SRT: https://matroska.org/technical/specs/subtitles/srt.html
 .. _MKVBatchMultiplex: https://github.com/akai10tsuki/mkvbatchmultiplex
 .. _WavPack: http://www.wavpack.com/
+.. _`The TV Database`: https://www.thetvdb.com/
+.. _`The Movie Database`: https://www.themoviedb.org/
+.. _`ubuntu 18.04 LTS`: https://www.ubuntu.com/
+.. _`macOS 10.14 Mojave`: https://www.apple.com/macos/mojave/
+.. _`Windows 10`: https://www.microsoft.com/en-us/windows
+.. _lxml: https://lxml.de/

@@ -10,7 +10,7 @@ import argparse
 
 from ..mkv import MKVCommand
 from ..media import MediaFileInfo
-from ..classes import RunCommand
+from ..process import RunCommand
 
 
 VERSION = "1.0"

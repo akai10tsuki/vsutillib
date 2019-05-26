@@ -38,7 +38,7 @@ def isConnected(hostname=None):
     return False
 
 
-def urlSearch(url, data=None, headers=None):
+def urlSearchJson(url, data=None, headers=None):
     """
     url search for json data retrieval
     it returns a dictionary

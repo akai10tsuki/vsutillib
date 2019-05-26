@@ -1,12 +1,15 @@
-#!/usr/bin/env python3
-
 """
 Decorators found on internet
 """
 
+
+import functools
+
+
 def callCounter(func):
     """function call counter"""
 
+    @functools.wraps(func)
     def helper(*args, **kwargs):
         helper.calls += 1
         return func(*args, **kwargs)

@@ -3,46 +3,40 @@
 Installation
 ************
 
-I'm working on the backbone to maintain the project on GitHub
-once is up work on easy installations for the supported
-operating system will be made.  If you are a python user
-I don't see any problems you using the application right away.
-
-Python package
-==============
-
-Python users can install the program using pip python dependencies
-will automatically install if not installed.
+For installation on the command line of your operating system:
 
 .. code:: bash
 
     pip install mkvbatchmultiplex
 
+The library works on CPython 3.5->3.7
+
 Dependencies
 ============
 
-The program uses:
+Some of the functions and/or classes use the following packages:
 
-    Python packages are installed is pip is used:
+    Python packages are installed if pip is used:
 
-        pymediainfo - Python MediaInfo wrapper, you can find it at
-        https://pypi.org/project/pymediainfo/
+        lxml_ - library for processing XML and HTML with Python
 
-        PySide2 - GUI interface library used,
-        https://wiki.qt.io/Qt_for_Python
+        pymediainfo_ - Python MediaInfo wrapper
 
-    MKVToolNix - The target tool from witch we get the command,
-    https://mkvtoolnix.download/
+    MKVToolNix_ - The target tool from witch we get the command
 
-    MediaInfo library, witch you can find at
-    https://mediaarea.net/en/MediaInfo.
-    The library has to be available in the PATH environment variable.
+    MediaInfo_ - unified display of the most relevant technical and
+    tag data for video and audio files.
+
+Besides lxml these are really dependencies of MKVBatchMultiplex application
+not necessary for majority of functions and classes.  Installation of MediaInfo
+is only needed on Linux.  And this is only needed for everything to work.
+lxml is use by XmlDB class witch can be useful.
 
 Known Issues
 ============
 
-* On macOS 10.14 Mojave:
-    - dark theme MKVToolNix prior to 30.0.0
-      don't work.
-    - binary install always uses light theme
-      this is not the case for the python install
+.. _lxml: https://lxml.de/
+.. _MediaInfo: https://mediaarea.net/en/MediaInfo/
+.. _MKVBatchMultiplex: https://pypi.org/project/mkvbatchmultiplex/
+.. _MKVToolNix: https://mkvtoolnix.download/
+.. _pymediainfo: https://pypi.org/project/pymediainfo/
