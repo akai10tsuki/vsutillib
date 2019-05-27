@@ -1,5 +1,6 @@
 """VS module names"""
 
+from . import files
 from . import log
 from . import macos
 from . import media
@@ -9,13 +10,7 @@ from . import process
 from . import xml
 
 from .cipher import encrypt, decrypt
-
-#from .classes import (
-#    ConfigurationSettings, LogRotateHandler,
-#    XmlDB
-#)
-
-from .decorators import staticVars
+from .decorators import staticVars, callCounter
 
 # scripts
 from .scripts import dsf2wv, mkvrun, apply2files

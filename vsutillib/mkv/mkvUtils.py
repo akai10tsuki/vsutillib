@@ -2,7 +2,6 @@
 mkvUtils:
 
 related to mkv application functionality
-
 """
 
 import ast
@@ -16,7 +15,7 @@ import shlex
 from pathlib import Path
 
 
-from ..file import findFileInPath
+from ..files import findFileInPath
 from ..process import RunCommand
 
 
@@ -86,6 +85,7 @@ def getMKVMergeVersion(mkvmerge):
         return runCmd.regexmatch
 
     return None
+
 
 def commandLooksOk(strCmd, lstResults=None):
     """
@@ -258,6 +258,7 @@ def commandLooksOk(strCmd, lstResults=None):
 
     return bOk
 
+
 def numberOfTracksInCommand(strCmd):
     """
     Every track have a --language option count
@@ -273,6 +274,7 @@ def numberOfTracksInCommand(strCmd):
 
     return len(matchLanguage)
 
+
 def stripEncaseQuotes(strFile):
     """
     Strip single quote at start and end of file name
@@ -285,6 +287,7 @@ def stripEncaseQuotes(strFile):
         s = s[1:-1]
 
     return s
+
 
 def _strStripEscapeChars(strCommand):
     """

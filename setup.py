@@ -9,10 +9,12 @@ import os
 
 from setuptools import setup, find_packages
 
+
 from vsutillib import config
 
 
 ROOT = os.path.abspath(os.path.dirname(__file__))
+
 
 def readme():
     """get README.rst"""

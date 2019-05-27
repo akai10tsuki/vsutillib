@@ -8,7 +8,7 @@ from pathlib import Path
 
 
 from ..process import RunCommand
-from ..file import getFileList
+from ..files import getFileList
 
 
 VERSION = '1.0'
