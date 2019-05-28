@@ -19,6 +19,7 @@ from pathlib import Path
 
 from ..mkvutils import commandLooksOk, stripEncaseQuotes
 
+
 MODULELOG = logging.getLogger(__name__)
 MODULELOG.addHandler(logging.NullHandler())
 
@@ -33,7 +34,20 @@ class MKVCommand():
     :type bRemoveTitle: bool
     """
 
-    log = False
+    __log = False
+
+    @classmethod
+    def classLog(cls, setLogging=None):
+        """
+        get/set logging at class level
+        every class instance will log
+        unless overwritten
+        """
+
+        if setLogging is None:
+            return cls.__log
+        elif isinstance(setLogging, bool):
+            cls.__log = setLogging
 
     def __init__(self, strCommand=None, bRemoveTitle=True):
 
@@ -44,6 +58,10 @@ class MKVCommand():
         self.__bErrorFound = False
         self.__workFiles = _WorkFiles()
         self.__commandTemplate = None
+
+        self.__log = None
+
+        print("Log = {}".format(self.log))
 
         # for iterator
         self.__index = 0
@@ -104,6 +122,7 @@ class MKVCommand():
                 f = Path(stripEncaseQuotes(fileName))
                 d = f.parent
                 fd = [x for x in d.glob('*' + f.suffix) if x.is_file()]
+                fd.sort(key=_strPath)
 
                 if lenOfListOfFiles == 0:
                     lenOfListOfFiles = len(fd)
@@ -147,6 +166,8 @@ class MKVCommand():
                     lstTmp1.append(filesInDir)
                 lstTmp.append(list(z))
 
+            if self.log:
+                MODULELOG.debug("MKV0006: Files by Key %s", str(lstTmp))
             #
             # list of the form:
             # [(('<SOURCE0>', file1), ('<OUTFILE>', file1), ('<SOURCE1>', file1), ...),
@@ -188,6 +209,15 @@ class MKVCommand():
             self.__workFiles.sourceFiles = lstSourceFiles
             self.__workFiles.destinationFiles = filesInDirsByKey['<OUTPUTFILE>']
 
+            if self.log:
+                MODULELOG.debug("MKV0001: Command template %s", str(self.__commandTemplate))
+                MODULELOG.debug("MKV0002: Base files %s", str(self.__workFiles.baseFiles))
+                MODULELOG.debug("MKV0003: Source files %s", str(self.__workFiles.sourceFiles))
+                MODULELOG.debug(
+                    "MKV0004: Destination files %s",
+                    str(self.__workFiles.destinationFiles)
+                )
+
         else:
             # error cannot process command
             self.__reset()
@@ -195,7 +225,7 @@ class MKVCommand():
             self.__bErrorFound = True
 
             if self.log:
-                MODULELOG.error("MC001: ".join(self.__strError))
+                MODULELOG.error("MKV0005: %s", self.__strError)
 
     def __reset(self):
         """Reset variable properties"""
@@ -236,6 +266,24 @@ class MKVCommand():
                     self.__workFiles.baseFiles,
                     self.__workFiles.sourceFiles[self.__index - 1],
                     self.__workFiles.destinationFiles[self.__index - 1]]
+
+    @property
+    def log(self):
+        """
+        return log enable/disable
+        instance variable self.__log
+        overrides global variable
+        """
+        if self.__log is not None:
+            return self.__log
+
+        return MKVCommand.classLog()
+
+    @log.setter
+    def log(self, value):
+        """set instance log variable"""
+        if isinstance(value, bool) or value is None:
+            self.__log = value
 
     @property
     def command(self):
@@ -318,3 +366,7 @@ def _resolveOverwrite(fileName, strPrefix='new-'):
                 break
     # video-S01E01.mkv
     return fileNameTmp
+
+def _strPath(value):
+    print(str(value))
+    return str(value)

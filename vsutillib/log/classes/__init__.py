@@ -2,4 +2,4 @@
 logging related classes
 """
 
-from .logrotatehandler import LogRotateHandler
+from .logrotatehandler import LogRotateFileHandler

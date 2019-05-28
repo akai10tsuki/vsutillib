@@ -9,13 +9,18 @@ with every line read
 if regexsearch regular expresion is provided the first
 match will be set on regexmatch property
 """
+# RNC0001
 
-
+import logging
 import re
 import shlex
 import subprocess
 
 import traceback
+
+
+MODULELOG = logging.getLogger(__name__)
+MODULELOG.addHandler(logging.NullHandler())
 
 
 class RunCommand:
@@ -30,6 +35,21 @@ class RunCommand:
     :param regexsearch: regular expresion to search for match
     :type regexsearch: str
     """
+
+    __log = False
+
+    @classmethod
+    def classLog(cls, setLogging=None):
+        """
+        get/set logging at class level
+        every class instance will log
+        unless overwritten
+        """
+
+        if setLogging is None:
+            return cls.__log
+        elif isinstance(setLogging, bool):
+            cls.__log = setLogging
 
     def __init__(
             self,
@@ -82,6 +102,24 @@ class RunCommand:
         if self.__command:
             return True
         return False
+
+    @property
+    def log(self):
+        """
+        return log enable/disable
+        instance variable self.__log
+        overrides global variable
+        """
+        if self.__log is not None:
+            return self.__log
+
+        return RunCommand.classLog()
+
+    @log.setter
+    def log(self, value):
+        """set instance log variable"""
+        if isinstance(value, bool) or value is None:
+            self.__log = value
 
     @property
     def command(self):
@@ -231,6 +269,9 @@ class RunCommand:
                             **self.__processKWArgs
                         )
 
+                    if self.log:
+                        MODULELOG.debug("RNC0001: Unicode decode error %s", msg)
+
                 except KeyboardInterrupt as error:
 
                     trb = traceback.format_exc()
@@ -245,6 +286,9 @@ class RunCommand:
                             *self.__processArgs,
                             **self.__processKWArgs
                         )
+
+                    if self.log:
+                        MODULELOG.debug("RNC0002: Keyboard interrupt %s", msg)
 
                     raise SystemExit(0)
 

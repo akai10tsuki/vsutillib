@@ -16,7 +16,20 @@ MODULELOG.addHandler(logging.NullHandler())
 class VerifyStructure():
     """class to verify structure of media files against base files"""
 
-    log = False
+    __log = False
+
+    @classmethod
+    def classLog(cls, setLogging=None):
+        """
+        get/set logging at class level
+        every class instance will log
+        unless overwritten
+        """
+
+        if setLogging is None:
+            return cls.__log
+        elif isinstance(setLogging, bool):
+            cls.__log = setLogging
 
     def __init__(self, lstBaseFiles=None, lstFiles=None):
 
@@ -36,6 +49,25 @@ class VerifyStructure():
         for m in self.__messages:
             msgs += m
         return msgs
+
+    @property
+    def log(self):
+        """
+        return log enable/disable
+        instance variable self.__log
+        overrides global variable
+        """
+        if self.__log is not None:
+            return self.__log
+
+        return VerifyStructure.classLog()
+
+    @log.setter
+    def log(self, value):
+        """set instance log variable"""
+        if isinstance(value, bool) or value is None:
+            self.__log = value
+
 
     @property
     def isOk(self):

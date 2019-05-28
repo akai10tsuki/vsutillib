@@ -29,6 +29,21 @@ class VerifyMKVCommand():
     :rtype: bool
     """
 
+    __log = False
+
+    @classmethod
+    def classLog(cls, setLogging=None):
+        """
+        get/set logging at class level
+        every class instance will log
+        unless overwritten
+        """
+
+        if setLogging is None:
+            return cls.__log
+        elif isinstance(setLogging, bool):
+            cls.__log = setLogging
+
     def __init__(self, strCommand=None):
 
         self.__lstAnalysis = None
@@ -206,6 +221,24 @@ class VerifyMKVCommand():
             n += 1
 
         self.__errorFound = not bOk
+
+    @property
+    def log(self):
+        """
+        return log enable/disable
+        instance variable self.__log
+        overrides global variable
+        """
+        if self.__log is not None:
+            return self.__log
+
+        return VerifyMKVCommand.classLog()
+
+    @log.setter
+    def log(self, value):
+        """set instance log variable"""
+        if isinstance(value, bool) or value is None:
+            self.__log = value
 
     @property
     def analysis(self):

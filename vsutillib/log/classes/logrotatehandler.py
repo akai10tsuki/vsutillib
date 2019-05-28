@@ -1,18 +1,48 @@
 """
 rotating logging handler
+it rotates at initialization
+this means by number of executions
 """
 
 
 import codecs
-import logging
+import logging.handlers
 import re
 import sys
 from pathlib import Path
 
-class LogRotateHandler(logging.Handler):
+
+class LogRotateFileHandler(logging.handlers.RotatingFileHandler):
+
+    """
+    logging handler that rotate files at the start
+
+    :param logFile: file where to save logs
+    :type logFile: str
+    :param backupCount: number of files to save
+    :type backupCount: int
+    """
+
+    def __init__(self, fileName, backupCount=0, encoding=None, **kwargs):
+
+        # Python 3.5 open not compatible with pathlib
+        if sys.version_info[:2] == (3, 5):
+            f = str(fileName)
+        else:
+            f = fileName
+
+        super(LogRotateFileHandler, self).__init__(
+            f,
+            backupCount=backupCount,
+            encoding=encoding,
+            **kwargs
+        )
+
+        self.doRollover()
+
+class LogRotateFileHandlerOriginal(logging.Handler):
     """
     Custom logging handler that rotate files at the start
-    and to make it thread safe
 
     :param logFile: file where to save logs
     :type logFile: str
@@ -21,7 +51,7 @@ class LogRotateHandler(logging.Handler):
     """
 
     def __init__(self, logFile, backupCount=0):
-        super(LogRotateHandler, self).__init__()
+        super(LogRotateFileHandlerOriginal, self).__init__()
 
         self.logFile = logFile
         self.backupCount = backupCount
