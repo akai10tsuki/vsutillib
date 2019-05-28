@@ -55,9 +55,9 @@ Examples:
     binary data that can converted to base64 and save as bytes
     can work the conversion from byres to binary is not
     manage by the class
-
-XML0001
 """
+
+# XML0001
 
 
 # pylint: disable=protected-access
