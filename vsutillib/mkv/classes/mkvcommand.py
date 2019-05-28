@@ -51,7 +51,7 @@ class MKVCommand():
 
     def __init__(self, strCommand=None, bRemoveTitle=True):
 
-        self.__destinationDirectory = None
+        #self.__destinationDirectory = None
         self.__lstCommands = []
         self.__strShellcommand = None
         self.__strError = ""
@@ -94,8 +94,8 @@ class MKVCommand():
 
             outputFile = Path(stripEncaseQuotes(strOutputFile))
 
-            if outputFile.parent.is_dir():
-                self.__destinationDirectory = outputFile.parent
+            #if outputFile.parent.is_dir():
+            #    self.__destinationDirectory = outputFile.parent
 
             #
             # search for the source files
@@ -230,7 +230,7 @@ class MKVCommand():
     def __reset(self):
         """Reset variable properties"""
 
-        self.__destinationDirectory = None
+        #self.__destinationDirectory = None
         self.__lstCommands = []
         self.__strShellcommand = None
         self.__strError = ""
