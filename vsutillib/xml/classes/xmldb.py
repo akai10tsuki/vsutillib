@@ -33,8 +33,9 @@ Examples:
     In the example the record id is the same but group+id is unique
     and the get uses the group
 
+::
 
-xml format:
+ xml format:
 
     <?xml version="1.0" ?>
     <Data>

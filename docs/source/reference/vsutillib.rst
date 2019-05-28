@@ -7,10 +7,15 @@ Subpackages
 .. toctree::
 
     vsutillib.classes
+    vsutillib.files
+    vsutillib.log
+    vsutillib.macos
     vsutillib.media
     vsutillib.mkv
-    vsutillib.mprocess
+    vsutillib.network
+    vsutillib.process
     vsutillib.scripts
+    vsutillib.xml
 
 Submodules
 ----------
@@ -35,38 +40,6 @@ vsutillib.decorators module
 ---------------------------
 
 .. automodule:: vsutillib.decorators
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-vsutillib.fileutil module
--------------------------
-
-.. automodule:: vsutillib.fileutil
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-vsutillib.network module
-------------------------
-
-.. automodule:: vsutillib.network
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-vsutillib.utils module
-----------------------
-
-.. automodule:: vsutillib.utils
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-vsutillib.xml module
---------------------
-
-.. automodule:: vsutillib.xml
     :members:
     :undoc-members:
     :show-inheritance:

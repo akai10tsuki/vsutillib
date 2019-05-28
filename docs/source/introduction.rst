@@ -1,7 +1,7 @@
 
-************
+============
 Introduction
-************
+============
 
 This library is published as support for MKVBatchMultiplex_ installation.  As I
 get ideas and work on more applications it became complicated to maintain the

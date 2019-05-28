@@ -1,7 +1,6 @@
 .. include:: introduction.rst
 
 .. toctree::
-   :caption: vsutillib Documentation
    :maxdepth: 2
 
    installation

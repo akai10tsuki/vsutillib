@@ -1,17 +1,17 @@
-vsutillib.mprocess package
-==========================
+vsutillib.process package
+=========================
 
 Subpackages
 -----------
 
 .. toctree::
 
-    vsutillib.mprocess.classess
+    vsutillib.process.classess
 
 Module contents
 ---------------
 
-.. automodule:: vsutillib.mprocess
+.. automodule:: vsutillib.process
     :members:
     :undoc-members:
     :show-inheritance:
