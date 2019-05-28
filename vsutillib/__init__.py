@@ -8,9 +8,7 @@ from . import mkv
 from . import network
 from . import process
 from . import xml
-
-from .cipher import encrypt, decrypt
-from .decorators import staticVars, callCounter
+from . import misc
 
 # scripts
 from .scripts import dsf2wv, mkvrun, apply2files

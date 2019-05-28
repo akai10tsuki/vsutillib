@@ -4,7 +4,7 @@ Simple symmetric encryption based on rc4
 
 import base64
 
-def rc4Crypt(data, key):
+def _rc4Crypt(data, key):
     """rc4 encryption"""
 
     S = list(range(256))
@@ -32,7 +32,7 @@ def rc4Crypt(data, key):
 def encrypt(data, key, encode=base64.b64encode):
     """encrypt"""
 
-    data = rc4Crypt(data, key)
+    data = _rc4Crypt(data, key)
 
     if encode:
         data = encode(data.encode())
@@ -48,4 +48,4 @@ def decrypt(data, key, decode=base64.b64decode):
     if decode:
         data = decode(data).decode()
 
-    return rc4Crypt(data, key)
+    return _rc4Crypt(data, key)
