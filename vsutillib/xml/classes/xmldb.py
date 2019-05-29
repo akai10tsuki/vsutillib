@@ -1,5 +1,6 @@
 """
-Read/Write data on xml file
+Read/Write data on xml file for very simple database
+
 
 Args:
     xmlFile (str | pathlib.Path): xml file name or Path object
@@ -90,6 +91,11 @@ class XmlDB:
     def __bool__(self):
 
         return self._xmlFile is not None
+
+    @property
+    def root(self):
+        """root of xml db"""
+        return self._root
 
     @property
     def status(self):
@@ -207,7 +213,13 @@ class XmlDB:
 
         r = self._root
         attr = attrib
-        attr[Key.recordID] = recordID
+
+        if not isinstance(recordID, str):
+            strID = str(recordID)
+        else:
+            strID = recordID
+
+        attr[Key.recordID] = strID
         attr[Key.recordType] = type(data).__name__
 
         ge = r.find('.//' + group) # group to actualize
@@ -215,7 +227,7 @@ class XmlDB:
         if isinstance(ge, ET._Element):
 
             # search record
-            find = ET.XPath('.//' + group + '/' + 'Record[@id="' + recordID + '"]')
+            find = ET.XPath('.//' + group + '/' + 'Record[@recordID="' + str(recordID) + '"]')
             try:
                 e = find(r)[0]
             except IndexError:
@@ -240,12 +252,18 @@ class XmlDB:
     def get(self, group, recordID):
         """get record"""
 
+        if not isinstance(recordID, str):
+            strID = str(recordID)
+        else:
+            strID = recordID
+
         value = None
 
         r = self._root
 
         # search record
-        find = ET.XPath('.//' + group + '/' + 'Record[@id="' + recordID + '"]')
+        find = ET.XPath('.//' + group + '/' + 'Record[@recordID="' + strID + '"]')
+
         try:
             e = find(r)[0]
         except IndexError:
@@ -263,18 +281,36 @@ class XmlDB:
         else:
             self._status = "Record not found: group - {} record id - {}".format(
                 group,
-                recordID
+                strID
             )
 
         return value
 
+    def getGroupRoot(self, group):
+        """returns the root of a group"""
+
+        r = self._root
+        find = ET.XPath('.//' + group)
+
+        try:
+            e = find(r)[0]
+        except IndexError:
+            e = None
+
+        return e
+
     def remove(self, group, recordID):
         """add record to xml group"""
+
+        if not isinstance(recordID, str):
+            strID = str(recordID)
+        else:
+            strID = recordID
 
         r = self._root
 
         # search record
-        find = ET.XPath('.//' + group + '/' + 'Record[@id="' + recordID + '"]')
+        find = ET.XPath('.//' + group + '/' + 'Record[@id="' + strID + '"]')
         try:
             e = find(r)[0]
         except IndexError:
@@ -292,7 +328,7 @@ class XmlDB:
         else:
             self._status = "Record to remove not found: group - {} record id - {}".format(
                 group,
-                recordID
+                strID
             )
         return False
 
@@ -335,6 +371,8 @@ class Key:
     recordID = "recordID"
     recordType = "recordType"
     InitializationValues = "InitializationValues"
+    Movie = "Movie"
+    TV = "TV"
 
 def _attribToString(attrib):
     """
