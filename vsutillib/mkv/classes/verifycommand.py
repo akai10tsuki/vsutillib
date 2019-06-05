@@ -84,6 +84,9 @@ class VerifyMKVCommand():
         reSourcesEx = re.compile(r"'\('\s(.*?)\s'\)'")
         matchSources = reSourcesEx.finditer(strCommand)
 
+        reChaptersFileEx = re.compile(r".*?\-\-chapters\s(.*?)\s\-\-")
+        matchChaptersFile = reChaptersFileEx.match(strCommand)
+
         reAttachmentsEx = re.compile(r"\-\-attach-file.(.*?)\s\-\-")
         matchAttachments = reAttachmentsEx.finditer(strCommand)
 
@@ -202,6 +205,20 @@ class VerifyMKVCommand():
         else:
             self.__lstAnalysis.append("err: Source directory not found.")
             bOk = False
+
+        # Check for optional chapters file
+        if matchChaptersFile:
+            f = stripEncaseQuotes(matchChaptersFile.group(1))
+            p = Path(f)
+            if not p.is_file():
+                self.__lstAnalysis.append(
+                    "err: Chapters file not found - {}.".format(str(p))
+                )
+                bOk = False
+            else:
+                self.__lstAnalysis.append(
+                    "chk: Chapters file ok - {}".format(str(p))
+                )
 
         # This check if for optional attachments files
         n = 1
