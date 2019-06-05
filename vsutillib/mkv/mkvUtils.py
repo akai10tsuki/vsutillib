@@ -102,7 +102,7 @@ def commandLooksOk(strCmd, lstResults=None):
     if not strCmd:
         return False
 
-    strCommand = _strStripEscapeChars(strCmd)  # Comvert line to bash style
+    strCommand = strStripEscapeChars(strCmd)  # Comvert line to bash style
 
     lstAnalysis = []
 
@@ -118,6 +118,9 @@ def commandLooksOk(strCmd, lstResults=None):
 
     reOutputFileEx = re.compile(r".*?\-\-output\s(.*?)\s\-\-")
     matchOutputFile = reOutputFileEx.match(strCommand)
+
+    reChaptersFileEx = re.compile(r".*?\-\-chapters\s(.*?)\s\-\-")
+    matchChaptersFile = reChaptersFileEx.match(strCommand)
 
     reSourcesEx = re.compile(r"'\('\s(.*?)\s'\)'")
     matchSources = reSourcesEx.finditer(strCommand)
@@ -237,6 +240,19 @@ def commandLooksOk(strCmd, lstResults=None):
         lstAnalysis.append("Source directory not found.")
         bOk = False
 
+    # Check for optional chapters file
+    if matchChaptersFile:
+        f = stripEncaseQuotes(matchChaptersFile.group(1))
+        p = Path(f)
+        print(p)
+        if not p.is_file():
+            if lstResults is None:
+                return False
+            lstAnalysis.append("Chapters file not found - {}.".format(str(p)))
+            bOk = False
+        else:
+            lstAnalysis.append("Chapters file ok - {}".format(str(p)))
+
     # This check if for optional attachments files
     n = 1
     for match in matchAttachments:
@@ -289,7 +305,7 @@ def stripEncaseQuotes(strFile):
     return s
 
 
-def _strStripEscapeChars(strCommand):
+def strStripEscapeChars(strCommand):
     """
     Strip escape windows chars for the command line
     in the end they won't be used in a shell
