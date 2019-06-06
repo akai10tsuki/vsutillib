@@ -1,29 +1,27 @@
 vsutillib.files package
 =======================
 
-Subpackages
------------
+The ``ConfigurationSettings`` class
+-----------------------------------
 
-.. toctree::
+.. automodule:: vsutillib.files.classes.configurationsettings
 
-    vsutillib.files.classes
+.. autoclass:: vsutillib.files.ConfigurationSettings
+    :members:
 
-Submodules
-----------
+functions
+~~~~~~~~~
 
-vsutillib.files.fileutil module
+The ``findFileInPath`` function
 -------------------------------
 
-.. automodule:: vsutillib.files.fileutil
-    :members:
-    :undoc-members:
-    :show-inheritance:
+.. autofunction:: vsutillib.files.findFileInPath
 
+The ``getExecutable`` function
+------------------------------
 
-Module contents
----------------
+.. autofunction:: vsutillib.files.getExecutable
 
-.. automodule:: vsutillib.files
-    :members:
-    :undoc-members:
-    :show-inheritance:
+The ``getFileList`` function
+----------------------------
+.. autofunction:: vsutillib.files.getFileList

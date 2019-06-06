@@ -10,6 +10,15 @@ class UrlRequest():
     status and message properties
     POST if data is not None
     GET is data is None
+
+    Args:
+        url (:obj:`str`, optional): URL for request
+        data (:obj:`dict`, optional): dictionary with data for GET
+        headers (:obj:`dict`, optional): dictionary with any needed headers
+
+    Attributes:
+        status (int): status code from request
+        message (str): message response from request
     """
 
     def __init__(self, url=None, data=None, headers=None):
@@ -26,6 +35,12 @@ class UrlRequest():
     def request(self, url=None, data=None, headers=None):
         """
         Issue a new request for url
+
+        Args:
+            url (str): URL for request
+            data (:obj:`dict`, optional): dictionary with data for GET
+            headers (:obj:`dict`, optional): dictionary with any needed headers
+
         """
         self.url = url
         self.status = data

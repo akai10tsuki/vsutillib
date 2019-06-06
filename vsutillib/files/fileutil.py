@@ -9,7 +9,21 @@ from pathlib import Path, PurePath
 
 
 def findFileInPath(element, dirPath=None):
-    """find file in the path"""
+    """
+    Convinience function that finds a file in the
+    PATH environment variable
+
+    Args:
+        dirPath (str): search in the specified PATH
+
+    Returns:
+        list: list of :py:class:`pathlib.Path`
+
+    I really like the :mod:`threading` module which has the
+    :class:`threading.Thread` class.
+
+    Here is a link :func:`time.time`.
+    """
 
     filesFound = []
 
@@ -27,7 +41,6 @@ def findFileInPath(element, dirPath=None):
             filesFound.append(candidate)
 
     return filesFound
-
 
 def getFileList(strPath, wildcard=None, fullpath=False, recursive=False, strName=False):
     """

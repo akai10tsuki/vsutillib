@@ -9,7 +9,16 @@ from ..process import RunCommand
 
 
 def isMacDarkMode():
-    """Test for macOS Dark Mode"""
+    """
+    Test for macOS Dark Mode
+
+    Returns:
+        bool:
+
+        True if the macOS is using Dark Mode
+
+        False if not or if called on other operating systems
+    """
 
     if platform.system() == "Darwin":
         cmd = RunCommand("defaults read -g AppleInterfaceStyle")

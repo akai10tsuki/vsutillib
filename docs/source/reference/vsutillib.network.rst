@@ -1,29 +1,18 @@
 vsutillib.network package
 =========================
 
-Subpackages
------------
+The ``UrlRequest`` class
+------------------------
 
-.. toctree::
-
-    vsutillib.network.classes
-
-Submodules
-----------
-
-vsutillib.network.network module
---------------------------------
-
-.. automodule:: vsutillib.network.network
+.. autoclass:: vsutillib.network.UrlRequest
     :members:
-    :undoc-members:
-    :show-inheritance:
 
+The ``isConnected`` function
+----------------------------
 
-Module contents
----------------
+.. autofunction:: vsutillib.network.isConnected
 
-.. automodule:: vsutillib.network
-    :members:
-    :undoc-members:
-    :show-inheritance:
+The ``urlSearchJson`` function
+------------------------------
+
+.. autofunction:: vsutillib.network.urlSearchJson

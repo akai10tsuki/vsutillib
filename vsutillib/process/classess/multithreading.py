@@ -14,7 +14,12 @@ MODULELOG.addHandler(logging.NullHandler())
 
 class GenericThreadWorker(threading.Thread):
     """
-    Generic Thread
+    Generic Thread worker
+
+    Args:
+        function (function): function to submit to Process
+        *args: Variable length argument list.
+        **kwargs: Arbitrary keyword arguments.
     """
 
     log = False
@@ -27,7 +32,10 @@ class GenericThreadWorker(threading.Thread):
         self.kwargs = kwargs
 
     def run(self):
-        """Override run and start function from argument"""
+        """
+        Override run initialise and starts the worker function
+        with passed args, kwargs.
+        """
 
         try:
             self.function(*self.args, **self.kwargs)
@@ -39,7 +47,13 @@ class GenericThreadWorker(threading.Thread):
 
 class QueueThreadWorker(threading.Thread):
     """
-    Queue ThreadWorker
+    Generic Queue process Thread worker
+
+    Args:
+        queue (Queue): Queue to process
+        function (function): function to submit to Process
+        *args: Variable length argument list.
+        **kwargs: Arbitrary keyword arguments.
     """
 
     log = False
@@ -53,6 +67,11 @@ class QueueThreadWorker(threading.Thread):
         self.kwargs = kwargs
 
     def run(self):
+        """
+        Override run gets next job from queue. The initialise and
+        starts the worker function with passed args, kwargs and
+        nextJob.
+        """
 
         while True:
             # Get the work from the queue and expand the tuple
@@ -69,11 +88,13 @@ class ThreadWorker(threading.Thread):
 
     Inherits from threading.Tread to handle worker thread setup, signals and wrap-up.
 
-    :param function: The function callback to run on this worker thread. Supplied args and
-                     kwargs will be passed through to the runner.
-    :type function: function
-    :param args: Arguments to pass to the callback function
-    :param kwargs: Keywords to pass to the callback function
+    Args:
+        function (function): Function to submit to Thread.
+        funcFinished (function): Call back function when thread finishes.
+        funcError (function): Call back function when an error occurs.
+        funcResult (function): Call back function with the result of the execution.
+        *args: Variable length argument list.
+        **kwargs: Arbitrary keyword arguments.
     """
 
     log = False
@@ -99,7 +120,8 @@ class ThreadWorker(threading.Thread):
 
     def run(self):
         """
-        Initialise the runner function with passed args, kwargs.
+        Override run initialise and starts the worker function
+        with passed args, kwargs.
         """
 
         # Retrieve args/kwargs here; and fire processing using them

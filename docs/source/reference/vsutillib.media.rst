@@ -1,29 +1,21 @@
 vsutillib.media package
 =======================
 
-Subpackages
------------
+.. _MediaFileInfo:
 
-.. toctree::
+The ``MediaFileInfo`` class
+---------------------------
 
-    vsutillib.media.classes
-
-Submodules
-----------
-
-vsutillib.media.mediautils module
----------------------------------
-
-.. automodule:: vsutillib.media.mediautils
+.. autoclass:: vsutillib.media.MediaFileInfo
     :members:
-    :undoc-members:
-    :show-inheritance:
 
+The ``MediaTrackInfo`` class
+----------------------------
 
-Module contents
----------------
-
-.. automodule:: vsutillib.media
+.. autoclass:: vsutillib.media.MediaTrackInfo
     :members:
-    :undoc-members:
-    :show-inheritance:
+
+The ``isMediaInfoLib`` function
+-------------------------------
+
+.. autofunction:: vsutillib.media.isMediaInfoLib

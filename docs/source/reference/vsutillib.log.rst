@@ -1,17 +1,11 @@
 vsutillib.log package
 =====================
 
-Subpackages
------------
+The ``LogRotateFileHandler`` class
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. toctree::
-
-    vsutillib.log.classes
-
-Module contents
----------------
-
-.. automodule:: vsutillib.log
-    :members:
-    :undoc-members:
+.. autoclass:: vsutillib.log.LogRotateFileHandler
     :show-inheritance:
+
+.. inheritance-diagram:: vsutillib.log.LogRotateFileHandler
+    :parts: 1

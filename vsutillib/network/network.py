@@ -11,9 +11,11 @@ REMOTE_SERVER = "www.google.com"
 
 def isConnected(hostname=None):
     """
-    Test for web server connection
-    no parameters checks for
-    internet connection
+    Convenience function to test for web server connection
+    no parameters checks for internet connection
+
+    Args:
+        hostname (str): hostname to test for connection
     """
 
     if hostname is None:
@@ -40,8 +42,17 @@ def isConnected(hostname=None):
 
 def urlSearchJson(url, data=None, headers=None):
     """
-    url search for json data retrieval
-    it returns a dictionary
+    url request to a site that returns json data
+
+    Args:
+        url (str): URL for request
+        data (:obj:`dict`, optional): dictionary with data for GET
+        headers (:obj:`dict`, optional): dictionary with any needed headers
+
+    Returns:
+        dict:
+
+        dictionary with the json response
     """
 
     if data is not None:

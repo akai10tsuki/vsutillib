@@ -1,38 +1,14 @@
 vsutillib.scripts package
 =========================
 
-Submodules
-----------
+Small command line set of utilities.
 
-vsutillib.scripts.appy2files module
------------------------------------
+The ``mkvrun`` script
+---------------------
 
-.. automodule:: vsutillib.scripts.appy2files
-    :members:
-    :undoc-members:
-    :show-inheritance:
+.. autofunction:: vsutillib.scripts.mkvrun
 
-vsutillib.scripts.dsf2wv module
--------------------------------
+The ``apply2files`` script
+--------------------------
 
-.. automodule:: vsutillib.scripts.dsf2wv
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-vsutillib.scripts.mkvrun module
--------------------------------
-
-.. automodule:: vsutillib.scripts.mkvrun
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-
-Module contents
----------------
-
-.. automodule:: vsutillib.scripts
-    :members:
-    :undoc-members:
-    :show-inheritance:
+.. autofunction:: vsutillib.scripts.apply2files

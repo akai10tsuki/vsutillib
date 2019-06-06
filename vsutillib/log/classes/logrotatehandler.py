@@ -15,15 +15,19 @@ from pathlib import Path
 class LogRotateFileHandler(logging.handlers.RotatingFileHandler):
 
     """
-    logging handler that rotate files at the start
+    logging handler that rotate files at initialzation time
+    this will create a new file each time is run against
+    the same log file.
 
-    :param logFile: file where to save logs
-    :type logFile: str
-    :param backupCount: number of files to save
-    :type backupCount: int
+    Args:
+        fileName (Path|str): file where to save the log
+
+        **kwargs: variable number of key value parameters
+            that are passed to the super class on
+            initialization
     """
 
-    def __init__(self, fileName, backupCount=0, encoding=None, **kwargs):
+    def __init__(self, fileName, **kwargs):
 
         # Python 3.5 open not compatible with pathlib
         if sys.version_info[:2] == (3, 5):
@@ -33,8 +37,6 @@ class LogRotateFileHandler(logging.handlers.RotatingFileHandler):
 
         super(LogRotateFileHandler, self).__init__(
             f,
-            backupCount=backupCount,
-            encoding=encoding,
             **kwargs
         )
 

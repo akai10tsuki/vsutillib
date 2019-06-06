@@ -14,7 +14,7 @@ from ..files import getFileList
 VERSION = '1.0'
 
 
-class Command:
+class Command(object):
     """Command"""
 
     command = None
@@ -96,7 +96,35 @@ def printToConsoleAndFile(oFile, msg):
     print(msg)
 
 def apply2files():
-    """Main"""
+    """
+    script to apply supplied command to file in directory
+    and subdirectories if needed
+
+    ::
+
+        usage: apply2files.py [-h] [-a ARGUMENTS] [-d] [-o] [-v] [-c COMMAND]
+                            [-l LOGFILE] [-w WILDCARD] [--version]
+                            directory [directory ...]
+
+        positional arguments:
+        directory             enter directory to process
+
+        optional arguments:
+        -h, --help            show this help message and exit
+        -a ARGUMENTS, --arguments ARGUMENTS
+                                optional arguments pass to command
+        -d, --debug           just print commands
+        -o, --onlycurrentdir  don't proccess subdirectories
+        -v, --verbose         increase verbosity
+        -c COMMAND, --command COMMAND
+                                command to apply
+        -l LOGFILE, --logfile LOGFILE
+                                file to log output
+        -w WILDCARD, --wildcard WILDCARD
+                                wildcard to select files to process
+        --version             show program's version number and exit
+
+    """
 
     cmd = Command()
 

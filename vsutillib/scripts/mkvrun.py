@@ -17,7 +17,14 @@ VERSION = "1.0"
 
 
 def displayMKVRun(line):
-    """used to display lines of the mkvmerge run"""
+    """
+    Convenience function used by mkvrun
+    used to display lines of the mkvmerge
+    execution
+
+    Args:
+        line (str): line to display
+    """
 
     if line.find("Progress:") >= 0:
         print("\r" + line[:-1], end='')
@@ -27,7 +34,16 @@ def displayMKVRun(line):
         print(line, end='')
 
 def mkvVerifyStructure(lstBaseFiles, lstFiles, msgs):
-    """verify the file structure against the base files"""
+    """
+    Convenience function used by mkvrun
+    verify the file structure against
+    the base files
+
+    Args:
+        lstBaseFiles (list): list files parsed from command
+
+        lstFiles (list): list of files read from directories
+    """
 
     msg = "Error: In structure \n\nSource:\n{}\nBase Source:\n{}\n"
 
@@ -54,8 +70,28 @@ def mkvVerifyStructure(lstBaseFiles, lstFiles, msgs):
 
 def mkvrun():
     """
-    run mkvmerge-gui generated cli command and
-    applied to all files in directory
+    Run mkvmerge-gui generated cli command and
+    applied to all files in directory. The command
+    select has to be for bash shell and encase in
+    double quotes
+
+    ::
+
+        usage: mkvrun.py [-h] [--version] command
+
+        mkvmerge-gui generated command line batch run utility
+
+        positional arguments:
+        command     mkvmerge-gui "command" line - used Linux/Unix shell enclose it
+                    in double quotes
+
+        optional arguments:
+        -h, --help  show this help message and exit
+        --version   show program's version number and exit
+
+    Args:
+        command (str): bash command line as generated
+            by mkvmerge-gui
     """
 
     #"'C:/Program Files/MKVToolNix\mkvmerge.exe' --ui-language en --output 'C:\Projects\Python\Develop\test\tmp\video - S01E02.mkv' --language 0:und --language 1:jpn '(' 'C:\Projects\PySide\mkvbatchmultiplex\tests\VideoFiles\video - S01E02.avi' ')' --language 0:eng '(' 'C:\Projects\PySide\mkvbatchmultiplex\tests\VideoFiles\Video - S01E02.ass' ')' --track-order 0:0,0:1,1:0"

@@ -6,7 +6,12 @@ import platform
 
 
 def isMediaInfoLib():
-    """find MediaInfo library on system"""
+    """
+    Check if MediaInfo library is on the system
+
+    Returns:
+        bool: True if found False otherwise
+    """
 
     currentOS = platform.system()
     libNames = ()

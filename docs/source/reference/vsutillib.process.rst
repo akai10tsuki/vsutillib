@@ -1,17 +1,38 @@
 vsutillib.process package
 =========================
 
-Subpackages
------------
+The ``ProcessWorker`` class
+---------------------------
 
-.. toctree::
-
-    vsutillib.process.classess
-
-Module contents
----------------
-
-.. automodule:: vsutillib.process
+.. autoclass:: vsutillib.process.ProcessWorker
     :members:
-    :undoc-members:
-    :show-inheritance:
+
+The ``GenericThreadWorker`` class
+---------------------------------
+
+.. autoclass:: vsutillib.process.GenericThreadWorker
+    :members:
+
+The ``QueueProcessWorker`` class
+--------------------------------
+
+.. autoclass:: vsutillib.process.QueueProcessWorker
+    :members:
+
+The ``QueueThreadWorker`` class
+--------------------------------
+
+.. autoclass:: vsutillib.process.QueueThreadWorker
+    :members:
+
+The ``RunCommand`` class
+------------------------
+
+.. autoclass:: vsutillib.process.RunCommand
+    :members:
+
+The ``ThreadWorker`` class
+--------------------------------
+
+.. autoclass:: vsutillib.process.ThreadWorker
+    :members:

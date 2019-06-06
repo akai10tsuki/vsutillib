@@ -13,7 +13,12 @@ MODULELOG.addHandler(logging.NullHandler())
 
 class ProcessWorker(multiprocessing.Process):
     """
-    Generic Thread
+    Generic Process worker
+
+    Args:
+        function (function): function to submit to Process
+        *args: Variable length argument list.
+        **kwargs: Arbitrary keyword arguments.
     """
 
     log = False
@@ -26,7 +31,10 @@ class ProcessWorker(multiprocessing.Process):
         self.kwargs = kwargs
 
     def run(self):
-        """Override run and start function from argument"""
+        """
+        Override run then initialise and starts the worker
+        function with passed args, kwargs.
+        """
 
         try:
             self.function(*self.args, **self.kwargs)
@@ -37,7 +45,13 @@ class ProcessWorker(multiprocessing.Process):
 
 class QueueProcessWorker(multiprocessing.Process):
     """
-    Queue ThreadWorker
+    Generic Queue Process worker
+
+    Args:
+        queue (Queue): Queue to process
+        function (function): function to submit to Process
+        *args: Variable length argument list.
+        **kwargs: Arbitrary keyword arguments.
     """
 
     log = False
@@ -51,7 +65,11 @@ class QueueProcessWorker(multiprocessing.Process):
         self.kwargs = kwargs
 
     def run(self):
-
+        """
+        Override run gets next job from queue. The initialise and
+        starts the worker function with passed args, kwargs and
+        nextJob.
+        """
         while True:
             # Get the work from the queue and expand the tuple
             nextJob = self.queue.get()

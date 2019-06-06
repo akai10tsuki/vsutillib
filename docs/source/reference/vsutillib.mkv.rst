@@ -1,29 +1,41 @@
+.. include:: ../globals.rst
+
 vsutillib.mkv package
 =====================
 
-Subpackages
------------
+The classes and function in this module are related to the application
+MKVBatchMultiplex_ so they are really not useful.
 
-.. toctree::
+.. _MKVCommand:
 
-    vsutillib.mkv.classes
+The ``MKVCommand`` class
+------------------------
 
-Submodules
-----------
+.. autoclass:: vsutillib.mkv.MKVCommand
+    :members:
 
-vsutillib.mkv.mkvutils module
+The ``VerifyMKVCommand`` class
+------------------------------
+
+.. autoclass:: vsutillib.mkv.VerifyMKVCommand
+    :members:
+
+The ``VerifyStructure`` class
 -----------------------------
 
-.. automodule:: vsutillib.mkv.mkvutils
+.. autoclass:: vsutillib.mkv.VerifyStructure
     :members:
-    :undoc-members:
-    :show-inheritance:
 
+The ``getMKVMerge`` function
+----------------------------
 
-Module contents
----------------
+.. autofunction:: vsutillib.mkv.getMKVMerge
 
-.. automodule:: vsutillib.mkv
-    :members:
-    :undoc-members:
-    :show-inheritance:
+The ``getMKVMergeVersion`` function
+-----------------------------------
+
+.. autofunction:: vsutillib.mkv.getMKVMergeVersion
+
+The ``stripEncaseQuotes`` function
+
+.. autofunction:: vsutillib.mkv.stripEncaseQuotes

@@ -25,15 +25,33 @@ MODULELOG.addHandler(logging.NullHandler())
 
 class RunCommand:
     """
-    Run system command in subprocess
-    and save generated output
+    Run a command in a subprocess and capture any output
 
-    :param command: command to execute
-    :type command: str
-    :param processLine: function called with every line read
-    :type processLine: func
-    :param regexsearch: regular expresion to search for match
-    :type regexsearch: str
+    processLine function if provided it will be called
+    with every line read.
+
+    regexsearch regular expresion if provided the first
+    match will be set on regexmatch property
+
+    Args:
+        command (str): command to execute
+        commandShlex (:obj:`bool`): True if command is shlex.split
+            False otherwise. Defaults to False.
+        processLine (:obj:`function`, optional): Function called with
+            every line read. Defaults to None.
+        processArgs (:obj:`list`, optional): Variable length list to
+            pass to processLine. Defaults to None.
+        processKWArgs (:obj:`list`, optional): Arbitrary keyword
+            arguments to pass to processLine. Defaults to None.
+        regexsearch (:obj:`str`, optional): Regex applied to every
+            line read. Defaults to None
+        universalNewLine (:obj:`bool`): True to read in text mode
+            False to read binary mode. Defaults to False.
+
+    Raises:
+
+        ValueError: If processArgs is not a list or if processKWArgs
+            is not a dictionary.
     """
 
     __log = False
@@ -44,12 +62,23 @@ class RunCommand:
         get/set logging at class level
         every class instance will log
         unless overwritten
+
+        Args:
+            setLogging (`bool`):
+
+                - True class will log
+                - False turn off logging
+                - None returns current Value
+
+        Returns:
+            bool:
+
+            returns the current value set
         """
 
-        if setLogging is None:
-            return cls.__log
-        elif isinstance(setLogging, bool):
-            cls.__log = setLogging
+        if setLogging is not None:
+            if isinstance(setLogging, bool):
+                cls.__log = setLogging
 
     def __init__(
             self,
@@ -74,7 +103,7 @@ class RunCommand:
             if isinstance(processArgs, list):
                 self.__processArgs = processArgs
             else:
-                raise ValueError('processLineParam has to be a dictionary')
+                raise ValueError('processLineParam has to be a list')
 
         self.__processKWArgs = {}
 
@@ -106,9 +135,13 @@ class RunCommand:
     @property
     def log(self):
         """
-        return log enable/disable
-        instance variable self.__log
-        overrides global variable
+        class property can be used to override the class global
+        logging setting if set to None class log will be followed
+
+        Returns:
+            bool:
+
+            True if logging is enable False otherwise
         """
         if self.__log is not None:
             return self.__log
@@ -123,7 +156,17 @@ class RunCommand:
 
     @property
     def command(self):
-        """command to execute"""
+        """
+        command to execute
+
+        Args:
+            command (str): command to execute
+
+        Returns:
+            str:
+
+            current command set
+        """
         return self.__command
 
     @command.setter
@@ -134,17 +177,38 @@ class RunCommand:
 
     @property
     def shlexCommand(self):
-        """command to submit to subproccess PIPE"""
+        """
+        command to submit to subproccess PIPE
+
+        Returns:
+            list:
+
+            command split by shlex.split
+        """
         return shlex.split(self.__command)
 
     @property
     def error(self):
-        """error if command can not be executed"""
+        """
+        error if command can not be executed
+
+        Returns:
+            str:
+
+            message if command fails to execute
+        """
         return self.__error
 
     @property
     def output(self):
-        """captured output"""
+        """
+        captured output
+
+        Returns:
+            list:
+
+            output of executed command
+        """
         return self.__output
 
     @property
@@ -152,21 +216,45 @@ class RunCommand:
         """
         command parsed by shlex
         can be used for debugging
+
+        Returns:
+            list|dict:
+
+            depending of the regex returns a list or
+            re.Match object
         """
         return shlex.split(self.__command)
 
     @property
     def rc(self):
-        """return code"""
+        """
+        Return code. On Windows is not reliable information.
+
+        Returns:
+            int:
+
+            return code of executed command
+        """
         return self.__returnCode
 
     @property
     def regexmatch(self):
-        """results of regular expresion search"""
+        """
+        results of regular expresion search
+
+        Returns:
+            list|dict:
+
+            list if matches if single regex passed.  dict of list
+            with the regex as key if a list of regex is passed.
+        """
         return self.__regexmatch
 
     def run(self):
-        """method to call to execute command"""
+        """
+        method to submit command to subprocess PIPE
+        """
+
         self._reset()
 
         self._getCommandOutput()
@@ -177,6 +265,7 @@ class RunCommand:
         return False
 
     def _reset(self, command=None):
+        """reset internal variables"""
 
         self.__output = []
         self.__error = ""
