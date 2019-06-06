@@ -55,7 +55,7 @@ class OutputTextWidget(QTextEdit):
         self.parent = parent
         self.__log = None
 
-    def connect(self, objSignal):
+    def connectToInsertText(self, objSignal):
         """Connect to signal"""
 
         objSignal.connect(self.insertText)
