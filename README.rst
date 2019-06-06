@@ -1,4 +1,3 @@
-
 ****************************************************
 vsutillib: module with utility functions and classes
 ****************************************************
@@ -21,34 +20,32 @@ Description
 A range of functions and classes with a variety of uses for
 example:
 
- - functions
+    - functions
 
-   * **getFileList** - return the files on a directory in
-     **list** of pathlib.Path objects
-   * **findFile** - find a file in the system Path
-     return a pathlib.Path object if found
-   * **getExecutable** - find executable file
-     in PATH and the normal installation paths for Windows
-     and macOS for linux is like findFile
+        * **getFileList** - return the files on a directory in
+            **list** of pathlib.Path objects
+        * **findFile** - find a file in the system Path
+            return a pathlib.Path object if found
+        * **getExecutable** - find executable file
+            in PATH and the normal installation paths for Windows
+            and macOS for linux is like findFile
 
- - classes
+    - classes
 
-   * **RunCommand** - execute command in subprocess and capture
-     output optionally apply regular expression searches
-     and apply a supplied function to receive every line
-     read and process them as needed
-   * **ConfigurationSettings** - maintain a set of ConfigurationSettings
-     in a **dictionary** and saved it in xml file
+        * **RunCommand** - execute command in subprocess and capture
+            output optionally apply regular expression searches
+            and apply a supplied function to receive every line
+            read and process them as needed
+        * **ConfigurationSettings** - maintain a set of ConfigurationSettings
+            in a **dictionary** and saved it in xml file
 
- - utilities
+    - utilities
 
-   * **dsf2wv** - compresses DSF audio files to WavPack compressed
-     files
-   * **mkvrun** - CLI utility to execute MKVToolNix_ generated
-     command line.  MKVBatchMultiplex_ is a GUI implementation
-     of this and the main reason this module goes public.
-   * **apply2files** - apply a command to all files in the directory
-     specified in recursive by default
+        * **mkvrun** - CLI utility to execute MKVToolNix_ generated
+            command line.  MKVBatchMultiplex_ is a GUI implementation
+            of this and the main reason this module goes public.
+        * **apply2files** - apply a command to all files in the directory
+            specified in recursive by default
 
 and so on...
 
@@ -57,8 +54,8 @@ Installation
 
 ::
 
-  pip install vsutillib
-  or download the source
+    pip install vsutillib
+    or download the source
 
 Main development platform is Windows but the majority of functions
 work on Linux and macOS.  Some are OS specific like isDarkMode that
@@ -77,8 +74,6 @@ Dependencies
       This is only for Linux a dependency of pymediainfo.
     * MKVToolNix_ tested with versions 17.00->34.0.0
       mkvrun depends on it.
-    * WavPack_ file compressor 5.1.0 or greater
-      dsf2wv depends on it.
 
 lxml and pymediainfo are installed automatically they are the only
 python libraries used.  The other programs follow website instructions.
@@ -93,9 +88,15 @@ Usage
 Import the the library in your program:
 ::
 
-  from vsutillib import mkv
-  from vsutillib import media
-  from vsutillib import mprocess
+    from vsutillib import files
+    from vsutillib import log
+    from vsutillib import macos
+    from vsutillib import media
+    from vsutillib import mkv
+    from vsutillib import network
+    from vsutillib import process
+    from vsutillib import scripts
+    from vsutillib import xml
 
 Roadmap
 =======
@@ -112,7 +113,6 @@ Document all classes and functions.
 .. _AVI: https://docs.microsoft.com/en-us/windows/desktop/directshow/avi-file-format/
 .. _SRT: https://matroska.org/technical/specs/subtitles/srt.html
 .. _MKVBatchMultiplex: https://github.com/akai10tsuki/mkvbatchmultiplex
-.. _WavPack: http://www.wavpack.com/
 .. _`The TV Database`: https://www.thetvdb.com/
 .. _`The Movie Database`: https://www.themoviedb.org/
 .. _`ubuntu 18.04 LTS`: https://www.ubuntu.com/
