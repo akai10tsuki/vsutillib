@@ -9,6 +9,7 @@ path for executable and target options are parsed from the command line
 
 """
 
+import pprint
 import re
 import shlex
 import logging
@@ -66,6 +67,7 @@ class MKVCommand():
         self.__bErrorFound = False
         self.__workFiles = _WorkFiles()
         self.__commandTemplate = None
+        self.__outputFileName = None
 
         self.__log = None
 
@@ -167,13 +169,15 @@ class MKVCommand():
                     newCommandTemplate = newCommandTemplate.replace(
                         strOutputFile, _Key.outputFile, 1)
 
+                    # hook for rename
+                    self.__outputFileName = outputFile.parent.joinpath(fd[0].stem + '.mkv')
+
                 lstBaseFiles.append(f)  # backwards compatible
                 filesInDirsByKey[key] = fd
                 newCommandTemplate = newCommandTemplate.replace(sub, key, 1)
 
             # Set output files
             if bHasChaptersFile:
-                print("process chapters")
                 d = chaptersFile.parent
                 cd = [
                     x for x in d.glob('*' + chaptersFile.suffix)
@@ -206,7 +210,6 @@ class MKVCommand():
             # theese are the individual list by key
             #
             for key in filesInDirsByKey:
-                print("Key {}".format(key))
                 filesInDir = filesInDirsByKey[key]
                 z = zip([key] * len(filesInDir), filesInDir)
                 if key != _Key.outputFile:
@@ -230,6 +233,8 @@ class MKVCommand():
             #
             # generate all the commands and store them in shlex form
             #
+            pprint.pprint(lstSourceFilesWithKey)
+
             for s in lstSourceFilesWithKey:
 
                 newCommand = newCommandTemplate
@@ -289,6 +294,7 @@ class MKVCommand():
         self.__index = 0
         self.__workFiles.clear()
         self.__commandTemplate = None
+        self.__outputFileName = None
 
     def __bool__(self):
         return not self.__bErrorFound
@@ -399,6 +405,10 @@ class MKVCommand():
             list with destination files
         """
         return self.__workFiles.destinationFiles
+
+    @property
+    def outputFileName(self):
+        return self.__outputFileName
 
     @property
     def template(self):
