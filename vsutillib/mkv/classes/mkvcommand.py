@@ -197,8 +197,6 @@ class MKVCommand():
 
             self.__commandTemplate = newCommandTemplate
 
-            lstTmp = []
-            lstTmp1 = []
 
             #
             # lstTmp list of the form:
@@ -209,6 +207,11 @@ class MKVCommand():
             #  ...]
             # theese are the individual list by key
             #
+            pprint.pprint(filesInDirsByKey)
+
+            lstTmp = []
+            lstTmp1 = []
+
             for key in filesInDirsByKey:
                 filesInDir = filesInDirsByKey[key]
                 z = zip([key] * len(filesInDir), filesInDir)
@@ -233,7 +236,6 @@ class MKVCommand():
             #
             # generate all the commands and store them in shlex form
             #
-            pprint.pprint(lstSourceFilesWithKey)
 
             for s in lstSourceFilesWithKey:
 
