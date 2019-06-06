@@ -110,9 +110,7 @@ class ConfigurationSettings:
 
     # pickable types are python specific maybe
     # even version specific
-    _pickable = [
-        'range', 'bytearray', 'frozenset', 'function', 'pickle'
-    ]
+    _pickable = ['range', 'bytearray', 'frozenset', 'function', 'pickle']
 
     @classmethod
     def classLog(cls, setLogging=None):
@@ -211,7 +209,7 @@ class ConfigurationSettings:
             key (str): configuration element
 
             value: element value the type
-            is as explainded
+            is as explained
         """
 
         if isinstance(key, str):
@@ -222,8 +220,8 @@ class ConfigurationSettings:
             if valueType is not None:
                 _valueType = valueType
 
-            if not (_valueType in self._pickable) or (
-                    _valueType in self._literal):
+            if not ((_valueType in self._pickable) or
+                    (_valueType in self._literal)):
                 s = str(_valueType)
                 if self.log:
                     MODULELOG.debug('CM0003: value type not supported - %s',
@@ -423,6 +421,7 @@ class ConfigurationSettings:
 
 class Abc():
     """Test class"""
+
     def __init__(self, param):
         self.value = param
 
