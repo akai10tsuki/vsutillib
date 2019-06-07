@@ -4,4 +4,4 @@ PySide2 related classes and functions
 
 # classes
 
-from .classes import OutputTextWidget, QActionWidget, QMenuWidget
+from .classes import FileListWidget, OutputTextWidget, QActionWidget, QMenuWidget
