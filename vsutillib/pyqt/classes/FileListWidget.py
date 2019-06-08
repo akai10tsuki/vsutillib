@@ -6,7 +6,7 @@ from pathlib import Path
 
 from PySide2.QtCore import Qt, Slot, Signal
 from PySide2.QtGui import QTextCursor
-from PySide2.QtWidgets import QTextEdit, QStyleFactory
+from PySide2.QtWidgets import QTextEdit, QStyleFactory, QMenu
 
 from ... import macos
 
@@ -90,7 +90,23 @@ class FileListWidget(QTextEdit):
 
         if bUpdate:
             self.displayFiles()
-            self.filesDroppedUpdateSignal.emit(list(self.filesDropped))
+            self.filesDroppedUpdateSignal.emit(self.filesDropped)
+
+    def contextMenuEvent(self, event):
+
+        if self.filesDropped:
+            menu = QMenu(self)
+            clearAction = menu.addAction(Actions.Clear)
+            sortAction = menu.addAction(Actions.Sort)
+            action = menu.exec_(self.mapToGlobal(event.pos()))
+            if action == clearAction:
+                self.clear()
+                self.filesDroppedUpdateSignal.emit(self.filesDropped)
+            elif action == sortAction:
+                if self.filesDropped:
+                    self.filesDropped.sort(key=str)
+                    self.displayFiles()
+                    self.filesDroppedUpdateSignal.emit(self.filesDropped)
 
     def connectToInsertText(self, objSignal):
         """Connect to signal"""
@@ -197,8 +213,11 @@ class FileListWidget(QTextEdit):
 
         super().clear()
 
-        print("\nIn Here")
         for f in self.filesDropped:
-            print(str(f))
-            self.insertPlainText(f.name  +'\n')
-        print("End in here.\n")
+            self.insertPlainText(f.name + '\n')
+
+
+class Actions(object):
+
+    Clear = "Clear"
+    Sort = "Sort"
