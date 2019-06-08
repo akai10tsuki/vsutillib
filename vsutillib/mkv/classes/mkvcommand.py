@@ -9,7 +9,6 @@ path for executable and target options are parsed from the command line
 
 """
 
-import pprint
 import re
 import shlex
 import logging
@@ -67,7 +66,6 @@ class MKVCommand(object):
         self.__bErrorFound = False
         self.__workFiles = _WorkFiles()
         self.__commandTemplate = None
-        self.__outputFileName = None
         self.__filesInDirsByKey = None
 
         self.__log = None
@@ -170,10 +168,6 @@ class MKVCommand(object):
                     newCommandTemplate = newCommandTemplate.replace(
                         strOutputFile, _Key.outputFile, 1)
 
-                    # hook for rename
-                    self.__outputFileName = outputFile.parent.joinpath(
-                        fd[0].stem + '.mkv')
-
                 lstBaseFiles.append(f)  # backwards compatible
                 filesInDirsByKey[key] = fd
                 newCommandTemplate = newCommandTemplate.replace(sub, key, 1)
@@ -226,7 +220,6 @@ class MKVCommand(object):
         self.__index = 0
         self.__workFiles.clear()
         self.__commandTemplate = None
-        self.__outputFileName = None
         self.__filesInDirsByKey = None
 
     def __bool__(self):
@@ -277,8 +270,6 @@ class MKVCommand(object):
         #  ...]
         # theese are the individual list by key
         #
-        #pprint.pprint(self.__filesInDirsByKey)
-
         for key in self.__filesInDirsByKey:
             filesInDir = self.__filesInDirsByKey[key]
             z = zip([key] * len(filesInDir), filesInDir)
@@ -288,6 +279,7 @@ class MKVCommand(object):
 
         if self.log:
             MODULELOG.debug("MKV0006: Files by Key %s", str(lstTmp))
+
         #
         # list of the form:
         # [(('<OUTFILE>', file1), ('<SOURCE0>', file1), ('<SOURCE1>', file1), ('<CHAPTERS>', file1), ...), pylint: disable=line-too-long
@@ -420,10 +412,6 @@ class MKVCommand(object):
         return self.__workFiles.destinationFiles
 
     @property
-    def outputFileName(self):
-        return self.__outputFileName
-
-    @property
     def template(self):
         """
         template to construct the commands
@@ -452,11 +440,12 @@ class MKVCommand(object):
         totalNames = len(self.__filesInDirsByKey[_Key.outputFile])
         totalRenames = len(fileNames)
 
-        #print('Names to rename {} new name {}'.format(totalNames, totalRenames))
+        if totalNames != totalRenames:
+            self.__strError = "Files to rename and new names not equal length."
 
-        self.__filesInDirsByKey[_Key.outputFile] = fileNames
-
-        self._generateCommands()
+        else:
+            self.__filesInDirsByKey[_Key.outputFile] = fileNames
+            self._generateCommands()
 
 
 class _WorkFiles:
