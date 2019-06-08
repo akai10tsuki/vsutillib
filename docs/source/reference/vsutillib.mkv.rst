@@ -37,5 +37,6 @@ The ``getMKVMergeVersion`` function
 .. autofunction:: vsutillib.mkv.getMKVMergeVersion
 
 The ``stripEncaseQuotes`` function
+----------------------------------
 
 .. autofunction:: vsutillib.mkv.stripEncaseQuotes

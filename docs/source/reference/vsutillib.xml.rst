@@ -1,2 +1,0 @@
-vsutillib.xml package
-=====================
