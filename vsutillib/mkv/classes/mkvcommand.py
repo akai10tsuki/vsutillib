@@ -9,7 +9,6 @@ path for executable and target options are parsed from the command line
 
 """
 
-import pprint
 import re
 import shlex
 import logging
@@ -23,7 +22,7 @@ MODULELOG = logging.getLogger(__name__)
 MODULELOG.addHandler(logging.NullHandler())
 
 
-class MKVCommand():
+class MKVCommand(object):
     """
     Class to work with **mkvmerge** command part of MKVToolnix_
 
@@ -62,12 +61,12 @@ class MKVCommand():
 
         #self.__destinationDirectory = None
         self.__lstCommands = []
-        self.__strShellcommand = None
+        self.__strShellCommand = None
         self.__strError = ""
         self.__bErrorFound = False
         self.__workFiles = _WorkFiles()
         self.__commandTemplate = None
-        self.__outputFileName = None
+        self.__filesInDirsByKey = None
 
         self.__log = None
 
@@ -169,9 +168,6 @@ class MKVCommand():
                     newCommandTemplate = newCommandTemplate.replace(
                         strOutputFile, _Key.outputFile, 1)
 
-                    # hook for rename
-                    self.__outputFileName = outputFile.parent.joinpath(fd[0].stem + '.mkv')
-
                 lstBaseFiles.append(f)  # backwards compatible
                 filesInDirsByKey[key] = fd
                 newCommandTemplate = newCommandTemplate.replace(sub, key, 1)
@@ -196,86 +192,14 @@ class MKVCommand():
                     strChaptersFile, _Key.chaptersFile, 1)
 
             self.__commandTemplate = newCommandTemplate
-
-
-            #
-            # lstTmp list of the form:
-            # [[('<OUTFILE>', file1), ('<OUTFILE>', file2), ...],
-            #  [('<SOURCE0>', file1), ('<SOURCE0>', file2), ...],
-            #  [('<SOURCE1>', file1), ('<SOURCE1>', file2), ...],
-            #  [('<CHAPTERS>', file1), ('<CHAPTERS>', file2), ...], # optional
-            #  ...]
-            # theese are the individual list by key
-            #
-            pprint.pprint(filesInDirsByKey)
-
-            lstTmp = []
-            lstTmp1 = []
-
-            for key in filesInDirsByKey:
-                filesInDir = filesInDirsByKey[key]
-                z = zip([key] * len(filesInDir), filesInDir)
-                if key != _Key.outputFile:
-                    lstTmp1.append(filesInDir)
-                lstTmp.append(list(z))
-
-            if self.log:
-                MODULELOG.debug("MKV0006: Files by Key %s", str(lstTmp))
-            #
-            # list of the form:
-            # [(('<OUTFILE>', file1), ('<SOURCE0>', file1), ('<SOURCE1>', file1), ('<CHAPTERS>', file1), ...), pylint: disable=line-too-long
-            #  (('<OUTFILE>', file2), ('<SOURCE0>', file2), ('<SOURCE1>', file2), ('<CHAPTERS>', file1), ...),
-            #  ...]
-            # theese are the combined list of lstTmp unpacked and zip is applied
-            # to have all the keys for substitution at the same point
-            # chapters are optional
-            #
-            lstSourceFilesWithKey = list(zip(*lstTmp))
-            lstSourceFiles = list(zip(*lstTmp1))  # backwards compatible
-
-            #
-            # generate all the commands and store them in shlex form
-            #
-
-            for s in lstSourceFilesWithKey:
-
-                newCommand = newCommandTemplate
-
-                for e in s:
-                    key, fileName = e
-                    qf = shlex.quote(str(fileName))
-                    newCommand = newCommand.replace(key, qf, 1)
-
-                shellCommand = shlex.split(newCommand)
-
-                if bRemoveTitle and shellCommand:
-                    # Remove title if found since this is for batch processing
-                    # the title will propagate to all the files maybe erroneously.
-                    # This parameters are preserved from the source files.
-
-                    while "--title" in shellCommand:
-
-                        i = shellCommand.index("--title")
-                        del shellCommand[i:i + 2]
-
-                self.__lstCommands.append(shellCommand)
+            self.__filesInDirsByKey = filesInDirsByKey
 
             self.__workFiles.baseFiles = lstBaseFiles
-            self.__workFiles.sourceFiles = lstSourceFiles
-            self.__workFiles.destinationFiles = filesInDirsByKey[
-                _Key.outputFile]
-            self.__workFiles.chaptersFiles = None if _Key.chaptersFile not in filesInDirsByKey else filesInDirsByKey[
+            self.__workFiles.chaptersFiles = \
+                None if _Key.chaptersFile not in filesInDirsByKey else filesInDirsByKey[
                 _Key.chaptersFile]
 
-            if self.log:
-                MODULELOG.debug("MKV0001: Command template %s",
-                                str(self.__commandTemplate))
-                MODULELOG.debug("MKV0002: Base files %s",
-                                str(self.__workFiles.baseFiles))
-                MODULELOG.debug("MKV0003: Source files %s",
-                                str(self.__workFiles.sourceFiles))
-                MODULELOG.debug("MKV0004: Destination files %s",
-                                str(self.__workFiles.destinationFiles))
+            self._generateCommands()
 
         else:
             # error cannot process command
@@ -291,12 +215,12 @@ class MKVCommand():
 
         #self.__destinationDirectory = None
         self.__lstCommands = []
-        self.__strShellcommand = None
+        self.__strShellCommand = None
         self.__strError = ""
         self.__index = 0
         self.__workFiles.clear()
         self.__commandTemplate = None
-        self.__outputFileName = None
+        self.__filesInDirsByKey = None
 
     def __bool__(self):
         return not self.__bErrorFound
@@ -332,6 +256,85 @@ class MKVCommand():
             #        self.__workFiles.sourceFiles[self.__index - 1],
             #        self.__workFiles.destinationFiles[self.__index - 1]]
 
+    def _generateCommands(self, bRemoveTitle=True):
+
+        lstTmp = []
+        lstTmp1 = []
+
+        #
+        # lstTmp list of the form:
+        # [[('<OUTFILE>', file1), ('<OUTFILE>', file2), ...],
+        #  [('<SOURCE0>', file1), ('<SOURCE0>', file2), ...],
+        #  [('<SOURCE1>', file1), ('<SOURCE1>', file2), ...],
+        #  [('<CHAPTERS>', file1), ('<CHAPTERS>', file2), ...], # optional
+        #  ...]
+        # theese are the individual list by key
+        #
+        for key in self.__filesInDirsByKey:
+            filesInDir = self.__filesInDirsByKey[key]
+            z = zip([key] * len(filesInDir), filesInDir)
+            if key != _Key.outputFile:
+                lstTmp1.append(filesInDir)
+            lstTmp.append(list(z))
+
+        if self.log:
+            MODULELOG.debug("MKV0006: Files by Key %s", str(lstTmp))
+
+        #
+        # list of the form:
+        # [(('<OUTFILE>', file1), ('<SOURCE0>', file1), ('<SOURCE1>', file1), ('<CHAPTERS>', file1), ...), pylint: disable=line-too-long
+        #  (('<OUTFILE>', file2), ('<SOURCE0>', file2), ('<SOURCE1>', file2), ('<CHAPTERS>', file1), ...),
+        #  ...]
+        # theese are the combined list of lstTmp unpacked and zip is applied
+        # to have all the keys for substitution at the same point
+        # chapters are optional
+        #
+        lstSourceFilesWithKey = list(zip(*lstTmp))
+        lstSourceFiles = list(zip(*lstTmp1))  # backwards compatible
+
+        #
+        # generate all the commands and store them in shlex form
+        #
+
+        self.__lstCommands = []
+
+        for s in lstSourceFilesWithKey:
+
+            newCommand = self.__commandTemplate
+
+            for e in s:
+                key, fileName = e
+                qf = shlex.quote(str(fileName))
+                newCommand = newCommand.replace(key, qf, 1)
+
+            shellCommand = shlex.split(newCommand)
+
+            if bRemoveTitle and shellCommand:
+                # Remove title if found since this is for batch processing
+                # the title will propagate to all the files maybe erroneously.
+                # This parameters are preserved from the source files.
+
+                while "--title" in shellCommand:
+
+                    i = shellCommand.index("--title")
+                    del shellCommand[i:i + 2]
+
+            self.__lstCommands.append(shellCommand)
+
+        self.__workFiles.sourceFiles = lstSourceFiles  # redundant for rename
+        self.__workFiles.destinationFiles = self.__filesInDirsByKey[
+            _Key.outputFile]
+
+        if self.log:
+            MODULELOG.debug("MKV0001: Command template %s",
+                            str(self.__commandTemplate))
+            MODULELOG.debug("MKV0002: Base files %s",
+                            str(self.__workFiles.baseFiles))
+            MODULELOG.debug("MKV0003: Source files %s",
+                            str(self.__workFiles.sourceFiles))
+            MODULELOG.debug("MKV0004: Destination files %s",
+                            str(self.__workFiles.destinationFiles))
+
     @property
     def log(self):
         """
@@ -363,7 +366,7 @@ class MKVCommand():
 
             original command set
         """
-        return self.__strShellcommand
+        return self.__strShellCommand
 
     @command.setter
     def command(self, value):
@@ -409,10 +412,6 @@ class MKVCommand():
         return self.__workFiles.destinationFiles
 
     @property
-    def outputFileName(self):
-        return self.__outputFileName
-
-    @property
     def template(self):
         """
         template to construct the commands
@@ -435,6 +434,18 @@ class MKVCommand():
             error description
         """
         return self.__strError
+
+    def renameOutputFiles(self, fileNames):
+
+        totalNames = len(self.__filesInDirsByKey[_Key.outputFile])
+        totalRenames = len(fileNames)
+
+        if totalNames != totalRenames:
+            self.__strError = "Files to rename and new names not equal length."
+
+        else:
+            self.__filesInDirsByKey[_Key.outputFile] = fileNames
+            self._generateCommands()
 
 
 class _WorkFiles:

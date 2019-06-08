@@ -2,7 +2,6 @@
 File utilities
 """
 
-
 import os
 import platform
 from pathlib import Path, PurePath
@@ -10,7 +9,7 @@ from pathlib import Path, PurePath
 
 def findFileInPath(element, dirPath=None):
     """
-    Convinience function that finds a file in the
+    Convenience function that finds a file in the
     PATH environment variable
 
     Args:
@@ -42,7 +41,12 @@ def findFileInPath(element, dirPath=None):
 
     return filesFound
 
-def getFileList(strPath, wildcard=None, fullpath=False, recursive=False, strName=False):
+
+def getFileList(strPath,
+                wildcard=None,
+                fullpath=False,
+                recursive=False,
+                strName=False):
     """
     Get files in a directory
     strPath has to be an existing directory or file
