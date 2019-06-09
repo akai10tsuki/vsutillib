@@ -1,5 +1,5 @@
 """
-Import names for mprocess
+Import names for process
 """
 
 # THR0001

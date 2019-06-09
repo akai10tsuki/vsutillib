@@ -15,9 +15,7 @@ import logging
 import re
 import shlex
 import subprocess
-
 import traceback
-
 
 MODULELOG = logging.getLogger(__name__)
 MODULELOG.addHandler(logging.NullHandler())
@@ -80,16 +78,14 @@ class RunCommand:
             if isinstance(setLogging, bool):
                 cls.__log = setLogging
 
-    def __init__(
-            self,
-            command=None,
-            processLine=None,
-            processArgs=None,
-            processKWArgs=None,
-            regexsearch=None,
-            commandShlex=False,
-            universalNewLines=False
-        ):
+    def __init__(self,
+                 command=None,
+                 processLine=None,
+                 processArgs=None,
+                 processKWArgs=None,
+                 regexsearch=None,
+                 commandShlex=False,
+                 universalNewLines=False):
 
         self.__command = None
         self.command = command
@@ -317,12 +313,11 @@ class RunCommand:
 
         try:
 
-            with subprocess.Popen(
-                    cmd, stdout=subprocess.PIPE,
-                    bufsize=1,
-                    universal_newlines=self.__universalNewLines,
-                    stderr=subprocess.STDOUT
-                ) as p:
+            with subprocess.Popen(cmd,
+                                  stdout=subprocess.PIPE,
+                                  bufsize=1,
+                                  universal_newlines=self.__universalNewLines,
+                                  stderr=subprocess.STDOUT) as p:
 
                 try:
 
@@ -337,11 +332,8 @@ class RunCommand:
                         self._regexMatch(line)
 
                         if self.__process is not None:
-                            self.__process(
-                                line,
-                                *self.__processArgs,
-                                **self.__processKWArgs
-                            )
+                            self.__process(line, *self.__processArgs,
+                                           **self.__processKWArgs)
 
                 except UnicodeDecodeError as error:
 
@@ -352,14 +344,12 @@ class RunCommand:
                     self.__output.append(trb)
 
                     if self.__process is not None:
-                        self.__process(
-                            line,
-                            *self.__processArgs,
-                            **self.__processKWArgs
-                        )
+                        self.__process(line, *self.__processArgs,
+                                       **self.__processKWArgs)
 
                     if self.log:
-                        MODULELOG.debug("RNC0001: Unicode decode error %s", msg)
+                        MODULELOG.debug("RNC0001: Unicode decode error %s",
+                                        msg)
 
                 except KeyboardInterrupt as error:
 
@@ -370,11 +360,8 @@ class RunCommand:
                     self.__output.append(trb)
 
                     if self.__process is not None:
-                        self.__process(
-                            line,
-                            *self.__processArgs,
-                            **self.__processKWArgs
-                        )
+                        self.__process(line, *self.__processArgs,
+                                       **self.__processKWArgs)
 
                     if self.log:
                         MODULELOG.debug("RNC0002: Keyboard interrupt %s", msg)
@@ -403,11 +390,10 @@ class RunCommand:
 
         try:
 
-            with subprocess.Popen(
-                    cmd, stdout=subprocess.PIPE,
-                    bufsize=1,
-                    stderr=subprocess.STDOUT
-                ) as p:
+            with subprocess.Popen(cmd,
+                                  stdout=subprocess.PIPE,
+                                  bufsize=1,
+                                  stderr=subprocess.STDOUT) as p:
 
                 try:
                     for l in iter(p.stdout):
@@ -418,11 +404,8 @@ class RunCommand:
                         self._regexMatch(line)
 
                         if self.__process is not None:
-                            self.__process(
-                                line,
-                                *self.__processArgs,
-                                **self.__processKWArgs
-                            )
+                            self.__process(line, *self.__processArgs,
+                                           **self.__processKWArgs)
 
                 except UnicodeDecodeError as error:
 

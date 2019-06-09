@@ -1,8 +1,8 @@
 """
-mprocess namespace
+process namespace
 """
 
-from .classess import (
+from .classes import (
     GenericThreadWorker,
     ProcessWorker,
     QueueProcessWorker,
