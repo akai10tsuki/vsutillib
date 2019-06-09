@@ -35,5 +35,8 @@ setup(
     author_email=config.EMAIL,
     license='MIT',
     packages=['vsutillib.' + PACKAGE, 'vsutillib.' + PACKAGE + '.classes'],
+    install_requires=[
+        'pymediainfo>=4.0',
+    ],
     zip_safe=False,
 )

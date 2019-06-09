@@ -35,5 +35,10 @@ setup(
     author_email=config.EMAIL,
     license='MIT',
     packages=['vsutillib.' + PACKAGE, 'vsutillib.' + PACKAGE + '.classes'],
+    install_requires=[
+        'vsutillib-files>=1.0.0',
+        'vsutillib-media>=1.0.0',
+        'vsutillib-process>=1.0.0',
+    ],
     zip_safe=False,
 )

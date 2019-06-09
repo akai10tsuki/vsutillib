@@ -13,7 +13,7 @@ from vsutillib import config
 sys.path.insert(0, os.path.abspath('../..'))
 
 ROOT = os.path.abspath(os.path.dirname(__file__))
-PACKAGE = "log"
+PACKAGE = "process"
 
 def readme():
     """get README.rst"""
@@ -24,7 +24,6 @@ def readme():
     except FileNotFoundError:
         long_description = "vsutillib." + PACKAGE + " sub package part of vsutillib"
     return long_description
-
 
 setup(
     name=config.NAME + '-' + PACKAGE,

@@ -1,3 +1,18 @@
+"""
+function for QMessageBox Yes|No needed for change
+font on the fly and localization
+
+Args:
+    self (QWidget): parent QWidget
+    tittle (str): tittle for QMessageBox
+    text (str): text for QMessageBox
+    icon (QIcon): standard icons for QMessageBox
+        question mark, warning ...
+Returns:
+    QMessageBox.button: standar QMessageBox button
+
+"""
+
 from PySide2.QtWidgets import QMessageBox
 
 def messageBoxYesNo(self, title, text, icon):
@@ -11,7 +26,7 @@ def messageBoxYesNo(self, title, text, icon):
     m.setText(text)
     m.setIcon(icon)
     yesButton = m.addButton('Yes', QMessageBox.ButtonRole.YesRole)
-    noButton = m.addButton(' No ', QMessageBox.ButtonRole.NoRole)
+    noButton = m.addButton('No', QMessageBox.ButtonRole.NoRole)
     m.setDefaultButton(noButton)
     m.setFont(self.font())
     m.exec_()

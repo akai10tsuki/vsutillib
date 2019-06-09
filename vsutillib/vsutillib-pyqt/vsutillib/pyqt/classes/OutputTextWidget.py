@@ -12,7 +12,7 @@ from PySide2.QtCore import Qt, Slot
 from PySide2.QtGui import QTextCursor
 from PySide2.QtWidgets import QTextEdit, QStyleFactory
 
-from ... import macos
+import vsutillib.macos as macos
 
 MODULELOG = logging.getLogger(__name__)
 MODULELOG.addHandler(logging.NullHandler())

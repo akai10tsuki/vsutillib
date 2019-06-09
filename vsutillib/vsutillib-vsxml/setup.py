@@ -13,7 +13,7 @@ from vsutillib import config
 sys.path.insert(0, os.path.abspath('../..'))
 
 ROOT = os.path.abspath(os.path.dirname(__file__))
-PACKAGE = "log"
+PACKAGE = "vsxml"
 
 def readme():
     """get README.rst"""
@@ -35,5 +35,8 @@ setup(
     author_email=config.EMAIL,
     license='MIT',
     packages=['vsutillib.' + PACKAGE, 'vsutillib.' + PACKAGE + '.classes'],
+    install_requires=[
+        'lxml>=4.0',
+    ],
     zip_safe=False,
 )

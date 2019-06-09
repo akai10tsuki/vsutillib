@@ -6,8 +6,8 @@ use the linux bash one encased in double quotes
 
 import argparse
 
-from vsutillib.mkv import MKVCommand
 from vsutillib.media import MediaFileInfo
+from vsutillib.mkv import MKVCommand
 from vsutillib.process import RunCommand
 
 VERSION = "1.0"
