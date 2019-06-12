@@ -1,6 +1,7 @@
+#! /usr/bin/env python
 """Compress DSF files into WavPack"""
 
-from vsutillib import dsf2wv
+from vsutillib.scripts import dsf2wv
 
 def main():
 

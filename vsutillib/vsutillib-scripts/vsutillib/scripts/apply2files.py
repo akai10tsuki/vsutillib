@@ -1,7 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""Compress DSF audio files into WavPack"""
-
 import argparse
 import sys
 import shlex
@@ -34,17 +32,17 @@ def parserArguments():
                         '--arguments',
                         action='store',
                         default='',
-                        help='optional arguments pass to command')
+                        help='optional arguments pass to command before file')
+    parser.add_argument('-p',
+                        '--append',
+                        action='store',
+                        default='',
+                        help='optional arguments pass to command after file')
     parser.add_argument('-d',
                         '--debug',
                         action='store_true',
                         default=False,
                         help='just print commands')
-    parser.add_argument('-o',
-                        '--onlycurrentdir',
-                        action='store_true',
-                        default=False,
-                        help='don\'t proccess subdirectories')
     parser.add_argument('-v',
                         '--verbose',
                         action='store_true',
@@ -68,6 +66,18 @@ def parserArguments():
     parser.add_argument('--version',
                         action='version',
                         version='%(prog)s ' + VERSION)
+
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument('-o',
+                       '--onlycurrentdir',
+                       action='store_true',
+                       default=False,
+                       help='don\'t proccess subdirectories')
+    group.add_argument('-s',
+                       '--onlysubdir',
+                       action='store_true',
+                       default=False,
+                       help='don\'t proccess current working directory')
 
     return parser
 
@@ -96,7 +106,9 @@ def apply2files():
         optional arguments:
         -h, --help            show this help message and exit
         -a ARGUMENTS, --arguments ARGUMENTS
-                                optional arguments pass to command
+                                optional arguments pass to command before file
+        -p ARGUMENTS, --append ARGUMENTS
+                                optional arguments pass to command after file
         -d, --debug           just print commands
         -o, --onlycurrentdir  don't proccess subdirectories
         -v, --verbose         increase verbosity
@@ -144,7 +156,10 @@ def apply2files():
         cmd.wildcard = ''
 
     debug = args.debug
-    recursive = not args.onlycurrentdir
+    recursive = (not args.onlycurrentdir) and (not args.onlysubdir)
+    subdironly = args.onlysubdir
+
+    print('Recursive {} subdironly {}'.format(recursive, subdironly))
 
     msg = 'Current directory {}\n'.format(str(cwd))
     printToConsoleAndFile(logFile, msg)
@@ -196,6 +211,11 @@ def apply2files():
         noMatchFiles = []
 
         for of in filesList:
+
+            if subdironly:
+                if of.resolve().parent == Path.cwd():
+                    print("By pass.")
+                    continue
 
             f = str(of)
 

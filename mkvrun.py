@@ -1,9 +1,11 @@
+#! /usr/bin/env python
+
 """
 Execute MKVToolnix genarated command
 and apply it to all files in directory
 """
 
-from vsutillib import mkvrun
+from vsutillib.scripts import mkvrun
 
 def main():
     """main"""
