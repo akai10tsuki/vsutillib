@@ -1,17 +1,16 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 """Compress DSF audio files into WavPack"""
-
 
 import argparse
 import sys
 import shlex
 from pathlib import Path
 
-
 from vsutillib.process import RunCommand
 from vsutillib.files import getFileList
 
-
-VERSION = '1.0'
+VERSION = '1.0.1'
 
 
 class Command(object):
@@ -20,80 +19,65 @@ class Command(object):
     command = None
     arguments = None
     wildcard = None
+    append = None
+
 
 def parserArguments():
     """construct parser"""
 
     parser = argparse.ArgumentParser()
 
-    parser.add_argument(
-        'directory',
-        nargs='+',
-        help='enter directory to process'
-    )
-    parser.add_argument(
-        '-a',
-        '--arguments',
-        action='store',
-        default='',
-        help='optional arguments pass to command'
-    )
-    parser.add_argument(
-        '-d',
-        '--debug',
-        action='store_true',
-        default=False,
-        help='just print commands'
-
-    )
-    parser.add_argument(
-        '-o',
-        '--onlycurrentdir',
-        action='store_true',
-        default=False,
-        help='don\'t proccess subdirectories'
-    )
-    parser.add_argument(
-        '-v',
-        '--verbose',
-        action='store_true',
-        default=False,
-        help='increase verbosity'
-    )
-    parser.add_argument(
-        '-c',
-        '--command',
-        action='store',
-        default='',
-        help='command to apply'
-    )
-    parser.add_argument(
-        '-l',
-        '--logfile',
-        action='store',
-        default='commandLog.txt',
-        help='file to log output'
-    )
-    parser.add_argument(
-        '-w',
-        '--wildcard',
-        action='store',
-        default='*',
-        help='wildcard to select files to process'
-    )
-    parser.add_argument(
-        '--version',
-        action='version',
-        version='%(prog)s ' + VERSION
-    )
+    parser.add_argument('directory',
+                        nargs='+',
+                        help='enter directory to process')
+    parser.add_argument('-a',
+                        '--arguments',
+                        action='store',
+                        default='',
+                        help='optional arguments pass to command')
+    parser.add_argument('-d',
+                        '--debug',
+                        action='store_true',
+                        default=False,
+                        help='just print commands')
+    parser.add_argument('-o',
+                        '--onlycurrentdir',
+                        action='store_true',
+                        default=False,
+                        help='don\'t proccess subdirectories')
+    parser.add_argument('-v',
+                        '--verbose',
+                        action='store_true',
+                        default=False,
+                        help='increase verbosity')
+    parser.add_argument('-c',
+                        '--command',
+                        action='store',
+                        default='',
+                        help='command to apply')
+    parser.add_argument('-l',
+                        '--logfile',
+                        action='store',
+                        default='commandLog.txt',
+                        help='file to log output')
+    parser.add_argument('-w',
+                        '--wildcard',
+                        action='store',
+                        default='*',
+                        help='wildcard to select files to process')
+    parser.add_argument('--version',
+                        action='version',
+                        version='%(prog)s ' + VERSION)
 
     return parser
+
 
 def printToConsoleAndFile(oFile, msg):
     """print to console and write to logfile"""
     if oFile:
         oFile.write(msg.encode())
     print(msg)
+
 
 def apply2files():
     """
@@ -151,6 +135,7 @@ def apply2files():
         return None
 
     cmd.arguments = args.arguments
+    cmd.append = args.append
 
     cmd.wildcard = None
     if args.wildcard:
@@ -192,16 +177,18 @@ def apply2files():
     if args.verbose:
         processLine = sys.stdout.write
 
-    cli = RunCommand(
-        processLine=processLine
-    )
+    cli = RunCommand(processLine=processLine)
 
     for d in args.directory:
 
-        msg = 'Working\n\nDirectory: [{}]\nWildcard:  {}\n\n'.format(str(Path(d).resolve()), cmd.wildcard)
+        msg = 'Working\n\nDirectory: [{}]\nWildcard:  {}\n\n'.format(
+            str(Path(d).resolve()), cmd.wildcard)
         printToConsoleAndFile(logFile, msg)
 
-        filesList = getFileList(d, wildcard=cmd.wildcard, fullpath=True, recursive=recursive)
+        filesList = getFileList(d,
+                                wildcard=cmd.wildcard,
+                                fullpath=True,
+                                recursive=recursive)
 
         nTotalFiles = len(filesList)
 
@@ -214,7 +201,7 @@ def apply2files():
 
             qf = shlex.quote(f)
 
-            cliCommand = cmd.command + " " + cmd.arguments + " " + qf
+            cliCommand = cmd.command + " " + cmd.arguments + " " + qf + " " + cmd.append
             cli.command = cliCommand
 
             msg = 'Processing file [{}]\n'.format(f)
@@ -239,3 +226,7 @@ def apply2files():
             for f in noMatchFiles:
                 msg = 'Check file \'{}\'\n'.format(f)
                 logFile.write(msg.encode())
+
+
+if __name__ == "__main__":
+    apply2files()

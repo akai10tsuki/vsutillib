@@ -1,17 +1,13 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-"""Setup.py for vsutillib"""
-
+# -*- coding: utf-8 -*-
 """setup file to build python distributions"""
-
 
 import io
 import os
 
-from setuptools import setup, find_packages
-
+from setuptools import setup
 
 from vsutillib import config
-
 
 ROOT = os.path.abspath(os.path.dirname(__file__))
 
@@ -27,24 +23,22 @@ def readme():
     return long_description
 
 setup(
-
     name=config.NAME,  # Required
     version=config.VERSION,  # Required
     description=config.DESCRIPTION,  # Required
     long_description=readme(),  # Optional
-    author='Efrain Vergara',  # Optional
-    author_email='akai10tsuki@gmail.com',  # Optional
-    url=config.URL,
+    author=config.AUTHOR,  # Optional
+    author_email=config.EMAIL,  # Optional
+    url=config.PYPI,
     license='MIT',
-
     classifiers=[  # Optional
         # Trove classifiers
         # Full list: https://pypi.python.org/pypi?%3Aaction=list_classifiers
-
-        'Development Status :: 4 - Beta',
+        'Development Status :: 5 - Production/Stable',
         'Environment :: Console',
         'Environment :: MacOS X',
         'Environment :: Win32 (MS Windows)',
+        'Environment :: X11 Applications :: Qt',
 
         # Indicate who your project is intended for
         'Intended Audience :: Developers',
@@ -68,27 +62,18 @@ setup(
         # Implementation
         "Programming Language :: Python :: Implementation :: CPython",
     ],
-
     keywords=config.KEYWORDS,  # Optional
-
-    packages=find_packages(exclude=['docs', 'tests*',]),  # Required
-
+    packages=['vsutillib.scripts'],
     install_requires=config.REQUIRED,
-
     python_requires='>=3.5, <4',
-
     include_package_data=True,
 
-    entry_points={  # Optional
-        'console_scripts': [
-            'apply2files=vsutillib:apply2files'
-            'dsf2wv=vsutillib:dsf2wv',
-            'mkvrun=vsutillib:mkvrun',
-        ],
-    },
-
-    project_urls={  # Optional
-        'Bug Reports': 'https://github.com/akai10tsuki/vsutillib/issues',
-        'Source': 'https://github.com/akai10tsuki/vsutillib/',
-    },
+    #entry_points={  # Optional
+    #    'console_scripts': [
+    #        'vsutillib-apply2files=vsutillib:scripts.apply2files',
+    #        'vsutillib-dsf2wv=vsutillib:scripts.dsf2wv',
+    #        'vsutillib-mkvrun=vsutillib:scripts.mkvrun',
+    #    ],
+    #},
+    project_urls=config.PROJECTURLS,
 )

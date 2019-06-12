@@ -5,9 +5,7 @@ against the source base files use for the templates
 
 import logging
 
-
 from vsutillib.media import MediaFileInfo
-
 
 MODULELOG = logging.getLogger(__name__)
 MODULELOG.addHandler(logging.NullHandler())
@@ -103,7 +101,6 @@ class VerifyStructure():
         """set instance log variable"""
         if isinstance(value, bool) or value is None:
             self.__log = value
-
 
     @property
     def isOk(self):

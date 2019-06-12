@@ -13,7 +13,7 @@ from vsutillib import config
 sys.path.insert(0, os.path.abspath('../..'))
 
 ROOT = os.path.abspath(os.path.dirname(__file__))
-PACKAGE = "log"
+PACKAGE = "pyqt"
 
 def readme():
     """get README.rst"""
@@ -28,7 +28,7 @@ def readme():
 
 setup(
     name=config.NAME + '-' + PACKAGE,
-    version='1.0.0',
+    version='1.0.1',
     description="vsutillib." + PACKAGE + " sub package part of vsutillib",
     long_description=readme(),
     author=config.AUTHOR,
@@ -37,6 +37,7 @@ setup(
     packages=['vsutillib.' + PACKAGE, 'vsutillib.' + PACKAGE + '.classes'],
     install_requires=[
         'vsutillib-macos>=1.0.0',
+        'PySide2>=5.12'
     ],
     zip_safe=False,
 )

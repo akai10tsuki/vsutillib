@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 """Compress DSF files into WavPack"""
 
 import argparse

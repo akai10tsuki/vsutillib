@@ -8,8 +8,6 @@ vsutillib
    vsutillib.log
    vsutillib.macos
    vsutillib.media
-   vsutillib.mkv
    vsutillib.network
    vsutillib.process
-   vsutillib.scripts
    vsutillib.vsxml

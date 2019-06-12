@@ -52,15 +52,28 @@ and so on...
 Installation
 ============
 
-::
+.. code:: bash
 
     pip install vsutillib
-    or download the source
 
-Main development platform is Windows but the majority of functions
-work on Linux and macOS.  Some are OS specific like isDarkMode that
-detect if macOS Mojave is running in Dark Mode.  If the function is
-run on Linux or Windows always returns **False**.
+This install all sub packages.
+
+You can also install any individual packages.
+
+.. code:: bash
+
+    pip install vsutillib-files
+    pip install vsutillib-log
+    pip install vsutillib-macos
+    pip install vsutillib-media
+    pip install vsutillib-network
+    pip install vsutillib-processing
+    pip install vsutillib-vsxml
+
+Main development platform is Windows but limited testing show they
+work on Lin Linux and macOS.  The only OS specific is **vsutillib.macos**
+but it run on other operating systems it won't raise exception
+the results will mainly be **None**.
 
 Dependencies
 ************
@@ -68,19 +81,10 @@ Dependencies
     * lxml_ 4.3.3 or greater on system
       XmlDB simple xml database
     * pymediainfo_ 4.0 or greater
-      MediaFileInfo depends on it
     * Python_ 3.5->3.7
     * MediaInfo_ tested with versions 17.10->18.12.
       This is only for Linux a dependency of pymediainfo.
-    * MKVToolNix_ tested with versions 17.00->34.0.0
-      mkvrun depends on it.
 
-lxml and pymediainfo are installed automatically they are the only
-python libraries used.  The other programs follow website instructions.
-Besides lxml all dependencies are for very specific uses if you don't
-have them on your system not much functionality is lost.
-
-On macOS 10.14 Dark Mode MKVToolNix has to be version 30.0.0+
 
 Usage
 =====
@@ -92,11 +96,10 @@ Import the the library in your program:
     from vsutillib import log
     from vsutillib import macos
     from vsutillib import media
-    from vsutillib import mkv
     from vsutillib import network
     from vsutillib import process
-    from vsutillib import scripts
     from vsutillib import xml
+
 
 Roadmap
 =======
