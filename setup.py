@@ -63,17 +63,8 @@ setup(
         "Programming Language :: Python :: Implementation :: CPython",
     ],
     keywords=config.KEYWORDS,  # Optional
-    packages=['vsutillib.scripts'],
-    install_requires=config.REQUIRED,
+    packages=['vsutillib'],
     python_requires='>=3.5, <4',
     include_package_data=True,
-
-    #entry_points={  # Optional
-    #    'console_scripts': [
-    #        'vsutillib-apply2files=vsutillib:scripts.apply2files',
-    #        'vsutillib-dsf2wv=vsutillib:scripts.dsf2wv',
-    #        'vsutillib-mkvrun=vsutillib:scripts.mkvrun',
-    #    ],
-    #},
     project_urls=config.PROJECTURLS,
 )

@@ -52,9 +52,10 @@ def getFileList(strPath,
     in case of a file the parent directory is used
     strExtFilter in the form -> .ext
     """
+
     p = Path(strPath)
 
-    if not p.is_file() and not p.is_dir():
+    if (not p.is_file()) and (not p.is_dir()):
         return []
 
     lstFilesFilter = []
@@ -68,7 +69,7 @@ def getFileList(strPath,
         wc = wildcard
 
     if recursive:
-        wc = "**/" + wc
+        wc = "**/" + stripEncaseQuotes(wildcard)
 
     lstObjFileNames = [x for x in p.glob(wc) if x.is_file()]
 
@@ -134,3 +135,26 @@ def getExecutable(search):
                 return executable
 
     return None
+
+
+def stripEncaseQuotes(strFile):
+    """
+    Strip single quote at start and end of file name
+    if they are found
+
+    Args:
+        strFile (str): file name
+
+    Returns:
+        str:
+
+        file name without start and end single quoute
+    """
+
+    # Path or str should work
+    s = str(strFile)
+
+    if (s[0:1] == "'") and (s[-1:] == "'"):
+        s = s[1:-1]
+
+    return s
