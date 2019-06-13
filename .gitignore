@@ -70,3 +70,4 @@ sources/
 test.py
 .DS_Store
 .gitchangelog.rc
+commandLog.txt
