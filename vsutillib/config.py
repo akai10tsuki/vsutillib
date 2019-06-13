@@ -29,7 +29,7 @@ from vsutillib.log import LogRotateFileHandler
 
 data = ConfigurationSettings()  # pylint: disable=invalid-name
 
-__VERSION = (1, 0, '1')
+__VERSION = (1, 0, '1', 'post1')
 
 VERSION = ".".join(map(str, __VERSION))
 AUTHOR = "Efrain Vergara"
@@ -53,9 +53,8 @@ REQUIRED = [
     'vsutillib-vsxml>=1.0.1',
 ]
 URL = 'https://github.com/akai10tsuki/vsutillib'
-PYPI = 'https://pypi.org/project/mkvbatchmultiplex/'
+PYPI = 'https://pypi.org/project/vsutillib/'
 PROJECTURLS = {
-    'Bug Reports': 'https://pypi.org/project/vsutillib/#files',
     'Source': 'https://pypi.org/project/vsutillib/#files',
 }
 

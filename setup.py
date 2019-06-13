@@ -4,12 +4,38 @@
 
 import io
 import os
+import shutil
 
+from distutils.command.clean import clean
+from distutils.command.install import install
+from pathlib import Path
 from setuptools import setup
 
 from vsutillib import config
 
 ROOT = os.path.abspath(os.path.dirname(__file__))
+
+
+class MyInstall(install):
+
+    # Calls the default run command, then deletes the build area
+    # (equivalent to "setup clean --all").
+    def run(self):
+        print("what to clean {}".format(self.distribution))
+        install.run(self)
+        c = clean(self.distribution)
+        c.all = True
+        c.finalize_options()
+        c.run()
+
+def removeBuild():
+    """
+    delete build directory setup was including files from other builds
+    """
+    b = Path('build')
+
+    if b.is_dir():
+        shutil.rmtree('build')
 
 
 def readme():
@@ -21,6 +47,8 @@ def readme():
     except FileNotFoundError:
         long_description = config.DESCRIPTION
     return long_description
+
+removeBuild()
 
 setup(
     name=config.NAME,  # Required

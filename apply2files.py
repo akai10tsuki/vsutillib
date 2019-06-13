@@ -1,4 +1,4 @@
-#! /usr/bin/env python -t -O -v
+#! /usr/bin/env python
 
 """Compress DSF files into WavPack"""
 

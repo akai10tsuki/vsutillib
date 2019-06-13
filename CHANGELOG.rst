@@ -2,11 +2,8 @@ Changelog
 =========
 
 
-Changes to to project should be listed here.
-(Unreleased)
-
-Date
-~~~~
+2019-6-13
+~~~~~~~~~
 
 First Release
 
