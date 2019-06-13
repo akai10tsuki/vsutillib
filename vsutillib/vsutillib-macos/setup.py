@@ -49,6 +49,6 @@ setup(
     author=config.AUTHOR,
     author_email=config.EMAIL,
     license='MIT',
-    packages=['vsutillib.' + PACKAGE, 'vsutillib.' + PACKAGE + '.classes'],
+    packages=['vsutillib.' + PACKAGE],
     zip_safe=False,
 )
