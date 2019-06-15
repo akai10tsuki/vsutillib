@@ -7,7 +7,6 @@ import sys
 import threading
 import traceback
 
-
 MODULELOG = logging.getLogger(__name__)
 MODULELOG.addHandler(logging.NullHandler())
 
@@ -39,7 +38,7 @@ class GenericThreadWorker(threading.Thread):
 
         try:
             self.function(*self.args, **self.kwargs)
-        except: # pylint: disable=bare-except
+        except:  # pylint: disable=bare-except
             traceback.print_exc()
 
         return
@@ -99,15 +98,13 @@ class ThreadWorker(threading.Thread):
 
     log = False
 
-    def __init__(
-            self,
-            function,
-            *args,
-            funcFinished=None,
-            funcError=None,
-            funcResult=None,
-            **kwargs
-        ):
+    def __init__(self,
+                 function,
+                 *args,
+                 funcFinished=None,
+                 funcError=None,
+                 funcResult=None,
+                 **kwargs):
         super(ThreadWorker, self).__init__()
 
         # Store constructor arguments (re-used for processing)
