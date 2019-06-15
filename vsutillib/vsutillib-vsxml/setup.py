@@ -43,12 +43,13 @@ removeBuild()
 
 setup(
     name=config.NAME + '-' + PACKAGE,
-    version='1.0.1.post1',
+    version='1.0.2',
     description="vsutillib." + PACKAGE + " sub package part of vsutillib",
     long_description=readme(),
     author=config.AUTHOR,
     author_email=config.EMAIL,
     license='MIT',
     packages=['vsutillib.' + PACKAGE, 'vsutillib.' + PACKAGE + '.classes'],
+    install_requires=['lxml'],
     zip_safe=False,
 )
