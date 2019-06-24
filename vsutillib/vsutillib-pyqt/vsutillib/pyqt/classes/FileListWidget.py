@@ -133,7 +133,6 @@ class FileListWidget(QTextEdit):
             # don't check for type to raise error
             super().setAcceptDrops(value)
 
-
     @Slot(str, dict)
     def insertText(self, strText, kwargs):
         """
@@ -141,14 +140,11 @@ class FileListWidget(QTextEdit):
         Cannot use standard keyword argument kwargs
         on emit calls, use dictionary instead
 
-        :param strText: text to insert on windows
-        :type strText: str
-        :param kwargs: dictionary for additional
-        commands for the insert operation
-        :type kwargs: dictionary
+        Args:
+            strText (str): text to insert on windows
+            kwargs (dict): dictionary for additional
+                commands for the insert operation
         """
-
-        print("Insert {}".format(strText))
 
         strTmp = ""
 
@@ -167,7 +163,7 @@ class FileListWidget(QTextEdit):
 
         # still no restore to default the ideal configuration
         # search will continue considering abandoning color
-        # in macOS
+        # in macOS saveStype works on Windows
 
         saveStyle = self.styleSheet()
 
@@ -236,6 +232,7 @@ class FileListWidget(QTextEdit):
 
         if filesList:
             self.bBlockDrops = True
+            self.bFilesDropped = False
             super().setAcceptDrops(False)
             self.fileList = []
 
