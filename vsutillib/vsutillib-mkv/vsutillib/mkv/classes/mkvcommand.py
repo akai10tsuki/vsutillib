@@ -87,10 +87,10 @@ class MKVCommand(object):
         if verify:
 
             self.__strShellCommand = strCommand
+            self.__bErrorFound = False
             lstSources = []
             bHasChaptersFile = False
 
-            #strCommand = strStripEscapeChars(strCommand)
             strCommand = verify.bashCommand
 
             reOutputFile = r"\-\-output\s(.*?)\s\-\-"
@@ -107,22 +107,20 @@ class MKVCommand(object):
             if match:
                 strOutputFile = match.group(1)
 
-            outputFile = Path(stripEncaseQuotes(strOutputFile))
+            outputFile = verify.outputFile
 
             # search for chapters file
+            #match = reChaptersFileEx.search(strCommand)
             match = reChaptersFileEx.search(strCommand)
 
             if match:
                 strChaptersFile = match.group(1)
-                chaptersFile = Path(stripEncaseQuotes(strChaptersFile))
+                chaptersFile = verify.chaptersFile
                 bHasChaptersFile = True
-
-            #if outputFile.parent.is_dir():
-            #    self.__destinationDirectory = outputFile.parent
 
             #
             # search for the source files
-            # this have to exists in the
+            # this have to exist in the
             # file system
             #
             match = reSourcesEx.findall((strCommand))
@@ -143,6 +141,7 @@ class MKVCommand(object):
                 # Set source files
                 sub, fileName = source
                 key = '<SOURCE{}>'.format(str(index))
+                fileName = fileName.replace(r"'\''", "'")
                 f = Path(stripEncaseQuotes(fileName))
                 d = f.parent
                 fd = [x for x in d.glob('*' + f.suffix) if x.is_file()]
@@ -191,15 +190,19 @@ class MKVCommand(object):
                 newCommandTemplate = newCommandTemplate.replace(
                     strChaptersFile, _Key.chaptersFile, 1)
 
-            self.__commandTemplate = newCommandTemplate
-            self.__filesInDirsByKey = filesInDirsByKey
+            if not self.__bErrorFound:
+                self.__commandTemplate = newCommandTemplate
+                self.__filesInDirsByKey = filesInDirsByKey
 
-            self.__workFiles.baseFiles = lstBaseFiles
-            self.__workFiles.chaptersFiles = \
-                None if _Key.chaptersFile not in filesInDirsByKey else filesInDirsByKey[
-                _Key.chaptersFile]
+                self.__workFiles.baseFiles = lstBaseFiles
+                self.__workFiles.chaptersFiles = \
+                    None if _Key.chaptersFile not in filesInDirsByKey else filesInDirsByKey[
+                    _Key.chaptersFile]
 
-            self._generateCommands()
+                self._generateCommands()
+            else:
+                if self.log:
+                    MODULELOG.error("MKV0005: %s", self.__strError)
 
         else:
             # error cannot process command
