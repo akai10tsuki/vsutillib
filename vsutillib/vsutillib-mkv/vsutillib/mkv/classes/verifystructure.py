@@ -160,3 +160,30 @@ class VerifyStructure():
                 msg = msg.format(str(objFile), str(objSource))
                 self.__analysis.append(msg)
                 self.__status = False
+                _detailAnalysis(self, objFile, objSource)
+
+def _detailAnalysis(self, mediaFile1, mediaFile2):
+
+    if mediaFile1.codec != mediaFile2.codec:
+        msg = "Codec mismatched {} - {}".format(mediaFile1.codec, mediaFile2.codec)
+        self.__analysis.append(msg)
+    elif len(mediaFile1) != len(mediaFile2):
+        msg = "Number of tracks mismatched {} - {}".format(len(mediaFile1), len(mediaFile2))
+        self.__analysis.append(msg)
+    elif len(mediaFile1) == len(mediaFile2):
+        for a, b in zip(mediaFile1.lstMediaTracks, mediaFile2.lstMediaTracks):
+            if a.streamorder != b.streamorder:
+                msg = "Stream order mismatched {} - {}".format(a.streamorder, b.streamorder)
+                self.__analysis.append(msg)
+            elif a.track_type != b.track_type:
+                msg = "Stream type mismatched {} - {}".format(a.track_type, b.track_type)
+                self.__analysis.append(msg)
+            elif a.language != b.language:
+                msg = "Stream language mismatched {} - {}".format(a.language, b.language)
+                self.__analysis.append(msg)
+            elif (a.codec != b.codec) and (a.track_type != "Audio"):
+                msg = "Codec mismatched {} - {}".format(a.codec, b.codec)
+                self.__analysis.append(msg)
+            elif a.format != b.format:
+                msg = "Stream format mismatched {} - {}".format(a.format, b.format)
+                self.__analysis.append(msg)
