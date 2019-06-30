@@ -29,7 +29,7 @@ from vsutillib.log import LogRotateFileHandler
 
 data = ConfigurationSettings()  # pylint: disable=invalid-name
 
-__VERSION = (1, 0, '1', 'post1')
+__VERSION = (1, 0, '2')
 
 VERSION = ".".join(map(str, __VERSION))
 AUTHOR = "Efrain Vergara"

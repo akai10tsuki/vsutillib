@@ -28,14 +28,18 @@ class MyInstall(install):
         c.finalize_options()
         c.run()
 
-def removeBuild():
+
+def removeTmpDirs():
     """
     delete build directory setup was including files from other builds
     """
-    b = Path('build')
+    p = Path('.')
+    eggDirs = [x for x in p.glob('*.egg-info') if x.is_dir()]
+    eggDirs.append(Path('build'))
 
-    if b.is_dir():
-        shutil.rmtree('build')
+    for d in eggDirs:
+        if d.is_dir():
+            shutil.rmtree(d)
 
 
 def readme():
@@ -48,7 +52,6 @@ def readme():
         long_description = config.DESCRIPTION
     return long_description
 
-removeBuild()
 
 setup(
     name=config.NAME,  # Required
@@ -96,3 +99,5 @@ setup(
     include_package_data=True,
     project_urls=config.PROJECTURLS,
 )
+
+removeTmpDirs()

@@ -18,14 +18,17 @@ ROOT = os.path.abspath(os.path.dirname(__file__))
 PACKAGE = "vsxml"
 
 
-def removeBuild():
+def removeTmpDirs():
     """
     delete build directory setup was including files from other builds
     """
-    b = Path('build')
+    p = Path('.')
+    eggDirs = [x for x in p.glob('*.egg-info') if x.is_dir()]
+    eggDirs.append(Path('build'))
 
-    if b.is_dir():
-        shutil.rmtree('build')
+    for d in eggDirs:
+        if d.is_dir():
+            shutil.rmtree(d)
 
 
 def readme():
@@ -39,8 +42,6 @@ def readme():
     return long_description
 
 
-removeBuild()
-
 setup(
     name=config.NAME + '-' + PACKAGE,
     version='1.0.2',
@@ -53,3 +54,5 @@ setup(
     install_requires=['lxml'],
     zip_safe=False,
 )
+
+removeTmpDirs()
