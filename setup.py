@@ -17,6 +17,7 @@ ROOT = os.path.abspath(os.path.dirname(__file__))
 
 
 class MyInstall(install):
+    """install subclass"""
 
     # Calls the default run command, then deletes the build area
     # (equivalent to "setup clean --all").
