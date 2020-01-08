@@ -5,6 +5,8 @@ against the source base files use for the templates
 
 import logging
 
+from pathlib import Path
+
 from vsutillib.media import MediaFileInfo
 
 MODULELOG = logging.getLogger(__name__)
@@ -160,30 +162,41 @@ class VerifyStructure():
                 msg = msg.format(str(objFile), str(objSource))
                 self.__analysis.append(msg)
                 self.__status = False
-                _detailAnalysis(self, objFile, objSource)
+                _detailAnalysis(self.__analysis, objFile, objSource)
 
-def _detailAnalysis(self, mediaFile1, mediaFile2):
+
+def _detailAnalysis(lstAnalysis, mediaFile1, mediaFile2):
+
+    name1 = Path(mediaFile1.fileName).name
+    name2 = Path(mediaFile2.fileName).name
 
     if mediaFile1.codec != mediaFile2.codec:
-        msg = "Codec mismatched {} - {}".format(mediaFile1.codec, mediaFile2.codec)
-        self.__analysis.append(msg)
+        msg = "Codec mismatched {}: {} - {}: {}\n".format(
+            name1, mediaFile1.codec, name2, mediaFile2.codec)
+        lstAnalysis.append(msg)
     elif len(mediaFile1) != len(mediaFile2):
-        msg = "Number of tracks mismatched {} - {}".format(len(mediaFile1), len(mediaFile2))
-        self.__analysis.append(msg)
+        msg = "Number of tracks mismatched {}: {} - {}: {}\n".format(
+            name1, len(mediaFile1), name2, len(mediaFile2))
+        lstAnalysis.append(msg)
     elif len(mediaFile1) == len(mediaFile2):
         for a, b in zip(mediaFile1.lstMediaTracks, mediaFile2.lstMediaTracks):
             if a.streamorder != b.streamorder:
-                msg = "Stream order mismatched {} - {}".format(a.streamorder, b.streamorder)
-                self.__analysis.append(msg)
+                msg = "Stream order mismatched {}: {} - {}: {}\n".format(
+                    name1, a.streamorder, name2, b.streamorder)
+                lstAnalysis.append(msg)
             elif a.track_type != b.track_type:
-                msg = "Stream type mismatched {} - {}".format(a.track_type, b.track_type)
-                self.__analysis.append(msg)
+                msg = "Stream type mismatched {}: {} - {}: {}\n".format(
+                    name1, a.track_type, name2, b.track_type)
+                lstAnalysis.append(msg)
             elif a.language != b.language:
-                msg = "Stream language mismatched {} - {}".format(a.language, b.language)
-                self.__analysis.append(msg)
+                msg = "Stream language mismatched {}: {} - {}: {}\n".format(
+                    name1, a.language, name2, b.language)
+                lstAnalysis.append(msg)
             elif (a.codec != b.codec) and (a.track_type != "Audio"):
-                msg = "Codec mismatched {} - {}".format(a.codec, b.codec)
-                self.__analysis.append(msg)
+                msg = "Codec mismatched {}: {} - {}: {}\n".format(
+                    name1, a.codec, name2, b.codec)
+                lstAnalysis.append(msg)
             elif a.format != b.format:
-                msg = "Stream format mismatched {} - {}".format(a.format, b.format)
-                self.__analysis.append(msg)
+                msg = "Stream format mismatched {}: {} - {}: {}\n".format(
+                    name1, a.format, name2, b.format)
+                lstAnalysis.append(msg)

@@ -13,6 +13,7 @@ Added
 Changed
 ********
 - block drag & drop when files added programmatically
+- Looking into Python 3.8 to cleanup code
 
 Fixed
 ******
@@ -22,10 +23,11 @@ mkv
 
 Added:
 ******
-- add property for chaptersFile pathlib.pathlib
+- add property for chaptersFile (pathlib.Path)
 
 Changed:
 ********
+- VerifyStructure provides more details
 
 Fixed:
 ******
