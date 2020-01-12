@@ -88,7 +88,7 @@ class RunCommand:
                  universalNewLines=False):
 
         self.__command = None
-        self.command = command
+        self.command = command  # Call class setter property
 
         self.__commandShlex = commandShlex
         self.__process = processLine
@@ -152,6 +152,12 @@ class RunCommand:
 
     @property
     def command(self):
+        """return current command set in class"""
+
+        return self.__command
+
+    @command.setter
+    def command(self, value):
         """
         command to execute
 
@@ -163,11 +169,6 @@ class RunCommand:
 
             current command set
         """
-        return self.__command
-
-    @command.setter
-    def command(self, value):
-        """return current command set in class"""
         self.__command = None
         self._reset(value)
 
@@ -272,14 +273,11 @@ class RunCommand:
     def _regexMatch(self, line):
         """Have to set the size of in case of list"""
 
-        m = None
-
         if isinstance(self.__regEx, list):
 
             for index, regex in enumerate(self.__regEx):
-                m = regex.search(line)
 
-                if m is not None:
+                if m := regex.search(line):
                     if self.__regexmatch is None:
                         self.__regexmatch = [None] * len(self.__regEx)
 
@@ -292,14 +290,14 @@ class RunCommand:
         else:
 
             if self.__regEx:
-                m = self.__regEx.search(line)
 
-            if m is not None:
-                if self.__regexmatch is None:
-                    self.__regexmatch = []
+                if m := self.__regEx.search(line):
 
-                for i in m.groups():
-                    self.__regexmatch.append(i)
+                    if self.__regexmatch is None:
+                        self.__regexmatch = []
+
+                    for i in m.groups():
+                        self.__regexmatch.append(i)
 
     def _getCommandOutput(self):
         """Execute command in a subprocess"""
@@ -315,7 +313,6 @@ class RunCommand:
 
             with subprocess.Popen(cmd,
                                   stdout=subprocess.PIPE,
-                                  bufsize=1,
                                   universal_newlines=self.__universalNewLines,
                                   stderr=subprocess.STDOUT) as p:
 
@@ -368,8 +365,7 @@ class RunCommand:
 
                     raise SystemExit(0)
 
-                rcResult = p.poll()
-                if rcResult is not None:
+                if rcResult := p.poll():
                     self.__returnCode = rcResult
                     rc = rcResult
 

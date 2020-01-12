@@ -1,10 +1,11 @@
 """
-File utilities
+Convenience functions related to files and file system
 """
 
 import os
 import platform
 from pathlib import Path, PurePath
+
 
 def findFileInPath(element, dirPath=None):
     """
@@ -26,7 +27,7 @@ def findFileInPath(element, dirPath=None):
     filesFound = []
 
     if dirPath is None:
-        dirPath = os.getenv('PATH')
+        dirPath = os.getenv("PATH")
 
     if isinstance(dirPath, str):
         dirs = dirPath.split(os.pathsep)
@@ -41,11 +42,9 @@ def findFileInPath(element, dirPath=None):
     return filesFound
 
 
-def getFileList(strPath,
-                wildcard=None,
-                fullpath=False,
-                recursive=False,
-                strName=False):
+def getFileList(
+    strPath, wildcard="*.*", fullpath=False, recursive=False, strName=False
+):
     """
     Get files in a directory
     strPath has to be an existing directory or file
@@ -63,10 +62,7 @@ def getFileList(strPath,
     if p.is_file():
         p = p.parent
 
-    if wildcard is None:
-        wc = "*.*"
-    else:
-        wc = wildcard
+    wc = wildcard
 
     if recursive:
         wc = "**/" + stripEncaseQuotes(wildcard)
@@ -95,43 +91,31 @@ def getExecutable(search):
 
     if currentOS == "Darwin":
 
-        lstTest = Path("/Applications").glob('**/' + fileToSearch)
+        lstTest = Path("/Applications").glob("**/" + fileToSearch)
 
         for l in lstTest:
-            p = Path(l)
-            if p.stem == fileToSearch:
+            if (p := Path(l)).stem == fileToSearch:
                 return p
 
     elif currentOS == "Windows":
 
-        if fileToSearch.find('.') < 0:
+        if fileToSearch.find(".") < 0:
             # assume is binary executable
-            fileToSearch += '.exe'
-
-        defPrograms64 = os.environ.get('ProgramFiles')
-        defPrograms32 = os.environ.get('ProgramFiles(x86)')
+            fileToSearch += ".exe"
 
         dirs = []
-        if defPrograms64 is not None:
-            dirs.append(defPrograms64)
-
-        if defPrograms32 is not None:
-            dirs.append(defPrograms32)
+        dirs.append(os.environ.get("ProgramFiles") or "")
+        dirs.append(os.environ.get("ProgramFiles(x86)") or "")
 
         # search 64 bits
         for d in dirs:
-            search = sorted(Path(d).rglob(fileToSearch))
-            if search:
-                executable = Path(search[0])
-                if executable.is_file():
+            if search := sorted(Path(d).rglob(fileToSearch)):
+                if (executable := Path(search[0])).is_file():
                     return executable
 
-    searchFile = findFileInPath(fileToSearch)
-
-    if searchFile:
+    if searchFile := findFileInPath(fileToSearch):
         for e in searchFile:
-            executable = Path(e)
-            if executable.is_file():
+            if (executable := Path(e)).is_file():
                 return executable
 
     return None

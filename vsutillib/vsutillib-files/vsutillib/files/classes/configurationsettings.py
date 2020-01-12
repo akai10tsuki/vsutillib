@@ -105,13 +105,21 @@ class ConfigurationSettings:
     # theese are human readable easier
     # to use on different systems
     _literal = [
-        'bool', 'bytes', 'complex', 'float', 'int', 'str', 'dict', 'list',
-        'tuple', 'set'
+        "bool",
+        "bytes",
+        "complex",
+        "float",
+        "int",
+        "str",
+        "dict",
+        "list",
+        "tuple",
+        "set",
     ]
 
     # pickable types are python specific maybe
     # even version specific
-    _pickable = ['range', 'bytearray', 'frozenset', 'function', 'pickle']
+    _pickable = ["range", "bytearray", "frozenset", "function", "pickle"]
 
     @classmethod
     def classLog(cls, setLogging=None):
@@ -221,13 +229,11 @@ class ConfigurationSettings:
             if valueType is not None:
                 _valueType = valueType
 
-            if not ((_valueType in self._pickable) or
-                    (_valueType in self._literal)):
+            if not ((_valueType in self._pickable) or (_valueType in self._literal)):
                 s = str(_valueType)
                 if self.log:
-                    MODULELOG.debug('CM0003: value type not supported - %s',
-                                    str(s))
-                raise TypeError('value type not supported - {}'.format(s))
+                    MODULELOG.debug("CM0003: value type not supported - %s", str(s))
+                raise TypeError("value type not supported - {}".format(s))
 
             self._configType[key] = _valueType
 
@@ -235,8 +241,8 @@ class ConfigurationSettings:
         else:
             s = str(key)
             if self.log:
-                MODULELOG.debug('CM0002: key must be a string - %s', str(s))
-            raise TypeError('key must be a string - {}'.format(s))
+                MODULELOG.debug("CM0002: key must be a string - %s", str(s))
+            raise TypeError("key must be a string - {}".format(s))
 
     def get(self, key):
         """
@@ -254,7 +260,7 @@ class ConfigurationSettings:
 
         if self.log:
             s = str(key)
-            MODULELOG.debug('CM0001: key not found - %s', s)
+            MODULELOG.debug("CM0001: key not found - %s", s)
 
         return None
 
@@ -293,8 +299,8 @@ class ConfigurationSettings:
                 u = base64.b64encode(p)
                 tValue = u
 
-            configElement = ET.SubElement(config, 'ConfigSetting')
-            configElement.attrib = {'id': key, 'type': valueType}
+            configElement = ET.SubElement(config, "ConfigSetting")
+            configElement.attrib = {"id": key, "type": valueType}
             configElement.text = str(tValue)
 
         if root is None:
@@ -321,8 +327,8 @@ class ConfigurationSettings:
 
         for setting in xmlDoc.findall(searchIn):
 
-            key = setting.attrib['id']
-            valueType = setting.attrib['type']
+            key = setting.attrib["id"]
+            valueType = setting.attrib["type"]
 
             if valueType == "str":
                 value = setting.text
@@ -353,7 +359,7 @@ class ConfigurationSettings:
 
         xmlDoc = DOM.parseString(ET.tostring(root))
 
-        xmlPretty = xmlDoc.toprettyxml(indent='    ')
+        xmlPretty = xmlDoc.toprettyxml(indent="    ")
 
         return xmlPretty
 
@@ -420,7 +426,7 @@ class ConfigurationSettings:
             self.fromXML(root)
 
 
-class Abc():
+class Abc:
     """Test class"""
 
     def __init__(self, param):
@@ -433,7 +439,7 @@ class Abc():
 
 def print13():
     """function for testing"""
-    print('Print from function = 13')
+    print("Print from function = 13")
 
 
 def test():
@@ -441,42 +447,39 @@ def test():
 
     classInstance = Abc(13)
 
-    configFile = Path(Path.cwd(), 'configmanager.xml')
+    configFile = Path(Path.cwd(), "configmanager.xml")
 
     configuration = ConfigurationSettings(configFile=configFile)
 
-    b = b'Sanson'
+    b = b"Sanson"
 
-    configuration.set('range', range(13))
-    configuration.set('set', {'r', 'n', 'a', 'f', 'e', 'i'})
-    configuration.set('bytearray', bytearray(b'Itsue'))
-    configuration.set('frozenset', frozenset('Itsue'))
-    configuration.set('function', print13, valueType='pickle')
-    configuration.set('class', classInstance, valueType='pickle')
-    configuration.set('bool', True)
+    configuration.set("range", range(13))
+    configuration.set("set", {"r", "n", "a", "f", "e", "i"})
+    configuration.set("bytearray", bytearray(b"Itsue"))
+    configuration.set("frozenset", frozenset("Itsue"))
+    configuration.set("function", print13, valueType="pickle")
+    configuration.set("class", classInstance, valueType="pickle")
+    configuration.set("bool", True)
     configuration.set(
-        'base64sting',
-        'AdnQywACAAAAAAHmAAAAoAAACM4AAAR5AAAB7wAAAMYAAAjFAAAEcAAAAAAAAAAACgA=')
+        "base64sting",
+        "AdnQywACAAAAAAHmAAAAoAAACM4AAAR5AAAB7wAAAMYAAAjFAAAEcAAAAAAAAAAACgA=",
+    )
     configuration.set(
-        'base86bytes',
-        'AdnQywACAAAAAAHmAAAAoAAACM4AAAR5AAAB7wAAAMYAAAjFAAAEcAAAAAAAAAAACgA='.
-        encode())
-    configuration.set('dict', {'key1': 1, 'key2': 2, 3: b})
-    configuration.set('list', [2, 3, 'list', {
-        'key1': 1,
-        2: [2]
-    }],
-                      valueType='pickle')
-    configuration.set('int', 13)
-    configuration.set('float', 1.3e200)
-    configuration.set('complex', 1 + 3j)
-    configuration.set('tuple', (1.11, 2.22, 3.33))
+        "base86bytes",
+        "AdnQywACAAAAAAHmAAAAoAAACM4AAAR5AAAB7wAAAMYAAAjFAAAEcAAAAAAAAAAACgA=".encode(),
+    )
+    configuration.set("dict", {"key1": 1, "key2": 2, 3: b})
+    configuration.set("list", [2, 3, "list", {"key1": 1, 2: [2]}], valueType="pickle")
+    configuration.set("int", 13)
+    configuration.set("float", 1.3e200)
+    configuration.set("complex", 1 + 3j)
+    configuration.set("tuple", (1.11, 2.22, 3.33))
 
-    print('\nConfiguration set\n')
+    print("\nConfiguration set\n")
     for key, value in configuration:
-        print('Key = {0}, type = {2} value = {1}'.format(
-            key, value,
-            type(value).__name__))
+        print(
+            "Key = {0}, type = {2} value = {1}".format(key, value, type(value).__name__)
+        )
 
     configuration.saveToFile()
 
@@ -484,21 +487,23 @@ def test():
 
     root = configuration.toXML()
 
-    print('\nRead from configuration file\n')
+    print("\nRead from configuration file\n")
     for key, value in configuration:
-        print('Key = {0}, type = {2}, value = {1}'.format(
-            key, value,
-            type(value).__name__))
+        print(
+            "Key = {0}, type = {2}, value = {1}".format(
+                key, value, type(value).__name__
+            )
+        )
 
     prettyXML = configuration.xmlPrettyPrint(root)
 
     print()
     print(prettyXML)
-    print('Call function: ')
-    f = configuration.get('function')
+    print("Call function: ")
+    f = configuration.get("function")
     f()
-    c = configuration.get('class')
-    print('Calling class method = {} '.format(c.getValue()))
+    c = configuration.get("class")
+    print("Calling class method = {} ".format(c.getValue()))
 
 
 if __name__ == "__main__":

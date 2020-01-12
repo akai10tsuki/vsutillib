@@ -1,6 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""Compress DSF files into WavPack"""
+"""
+Compress DSF files into WavPack
+
+DSD format is preserved
+"""
 
 import argparse
 import sys
@@ -10,45 +14,56 @@ from pathlib import Path
 from vsutillib.process import RunCommand
 from vsutillib.files import getFileList
 
-VERSION = "1.0"
+VERSION = "1.5.0"
+
+
+class Files:  # pylint: disable=too-few-public-methods
+    """
+    utility class
+    """
+
+    total = 0
+    count = 0
+    noMatch = []
 
 
 def parserArguments():
     """construct parser"""
 
     parser = argparse.ArgumentParser(
-        description='compress dsf audio file to WavPack container')
+        description="compress dsf audio file to WavPack container"
+    )
 
-    parser.add_argument('directory',
-                        nargs='+',
-                        help='enter directory to process')
-    parser.add_argument('-d',
-                        '--debug',
-                        action='store_true',
-                        default=False,
-                        help='just print commands')
-    parser.add_argument('-o',
-                        '--onlycurrentdir',
-                        action='store_true',
-                        default=False,
-                        help='don\'t proccess subdirectories')
-    parser.add_argument('-v',
-                        '--verbose',
-                        action='store_true',
-                        default=False,
-                        help='increase verbosity')
-    parser.add_argument('-c', '--command', help='command to apply')
-    parser.add_argument('-l',
-                        '--logfile',
-                        action='store',
-                        default='dsf2wv.txt',
-                        help='file to log output')
-    parser.add_argument('-w',
-                        '--wildcard',
-                        help='wildcard to select files to process')
-    parser.add_argument('--version',
-                        action='version',
-                        version='%(prog)s ' + VERSION)
+    parser.add_argument("directory", nargs="+", help="enter directory to process")
+    parser.add_argument(
+        "-d", "--debug", action="store_true", default=False, help="just print commands"
+    )
+    parser.add_argument(
+        "-o",
+        "--onlycurrentdir",
+        action="store_true",
+        default=False,
+        help="don't proccess subdirectories",
+    )
+    parser.add_argument(
+        "-v", "--verbose", action="store_true", default=False, help="increase verbosity"
+    )
+    parser.add_argument("-c", "--command", help="command to apply")
+    parser.add_argument(
+        "-l",
+        "--logfile",
+        action="store",
+        default="dsf2wv.txt",
+        help="file to log output",
+    )
+    parser.add_argument(
+        "-w",
+        "--wildcard",
+        action="store",
+        default="*.dsf",
+        help="wildcard to select files to process",
+    )
+    parser.add_argument("--version", action="version", version="%(prog)s " + VERSION)
 
     return parser
 
@@ -60,49 +75,44 @@ def printToConsoleAndFile(oFile, msg):
     print(msg)
 
 
-def dsf2wv():
-    """Main"""
+def setLogFile(logFileName):
+    """
+    Setup logging file
 
-    command = "wavpack -y --allow-huge-tags --import-id3"
-    wildcard = '*.dsf'
+    Arguments:
+        logFileName {str} -- name of log file
 
-    parser = parserArguments()
-    args = parser.parse_args()
+    Returns:
+        Pathlib.Path -- Pathlib object logfile
+    """
 
-    cwd = Path.cwd()
-    lFile = Path(args.logfile)
-    logFile = None
+    lFile = Path(logFileName)
 
     if Path(lFile.parent).is_dir():
         lFile.touch(exist_ok=True)
     else:
         # cannot create log file
         # on command line
-        lFile = Path('dsf2wv.txt')
+        lFile = Path("dsf2wv.txt")
         lFile.touch(exist_ok=True)
 
-    logFile = lFile.open(mode='wb')
+    return lFile
 
-    wildcard = None
-    if args.wildcard:
-        wildcard = args.wildcard
-    else:
-        wildcard = '*.dsf'
 
-    debug = args.debug
-    recursive = not args.onlycurrentdir
-
-    msg = 'Current directory {}\n'.format(str(cwd))
-    printToConsoleAndFile(logFile, msg)
+def verifyDirectories(args, logFile):
+    """
+    Verify that the directories in the argument are valid
+    """
 
     fCheckOk = True
+
     for d in args.directory:
 
         p = Path(d)
 
         try:
             if not p.is_dir():
-                msg = 'Invalid directory {}\n'.format(str(p))
+                msg = "Invalid directory {}\n".format(str(p))
                 printToConsoleAndFile(logFile, msg)
                 fCheckOk = False
 
@@ -113,87 +123,99 @@ def dsf2wv():
         if not fCheckOk:
             msg += "\n\nInput: {}"
             msg = msg.format(str(d))
+            printToConsoleAndFile(logFile, msg)
             raise ValueError(msg)
 
-    if not fCheckOk:
-        printToConsoleAndFile(logFile, msg)
+    return fCheckOk
+
+
+def dsf2wv():
+    """Main"""
+
+    command = "wavpack -y --import-id3 --allow-huge-tags"
+
+    args = parserArguments().parse_args()
+
+    logFile = setLogFile(args.logfile).open(mode="wb")
+
+    msg = "Current directory {}\n".format(str(Path.cwd()))
+    printToConsoleAndFile(logFile, msg)
+
+    if not verifyDirectories(args, logFile):
         return
 
     processLine = None
     if args.verbose:
         processLine = sys.stdout.write
 
-    cli = RunCommand(regexsearch=[
-        r'created (.*?) in.* (.*?)%', r'sor.\W(.*?) Version (.*)\r',
-        r'temp file (.*?) to (.*)!'
-    ],
-                     processLine=processLine)
+    cli = RunCommand(
+        regexsearch=[
+            r"created (.*?) in.* (.*?)%",
+            r"sor.\W(.*?) Version (.*)\r",
+            r"temp file (.*?) to (.*)!",
+        ],
+        processLine=processLine,
+    )
+
+    workFiles = Files()
 
     for d in args.directory:
 
-        msg = 'Working in \n\nDirectory: [{}]\nWildcard:  {}\n\n'.format(
-            str(Path(d).resolve()), wildcard)
+        msg = "Working in \n\nDirectory: [{}]\nWildcard:  {}\n\n".format(
+            str(Path(d).resolve()), args.wildcard
+        )
         printToConsoleAndFile(logFile, msg)
 
-        filesList = getFileList(d,
-                                wildcard=wildcard,
-                                fullpath=True,
-                                recursive=recursive)
+        filesList = getFileList(
+            d, wildcard=args.wildcard, fullpath=True, recursive=not args.onlycurrentdir
+        )
 
-        nTotalFiles = len(filesList)
-
-        count = 0
-        noMatchFiles = []
+        workFiles.total = len(filesList)
+        workFiles.count = 0
+        workFiles.noMatch = []
 
         for of in filesList:
 
             f = str(of)
 
-            qf = shlex.quote(f)
-
-            cliCommand = command + " " + qf
+            cliCommand = command + " " + shlex.quote(f)
             cli.command = cliCommand
 
-            msg = 'Processing file [{}]\n'.format(f)
+            msg = "Processing file [{}]\n".format(f)
             printToConsoleAndFile(logFile, msg)
 
-            if debug:
+            if args.debug:
 
-                msg = 'Command: {}\n\n'.format(cliCommand)
+                msg = "Command: {}\n\n".format(cliCommand)
                 printToConsoleAndFile(logFile, msg)
 
             else:
 
-                if cli.run():
+                cli.run()
 
-                    version = ""
+                version = ""
+                if fc := cli.regexmatch[1]:
+                    version = "WavPack {} Version {} ".format(fc[0], fc[1])
 
-                    if cli.regexmatch[1] is not None:
-                        fc = cli.regexmatch[1]
-                        version = "WavPack {} Version {} ".format(fc[0], fc[1])
+                if fc := cli.regexmatch[0]:
+                    if len(fc) == 2:
+                        msg = "{}created file [{}] at {}% compression\n\n".format(
+                            version, fc[0], fc[1]
+                        )
+                        printToConsoleAndFile(logFile, msg)
+                        workFiles.count += 1
+                    else:
+                        workFiles.noMatch.append(f)
 
-                    if cli.regexmatch[0] is not None:
-                        # File and compression ratio
-                        fc = cli.regexmatch[0]
+                if cli.output:
+                    for line in cli.output:
+                        logFile.write(line.encode())
+                    logFile.write("\n\n".encode())
 
-                        if fc:
-                            if len(fc) == 2:
-                                msg = '{}created file [{}] at {}% compression\n\n'.format(
-                                    version, fc[0], fc[1])
-                                printToConsoleAndFile(logFile, msg)
-                                count += 1
-                            else:
-                                noMatchFiles.append(f)
-
-                    if cli.output:
-                        for line in cli.output:
-                            logFile.write(line.encode())
-                        logFile.write('\n\n'.encode())
-
-        if count != nTotalFiles:
-            msg = 'Bummer..'
-            for f in noMatchFiles:
-                msg = 'Check file \'{}\'\n'.format(f)
+        if workFiles.count != workFiles.total:
+            msg = "Bummer.."
+            for f in workFiles.noMatch:
+                msg = "Check file '{}'\n".format(f)
                 logFile.write(msg.encode())
 
 

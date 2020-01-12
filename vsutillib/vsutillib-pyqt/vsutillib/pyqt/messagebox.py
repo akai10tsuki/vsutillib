@@ -9,7 +9,7 @@ Args:
     icon (QIcon): standard icons for QMessageBox
         question mark, warning ...
 Returns:
-    QMessageBox.button: standar QMessageBox button
+    QMessageBox.button: standard QMessageBox button
 
 """
 
@@ -18,7 +18,7 @@ from PySide2.QtWidgets import QMessageBox
 def messageBoxYesNo(self, title, text, icon):
 
     """
-    Save window state before exit
+    Yes | No message box
     """
 
     m = QMessageBox(self)

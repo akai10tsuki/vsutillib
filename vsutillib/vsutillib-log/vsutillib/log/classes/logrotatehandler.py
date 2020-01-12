@@ -35,12 +35,10 @@ class LogRotateFileHandler(logging.handlers.RotatingFileHandler):
         else:
             f = fileName
 
-        super(LogRotateFileHandler, self).__init__(
-            f,
-            **kwargs
-        )
+        super(LogRotateFileHandler, self).__init__(f, **kwargs)
 
         self.doRollover()
+
 
 class LogRotateFileHandlerOriginal(logging.Handler):
     """
@@ -69,7 +67,7 @@ class LogRotateFileHandlerOriginal(logging.Handler):
 
         if logFile.is_file():
             bRotate = True
-        #else:
+        # else:
         #    logFile.touch(exist_ok=True)
 
         if bRotate:
@@ -94,12 +92,12 @@ class LogRotateFileHandlerOriginal(logging.Handler):
 
             for n in range(maxIndexFile - 1, 0, -1):
                 if n in dFiles:
-                    rollFile = str(logFile) + "." + str(n+1)
+                    rollFile = str(logFile) + "." + str(n + 1)
                     dFiles[n].replace(rollFile)
 
             rollFile = str(logFile) + ".1"
             logFile.replace(rollFile)
-            #logFile.touch(exist_ok=True)
+            # logFile.touch(exist_ok=True)
 
     def emit(self, record):
         """

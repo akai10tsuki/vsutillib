@@ -15,7 +15,7 @@ import logging
 
 from pathlib import Path
 
-from ..mkvutils import stripEncaseQuotes
+from vsutillib.files import stripEncaseQuotes
 from .verifycommand import VerifyMKVCommand
 
 MODULELOG = logging.getLogger(__name__)
@@ -59,7 +59,7 @@ class MKVCommand(object):
 
     def __init__(self, strCommand=None):
 
-        #self.__destinationDirectory = None
+        # self.__destinationDirectory = None
         self.__lstCommands = []
         self.__strShellCommand = None
         self.__strError = ""
@@ -102,30 +102,22 @@ class MKVCommand(object):
             reSourcesEx = re.compile(reSourceFile)
 
             # search for the output file
-            match = reOutputFileEx.search(strCommand)
-
-            if match:
+            if match := reOutputFileEx.search(strCommand):
                 strOutputFile = match.group(1)
 
             outputFile = verify.outputFile
 
             # search for chapters file
-            #match = reChaptersFileEx.search(strCommand)
-            match = reChaptersFileEx.search(strCommand)
-
-            if match:
+            # match = reChaptersFileEx.search(strCommand)
+            if match := reChaptersFileEx.search(strCommand):
                 strChaptersFile = match.group(1)
                 chaptersFile = verify.chaptersFile
                 bHasChaptersFile = True
 
-            #
             # search for the source files
             # this have to exist in the
             # file system
-            #
-            match = reSourcesEx.findall((strCommand))
-
-            if match:
+            if match := reSourcesEx.findall((strCommand)):
                 for m in match:
                     lstSources.append(m)
 
@@ -140,11 +132,11 @@ class MKVCommand(object):
 
                 # Set source files
                 sub, fileName = source
-                key = '<SOURCE{}>'.format(str(index))
+                key = "<SOURCE{}>".format(str(index))
                 fileName = fileName.replace(r"'\''", "'")
                 f = Path(stripEncaseQuotes(fileName))
                 d = f.parent
-                fd = [x for x in d.glob('*' + f.suffix) if x.is_file()]
+                fd = [x for x in d.glob("*" + f.suffix) if x.is_file()]
                 fd.sort(key=_strPath)
 
                 # Check all lists have same number of files
@@ -160,12 +152,13 @@ class MKVCommand(object):
                 if index == 0:
                     od = []
                     for o in fd:
-                        of = outputFile.parent.joinpath(o.stem + '.mkv')
+                        of = outputFile.parent.joinpath(o.stem + ".mkv")
                         of = _resolveOverwrite(of)
                         od.append(of)
                     filesInDirsByKey[_Key.outputFile] = od
                     newCommandTemplate = newCommandTemplate.replace(
-                        strOutputFile, _Key.outputFile, 1)
+                        strOutputFile, _Key.outputFile, 1
+                    )
 
                 lstBaseFiles.append(f)  # backwards compatible
                 filesInDirsByKey[key] = fd
@@ -174,10 +167,7 @@ class MKVCommand(object):
             # Set output files
             if bHasChaptersFile:
                 d = chaptersFile.parent
-                cd = [
-                    x for x in d.glob('*' + chaptersFile.suffix)
-                    if x.is_file()
-                ]
+                cd = [x for x in d.glob("*" + chaptersFile.suffix) if x.is_file()]
                 cd.sort(key=_strPath)
 
                 if lenOfListOfFiles != len(cd):
@@ -188,16 +178,19 @@ class MKVCommand(object):
                 filesInDirsByKey[_Key.chaptersFile] = cd
 
                 newCommandTemplate = newCommandTemplate.replace(
-                    strChaptersFile, _Key.chaptersFile, 1)
+                    strChaptersFile, _Key.chaptersFile, 1
+                )
 
             if not self.__bErrorFound:
                 self.__commandTemplate = newCommandTemplate
                 self.__filesInDirsByKey = filesInDirsByKey
 
                 self.__workFiles.baseFiles = lstBaseFiles
-                self.__workFiles.chaptersFiles = \
-                    None if _Key.chaptersFile not in filesInDirsByKey else filesInDirsByKey[
-                    _Key.chaptersFile]
+                self.__workFiles.chaptersFiles = (
+                    None
+                    if _Key.chaptersFile not in filesInDirsByKey
+                    else filesInDirsByKey[_Key.chaptersFile]
+                )
 
                 self._generateCommands()
             else:
@@ -216,7 +209,7 @@ class MKVCommand(object):
     def __reset(self):
         """Reset variable properties"""
 
-        #self.__destinationDirectory = None
+        # self.__destinationDirectory = None
         self.__lstCommands = []
         self.__strShellCommand = None
         self.__strError = ""
@@ -233,11 +226,13 @@ class MKVCommand(object):
 
     def __getitem__(self, index):
         return [
-            self.__lstCommands[index], self.__workFiles.baseFiles,
+            self.__lstCommands[index],
+            self.__workFiles.baseFiles,
             self.__workFiles.sourceFiles[index],
             self.__workFiles.destinationFiles[index],
-            None if not self.__workFiles.chaptersFiles else
-            self.__workFiles.chaptersFiles[index]
+            None
+            if not self.__workFiles.chaptersFiles
+            else self.__workFiles.chaptersFiles[index],
         ]
 
     def __iter__(self):
@@ -254,7 +249,7 @@ class MKVCommand(object):
             self.__index += 1
             return self.__getitem__(self.__index - 1)
 
-            #return [self.__lstCommands[self.__index - 1],
+            # return [self.__lstCommands[self.__index - 1],
             #        self.__workFiles.baseFiles,
             #        self.__workFiles.sourceFiles[self.__index - 1],
             #        self.__workFiles.destinationFiles[self.__index - 1]]
@@ -315,28 +310,27 @@ class MKVCommand(object):
             if bRemoveTitle and shellCommand:
                 # Remove title if found since this is for batch processing
                 # the title will propagate to all the files maybe erroneously.
-                # This parameters are preserved from the source files.
+                # This field is preserved from the source files.
 
                 while "--title" in shellCommand:
 
                     i = shellCommand.index("--title")
-                    del shellCommand[i:i + 2]
+                    del shellCommand[i : i + 2]
 
             self.__lstCommands.append(shellCommand)
 
         self.__workFiles.sourceFiles = lstSourceFiles  # redundant for rename
-        self.__workFiles.destinationFiles = self.__filesInDirsByKey[
-            _Key.outputFile]
+        self.__workFiles.destinationFiles = self.__filesInDirsByKey[_Key.outputFile]
 
         if self.log:
-            MODULELOG.debug("MKV0001: Command template %s",
-                            str(self.__commandTemplate))
-            MODULELOG.debug("MKV0002: Base files %s",
-                            str(self.__workFiles.baseFiles))
-            MODULELOG.debug("MKV0003: Source files %s",
-                            str(self.__workFiles.sourceFiles))
-            MODULELOG.debug("MKV0004: Destination files %s",
-                            str(self.__workFiles.destinationFiles))
+            MODULELOG.debug("MKV0001: Command template %s", str(self.__commandTemplate))
+            MODULELOG.debug("MKV0002: Base files %s", str(self.__workFiles.baseFiles))
+            MODULELOG.debug(
+                "MKV0003: Source files %s", str(self.__workFiles.sourceFiles)
+            )
+            MODULELOG.debug(
+                "MKV0004: Destination files %s", str(self.__workFiles.destinationFiles)
+            )
 
     @property
     def log(self):
@@ -439,6 +433,12 @@ class MKVCommand(object):
         return self.__strError
 
     def renameOutputFiles(self, fileNames):
+        """
+        Mothod for renaming the output files
+
+        Arguments:
+            fileNames {list} -- list of file names
+        """
 
         totalNames = len(self.__filesInDirsByKey[_Key.outputFile])
         totalRenames = len(fileNames)
@@ -470,13 +470,13 @@ class _WorkFiles:
         self.chaptersFiles = []
 
 
-class _Key():
+class _Key:
 
     outputFile = "<OUTPUTFILE>"
     chaptersFile = "<CHAPTERS>"
 
 
-def _resolveOverwrite(fileName, strPrefix='new-'):
+def _resolveOverwrite(fileName, strPrefix="new-"):
 
     fileNameTmp = fileName
 
@@ -487,19 +487,28 @@ def _resolveOverwrite(fileName, strPrefix='new-'):
         n = 1
 
         while True:
-            fileNameTmp = fileNameTmp.parent.joinpath(strPrefix +
-                                                      fileName.stem +
-                                                      strSuffix +
-                                                      fileName.suffix)
+            fileNameTmp = fileNameTmp.parent.joinpath(
+                strPrefix + fileName.stem + strSuffix + fileName.suffix
+            )
 
             if fileNameTmp.is_file():
                 strSuffix = " ({})".format(n)
                 n += 1
             else:
                 break
+
     # video-S01E01.mkv
     return fileNameTmp
 
 
 def _strPath(value):
+    """
+    Convenience function to help sort
+
+    Arguments:
+        value {various types} -- value to convert to string
+
+    Returns:
+        str -- argument received converted to string
+    """
     return str(value)
