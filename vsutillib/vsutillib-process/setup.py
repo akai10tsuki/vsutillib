@@ -44,7 +44,7 @@ def readme():
 
 setup(
     name=config.NAME + '-' + PACKAGE,
-    version='1.0.1.post1',
+    version='1.5.0',
     description="vsutillib." + PACKAGE + " sub package part of vsutillib",
     long_description=readme(),
     author=config.AUTHOR,
