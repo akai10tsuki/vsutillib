@@ -29,7 +29,7 @@ from vsutillib.log import LogRotateFileHandler
 
 data = ConfigurationSettings()  # pylint: disable=invalid-name
 
-__VERSION = (1, 0, '2')
+__VERSION = (1, 5, '0')
 
 VERSION = ".".join(map(str, __VERSION))
 AUTHOR = "Efrain Vergara"
@@ -41,16 +41,16 @@ DESCRIPTION = 'Library module with miscellaneous convenience functions and class
 NAME = "vsutillib"
 KEYWORDS = 'mkv multimedia video audio configuration'
 REQUIRED = [
-    'vsutillib-files>=1.0.1',
+    'vsutillib-files>=1.5.0',
     'vsutillib-log>=1.0.1',
-    'vsutillib-macos>=1.0.1',
-    'vsutillib-media>=1.0.1',
-    'vsutillib-mkv>=1.0.1'
-    'vsutillib-network>=1.0.1',
-    'vsutillib-process>=1.0.1',
-    'vsutillib-pyqt>=1.0.1',
-    'vsutillib-scripts>=1.0.1'
-    'vsutillib-vsxml>=1.0.1',
+    'vsutillib-macos>=1.0.2',
+    'vsutillib-media>=1.0.2',
+    'vsutillib-mkv>=1.5.0'
+    'vsutillib-network>=1.0.2',
+    'vsutillib-process>=1.5.0',
+    'vsutillib-pyqt>=1.0.2',
+    'vsutillib-scripts>=1.5.0'
+    'vsutillib-vsxml>=1.0.2',
 ]
 URL = 'https://github.com/akai10tsuki/vsutillib'
 PYPI = 'https://pypi.org/project/vsutillib/'
