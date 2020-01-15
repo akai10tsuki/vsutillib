@@ -5,18 +5,15 @@ this information is used for internationalization
 
 from PySide2.QtWidgets import QAction
 
+
 class QActionWidget(QAction):
     """
     class QAction([parent=None])¶
     QAction(icon, text[, parent=None])
     QAction(text[, parent=None])
     """
-    def __init__(self,
-                 *args,
-                 shortcut=None,
-                 tooltip=None,
-                 **kwargs
-                ):
+
+    def __init__(self, *args, shortcut=None, tooltip=None, **kwargs):
 
         super().__init__(*args, **kwargs)
 
