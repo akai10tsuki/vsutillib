@@ -222,7 +222,6 @@ class ConfigurationSettings:
         """
 
         if isinstance(key, str):
-
             self._config[key] = value
             _valueType = type(value).__name__
 
@@ -238,6 +237,7 @@ class ConfigurationSettings:
             self._configType[key] = _valueType
 
             self._len = len(self._config)
+
         else:
             s = str(key)
             if self.log:
