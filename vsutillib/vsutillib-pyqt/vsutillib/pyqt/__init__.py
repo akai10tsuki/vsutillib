@@ -6,3 +6,4 @@ PySide2 related classes and functions
 
 from .classes import FileListWidget, OutputTextWidget, QActionWidget, QMenuWidget
 from .messagebox import messageBoxYesNo
+from .qtUtils import centerWidgets
