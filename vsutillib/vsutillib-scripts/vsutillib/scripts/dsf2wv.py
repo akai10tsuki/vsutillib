@@ -12,7 +12,7 @@ import shlex
 from pathlib import Path
 
 from vsutillib.process import RunCommand
-from vsutillib.files import getFileList
+from vsutillib.files import getFileList, getDirectoryList
 
 VERSION = "1.5.0"
 
@@ -102,9 +102,11 @@ def setLogFile(logFileName):
 def verifyDirectories(args, logFile):
     """
     Verify that the directories in the argument are valid
+    and expand wildcards on directory specified
     """
 
     fCheckOk = True
+    goodDirectory = []
 
     for d in args.directory:
 
@@ -115,16 +117,24 @@ def verifyDirectories(args, logFile):
                 msg = "Invalid directory {}\n".format(str(p))
                 printToConsoleAndFile(logFile, msg)
                 fCheckOk = False
-
         except OSError as error:
+            if wildcardDirs := getDirectoryList(d):
+                for g in wildcardDirs:
+                    goodDirectory.append(str(g))
+                continue
+
             msg = error.strerror
             fCheckOk = False
 
         if not fCheckOk:
-            msg += "\n\nInput: {}"
-            msg = msg.format(str(d))
+            msg = "\n\nInput: {}"
+            msg = msg.format(d)
             printToConsoleAndFile(logFile, msg)
             raise ValueError(msg)
+
+        goodDirectory.append(d)
+
+    args.directory = goodDirectory
 
     return fCheckOk
 
