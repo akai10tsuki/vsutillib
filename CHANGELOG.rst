@@ -5,19 +5,13 @@ Changelog
 ~~~~~~~~~~~~
 
 Changed
-********
+*******
+
 - modify files to bump version to 1.5.0
- - Using Python 3.8 features drop support for 3.5->3.8
+- Using some Python 3.8 specific features drop support versions less than 3.8
 
-pyqt
-----
-
-Added
-
-- centerWidgets function
-
-files
------
+files package
+~~~~~~~~~~~~~
 
 Added
 *****
@@ -34,8 +28,30 @@ Changed
 Fixed
 ******
 
-mkv
----
+
+pyqt package
+~~~~~~~~~~~~
+
+Added
+*****
+
+- centerWidgets function
+- QThreads classes
+
+Changed
+*******
+
+- To use this package Python version has to be 3.8.1 PySide2 does not support
+  version 3.8
+
+Fixed
+*****
+
+- shortcut handling on QActionWidget
+
+
+mkv package
+~~~~~~~~~~~
 
 Added:
 ******
