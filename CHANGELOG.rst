@@ -35,7 +35,8 @@ pyqt package
 Added
 *****
 
-- centerWidgets function
+- centerWidgets convenience function
+- pushButton convenience function
 - QThreads classes
 
 Changed
