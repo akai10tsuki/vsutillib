@@ -7,7 +7,9 @@ utility functions that use PySide2
 
 import logging
 
-from PySide2.QtWidgets import QDesktopWidget, QPushButton
+from PySide2.QtCore import Qt
+from PySide2.QtGui import QPalette, QColor
+from PySide2.QtWidgets import QDesktopWidget, QPushButton, QToolTip
 
 
 MODULELOG = logging.getLogger(__name__)
@@ -24,7 +26,11 @@ def centerWidgets(widget, parent=None):
         widget.move(parent.frameGeometry().center() - widget.frameGeometry().center())
 
     else:
-        widget.move(QDesktopWidget().availableGeometry().center() - widget.frameGeometry().center())
+        widget.move(
+            QDesktopWidget().availableGeometry().center()
+            - widget.frameGeometry().center()
+        )
+
 
 def pushButton(label, function, tooltip):
     """
@@ -45,3 +51,32 @@ def pushButton(label, function, tooltip):
     button.setToolTip(tooltip)
 
     return button
+
+
+def darkPalette():
+    """
+    darkPalette palette to change to a dark theme
+    """
+
+    palette = QPalette()
+    palette.setColor(QPalette.Window, QColor(53, 53, 53))
+    palette.setColor(QPalette.WindowText, Qt.white)
+    palette.setColor(QPalette.Base, QColor(25, 25, 25))
+    palette.setColor(QPalette.AlternateBase, QColor(53, 53, 53))
+    palette.setColor(QPalette.Text, Qt.white)
+    palette.setColor(QPalette.Button, QColor(53, 53, 53))
+    palette.setColor(QPalette.ButtonText, Qt.white)
+    palette.setColor(QPalette.BrightText, Qt.cyan)
+    palette.setColor(QPalette.Link, QColor(42, 130, 218))
+    palette.setColor(QPalette.Highlight, Qt.darkCyan)  # QColor(42, 130, 218)
+    palette.setColor(QPalette.HighlightedText, Qt.white)
+    palette.setColor(QPalette.Disabled, QPalette.Text, Qt.darkGray)
+    palette.setColor(QPalette.Disabled, QPalette.ButtonText, Qt.darkGray)
+
+    toolTipPalette = QPalette()
+    toolTipPalette.setColor(QPalette.Inactive, QPalette.ToolTipBase, Qt.lightGray) # QColor(53, 53, 53)
+    toolTipPalette.setColor(QPalette.Inactive, QPalette.ToolTipText, Qt.black)
+
+    QToolTip.setPalette(toolTipPalette)
+
+    return palette

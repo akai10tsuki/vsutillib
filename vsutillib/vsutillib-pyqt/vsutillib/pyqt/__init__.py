@@ -17,4 +17,4 @@ from .classes import (
     Worker,
 )
 from .messagebox import messageBoxYesNo
-from .qtUtils import centerWidgets, pushButton
+from .qtUtils import centerWidgets, pushButton, darkPalette
