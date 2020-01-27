@@ -7,6 +7,7 @@ PySide2 related classes and functions
 from .classes import (
     DualProgressBar,
     FileListWidget,
+    FormatLabel,
     OutputTextWidget,
     QActionWidget,
     QMenuWidget,
