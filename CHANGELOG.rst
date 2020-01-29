@@ -44,6 +44,7 @@ Changed
 
 - To use this package Python version has to be 3.8.1 PySide2 does not support
   version 3.8
+- OutputTextWidget class code refactoring and set scheme for font color
 
 Fixed
 *****
@@ -72,8 +73,15 @@ scripts
 Changed
 *******
 
+- bump version
 - dsf2wv accepts wildcard on directory argument
 - apply2files accepts wildcard on directory argument
+
+Fixed
+*****
+
+- mkvrun fix use of mkv.MKVCommand class changed while
+  unpacking
 
 2019-6-13
 ~~~~~~~~~
