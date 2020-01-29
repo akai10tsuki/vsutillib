@@ -12,7 +12,7 @@ from vsutillib.media import MediaFileInfo
 from vsutillib.mkv import MKVCommand, VerifyStructure
 from vsutillib.process import RunCommand
 
-VERSION = "1.0"
+VERSION = "1.5.0"
 
 
 def displayMKVRun(line):
@@ -122,7 +122,7 @@ def mkvrun():
 
     if mkv:
 
-        for cmd, baseFiles, sourceFiles, destinationFiles in mkv:
+        for cmd, baseFiles, sourceFiles, destinationFiles, _ in mkv:
 
             verify.verifyStructure(baseFiles, sourceFiles)
 
