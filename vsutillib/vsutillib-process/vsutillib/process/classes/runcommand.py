@@ -85,7 +85,7 @@ class RunCommand:
                  processKWArgs=None,
                  regexsearch=None,
                  commandShlex=False,
-                 universalNewLines=False):
+                 universalNewLines=False): # pylint: disable=too-many-arguments
 
         self.__command = None
         self.command = command  # Call class setter property
