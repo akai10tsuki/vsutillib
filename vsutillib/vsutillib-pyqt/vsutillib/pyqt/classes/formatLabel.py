@@ -13,12 +13,10 @@ align:
     Qt.Vertical - Vertical layout
 """
 
-
 import random
 
-
 from PySide2.QtWidgets import QWidget, QLabel
-from PySide2.QtCore import Slot
+from PySide2.QtCore import Slot, Signal
 
 
 class FormatLabel(QLabel):
@@ -28,14 +26,15 @@ class FormatLabel(QLabel):
     param align - Set alignment Qt.Horizontal or Qt.Vertical
     type align - Qt.AlignmentFlags
     """
-    #QLabel(QWidget *parent = nullptr, Qt::WindowFlags f = ...)
-    #QLabel(const QString &text, QWidget *parent = nullptr, Qt::WindowFlags f = ...)
+
+    setTemplateSignal = Signal(str)
+    setValueSignal = Signal(int, object)
+    setValuesSignal = Signal(list)
 
     def __init__(self, *args, **kwargs):
-        #super(JobStatusLabel, self).__init__(*args, **kwargs)
 
-        template = kwargs.pop('template', None)
-        initValues = kwargs.pop('init', None)
+        template = kwargs.pop("template", None)
+        initValues = kwargs.pop("init", None)
 
         if (args) or (template is not None):
             if initValues is None:
@@ -49,11 +48,14 @@ class FormatLabel(QLabel):
         if initValues is None:
             initValues = []
 
-        super().__init__(*args, **kwargs)
+        super(FormatLabel, self).__init__(*args, **kwargs)
+
+        self.setTemplateSignal.connect(self.setTemplate)
 
         if template is None:
-            self._template = \
+            self._template = (
                 "Job(s): {0:3d} Running: {1:3d} File: {2:3d} of {3:3d} Errors: {4:3d}"
+            )
             initValues = [0, 0, 0, 0, 0]
         else:
             self._template = template
@@ -65,14 +67,33 @@ class FormatLabel(QLabel):
         return self._values[index]
 
     def __setitem__(self, index, value):
-        self._values[index] = value
-        self._refresh()
+        self.setValueSignal.emit(index, value)
+        #self._values[index] = value
+        #self._refresh()
 
     def _refresh(self):
 
         strTmp = self._template
         strTmp = strTmp.format(*self._values)
         super().setText(strTmp)
+
+    @property
+    def template(self):
+        return self._template
+
+    @template.setter
+    def template(self, value):
+
+        if isinstance(value, str):
+            self._template = value
+            self._refresh()
+
+    @Slot(str)
+    def setTemplate(self, value):
+
+        if isinstance(value, str):
+            self._template = value
+            self._refresh()
 
     @Slot(list)
     def setValues(self, args):
@@ -116,7 +137,8 @@ class FormatLabel(QLabel):
 
         signal.connect(self.setValue)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
 
     import sys
     from PySide2.QtWidgets import QApplication, QGridLayout, QMainWindow, QPushButton
@@ -130,7 +152,9 @@ if __name__ == '__main__':
             l = QGridLayout()
 
             self.jobInfo = FormatLabel()
-            self.formatLabel = FormatLabel("Random 1 = {0:>3d} -- Random 2 = {0:3d}", init=[0, 0])
+            self.formatLabel = FormatLabel(
+                "Random 1 = {0:>3d} -- Random 2 = {0:3d}", init=[0, 0]
+            )
 
             b = QPushButton("Test 1")
             b.pressed.connect(self.test)
@@ -154,11 +178,7 @@ if __name__ == '__main__':
             r = random.randint
 
             self.jobInfo.setValues(
-                (r(1, 1001),
-                 r(1, 1001),
-                 r(1, 1001),
-                 r(1, 1001),
-                 r(1, 1001))
+                (r(1, 1001), r(1, 1001), r(1, 1001), r(1, 1001), r(1, 1001))
             )
 
         def test1(self):
