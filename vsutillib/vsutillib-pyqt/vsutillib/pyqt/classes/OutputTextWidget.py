@@ -7,10 +7,11 @@ Output widget form just to output text in color
 # OTW0004 Next log ID
 
 import logging
+import platform
 
-from PySide2.QtCore import Qt, Slot
+from PySide2.QtCore import Qt, Signal, Slot
 from PySide2.QtGui import QTextCursor
-from PySide2.QtWidgets import QTextEdit, QStyleFactory
+from PySide2.QtWidgets import QTextEdit
 
 import vsutillib.macos as macos
 
@@ -23,6 +24,7 @@ class OutputTextWidget(QTextEdit):
 
     # log state
     __log = False
+    insertTextSignal = Signal(str, dict)
 
     @classmethod
     def classLog(cls, setLogging=None):
@@ -55,6 +57,8 @@ class OutputTextWidget(QTextEdit):
         self.parent = parent
         self.__log = None
 
+        self.insertTextSignal.connect(self.insertText)
+
     def connectToInsertText(self, objSignal):
         """Connect to signal"""
 
@@ -63,44 +67,31 @@ class OutputTextWidget(QTextEdit):
     @Slot(str, dict)
     def insertText(self, strText, kwargs):
         """
-        Insert text in output window
-        Cannot use standard keyword argument kwargs
-        on emit calls, use dictionary instead
+        insertText - Insert text in output window.
+        Cannot use standard keyword arguments on
+        emit calls using a dictionary argument instead
 
-        :param strText: text to insert on windows
-        :type strText: str
-        :param kwargs: dictionary for additional
-        commands for the insert operation
-        :type kwargs: dictionary
+        Args:
+            strText (str): text to insert on output window
+            kwargs (dict): additional arguments in dictionary
+                           used like **kwargs
         """
 
         strTmp = ""
 
-        color = None
-        replaceLine = False
-        appendLine = False
-
-        if 'color' in kwargs:
-            color = kwargs['color']
-
-        if 'replaceLine' in kwargs:
-            replaceLine = kwargs['replaceLine']
-
-        if 'appendLine' in kwargs:
-            appendLine = kwargs['appendLine']
+        color = kwargs.pop("color", None)
+        replaceLine = kwargs.pop("replaceLine", False)
+        appendLine = kwargs.pop("appendLine", False)
 
         # still no restore to default the ideal configuration
         # search will continue considering abandoning color
-        # in macOS
 
-        saveStyle = self.styleSheet()
-
-        if macos.isMacDarkMode() and (color is None):
-            color = Qt.white
-        elif color is None:
-            color = Qt.black
-
-        if macos.isMacDarkMode() and (color is not None):
+        if color is None:
+            if macos.isMacDarkMode() or (platform.system() == "Windows"):
+                color = Qt.white
+            else:
+                color = Qt.black
+        elif macos.isMacDarkMode() or (platform.system() == "Windows"):
             if color == Qt.red:
                 color = Qt.magenta
             elif color == Qt.darkGreen:
@@ -120,8 +111,6 @@ class OutputTextWidget(QTextEdit):
             self.insertPlainText(strText)
 
         self.ensureCursorVisible()
-
-        self.setStyleSheet(QStyleFactory.create(saveStyle))
 
         if self.log:
             strTmp = strTmp + strText
