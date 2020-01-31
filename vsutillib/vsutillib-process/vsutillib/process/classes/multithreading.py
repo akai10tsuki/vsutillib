@@ -104,6 +104,7 @@ class ThreadWorker(threading.Thread):
                  funcFinished=None,
                  funcError=None,
                  funcResult=None,
+                 funcStart=None,
                  **kwargs):
         super(ThreadWorker, self).__init__()
 
@@ -111,6 +112,7 @@ class ThreadWorker(threading.Thread):
         self.function = function
         self.args = args
         self.kwargs = kwargs
+        self.start = funcStart
         self.finished = funcFinished
         self.error = funcError
         self.result = funcResult
@@ -126,6 +128,8 @@ class ThreadWorker(threading.Thread):
         # have to capture all exceptions using sys.exc_info()
         # to sort out what is happening
         try:
+            if callable(self.start):
+                self.finished()  # Done
             result = self.function(*self.args, **self.kwargs)
         except:
             traceback.print_exc()

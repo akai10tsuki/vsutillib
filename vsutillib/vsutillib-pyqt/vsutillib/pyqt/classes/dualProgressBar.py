@@ -24,6 +24,7 @@ class DualProgressBar(QWidget):
     def __init__(self, parent=None, align=Qt.Horizontal):
         super(DualProgressBar, self).__init__(parent)
 
+        self._lbl = QLabel()
         self._intControls()
         self._initLayout(align)
 
@@ -51,13 +52,13 @@ class DualProgressBar(QWidget):
     def _hLayout(self):
         """Set horizontal layout"""
 
-        lbl = QLabel("Progress:")
+        self._lbl.setText("Progress:")
 
         self.pbBarUnit.setOrientation(Qt.Horizontal)
         self.pbBarTotal.setOrientation(Qt.Horizontal)
 
         # Assign widgets to horizontal layout
-        self.hboxLayout.addWidget(lbl)
+        self.hboxLayout.addWidget(self._lbl)
         self.hboxLayout.addWidget(self.pbBarUnit)
         self.hboxLayout.addWidget(self.pbBarTotal)
 
@@ -80,6 +81,15 @@ class DualProgressBar(QWidget):
         else:
             self._hLayout()
             self.setLayout(self.hboxLayout)
+
+    @property
+    def label(self):
+        return self._lbl
+
+    @label.setter
+    def label(self, value):
+        if isinstance(value, str):
+            self._lbl.setText(value)
 
     @Slot(int)
     def setAlignment(self, align):

@@ -36,4 +36,5 @@ class QPushButtonWidget(QPushButton):
 
         if self.toolTip is None:
             self.toolTip = toolTip
+
         super().setStatusTip(toolTip, *args, **kwargs)
