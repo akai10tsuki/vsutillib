@@ -11,6 +11,7 @@ from PySide2.QtCore import Qt
 from PySide2.QtGui import QPalette, QColor
 from PySide2.QtWidgets import QDesktopWidget, QPushButton, QToolTip
 
+from .classes import RunInThread
 
 MODULELOG = logging.getLogger(__name__)
 MODULELOG.addHandler(logging.NullHandler())
@@ -74,9 +75,23 @@ def darkPalette():
     palette.setColor(QPalette.Disabled, QPalette.ButtonText, Qt.darkGray)
 
     toolTipPalette = QPalette()
-    toolTipPalette.setColor(QPalette.Inactive, QPalette.ToolTipBase, Qt.lightGray) # QColor(53, 53, 53)
+    toolTipPalette.setColor(
+        QPalette.Inactive, QPalette.ToolTipBase, Qt.lightGray
+    )  # QColor(53, 53, 53)
     toolTipPalette.setColor(QPalette.Inactive, QPalette.ToolTipText, Qt.black)
 
     QToolTip.setPalette(toolTipPalette)
 
     return palette
+
+
+def runFunctionInThread(function, *args, **kwargs):
+    """
+    Pass the function to execute Other args,
+    kwargs are passed to the run function
+    """
+
+    worker = RunInThread(function, *args, **kwargs)
+
+    # Execute
+    worker.run()

@@ -19,4 +19,4 @@ from .classes import (
     Worker,
 )
 from .messagebox import messageBoxYesNo
-from .qtUtils import centerWidgets, pushButton, darkPalette
+from .qtUtils import centerWidgets, pushButton, darkPalette, runFunctionInThread
