@@ -11,3 +11,4 @@ from .QActionWidget import QActionWidget
 from .QMenuWidget import QMenuWidget
 from .QPushButtonWidget import QPushButtonWidget
 from .QthThreads import Worker, WorkerSignals
+from .RunInThread import RunInThread

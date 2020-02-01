@@ -14,6 +14,7 @@ from .classes import (
     QPushButtonWidget,
     QthThreadWorker,
     QthThread,
+    RunInThread,
     WorkerSignals,
     Worker,
 )
