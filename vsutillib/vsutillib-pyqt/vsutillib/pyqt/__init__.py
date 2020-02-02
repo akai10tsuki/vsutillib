@@ -11,6 +11,7 @@ from .classes import (
     OutputTextWidget,
     QActionWidget,
     QMenuWidget,
+    QProgressIndicator,
     QPushButtonWidget,
     QthThreadWorker,
     QthThread,
@@ -18,5 +19,6 @@ from .classes import (
     WorkerSignals,
     Worker,
 )
+
 from .messagebox import messageBoxYesNo
 from .qtUtils import centerWidgets, pushButton, darkPalette, runFunctionInThread

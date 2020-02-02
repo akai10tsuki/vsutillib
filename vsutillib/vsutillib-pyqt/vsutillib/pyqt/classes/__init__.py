@@ -9,6 +9,7 @@ from .formatLabel import FormatLabel
 from .OutputTextWidget import OutputTextWidget
 from .QActionWidget import QActionWidget
 from .QMenuWidget import QMenuWidget
+from .QProgressIndicator import QProgressIndicator
 from .QPushButtonWidget import QPushButtonWidget
 from .QthThreads import Worker, WorkerSignals
 from .RunInThread import RunInThread
