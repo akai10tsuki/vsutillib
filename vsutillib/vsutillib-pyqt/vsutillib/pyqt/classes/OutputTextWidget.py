@@ -51,11 +51,12 @@ class OutputTextWidget(QTextEdit):
 
         return cls.__log
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, log=None):
         super(OutputTextWidget, self).__init__(parent)
 
         self.parent = parent
         self.__log = None
+        self.log = log
 
         self.insertTextSignal.connect(self.insertText)
 
@@ -79,9 +80,9 @@ class OutputTextWidget(QTextEdit):
 
         strTmp = ""
 
-        color = kwargs.pop("color", None)
-        replaceLine = kwargs.pop("replaceLine", False)
-        appendLine = kwargs.pop("appendLine", False)
+        color = kwargs.pop('color', None)
+        replaceLine = kwargs.pop('replaceLine', False)
+        appendLine = kwargs.pop('appendLine', False)
 
         # still no restore to default the ideal configuration
         # search will continue considering abandoning color
@@ -121,7 +122,7 @@ class OutputTextWidget(QTextEdit):
                 elif strTmp.find(u"Error") == 0 or color == Qt.red:
                     MODULELOG.error("OTW0002: %s", strTmp)
                 else:
-                    MODULELOG.info("OTW0003: %s", strTmp)
+                    MODULELOG.debug("OTW0003: %s", strTmp)
 
     @property
     def log(self):

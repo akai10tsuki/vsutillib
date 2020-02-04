@@ -57,7 +57,7 @@ class MKVCommand(object):
 
         return cls.__log
 
-    def __init__(self, strCommand=None):
+    def __init__(self, strCommand=None, log=None):
 
         # self.__destinationDirectory = None
         self.__lstCommands = []
@@ -69,6 +69,7 @@ class MKVCommand(object):
         self.__filesInDirsByKey = None
 
         self.__log = None
+        self.log = log
 
         # for iterator
         self.__index = 0
@@ -82,7 +83,7 @@ class MKVCommand(object):
             self.__reset()
             verify = False
         else:
-            verify = VerifyMKVCommand(strCommand)
+            verify = VerifyMKVCommand(strCommand, log=self.log)
 
         if verify:
 
@@ -201,6 +202,7 @@ class MKVCommand(object):
             # error cannot process command
             self.__reset()
             self.__strError = "Error parsing command line."
+            self.__strShellCommand = strCommand
             self.__bErrorFound = True
 
             if self.log:

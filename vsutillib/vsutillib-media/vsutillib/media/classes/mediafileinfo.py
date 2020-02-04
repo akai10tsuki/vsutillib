@@ -57,13 +57,14 @@ class MediaFileInfo(object):
 
         return cls.__log
 
-    def __init__(self, strMediaFile):
+    def __init__(self, strMediaFile, log=None):
 
         self.fileName = strMediaFile
         self.codec = ""
         self.format = ""
         self.lstMediaTracks = []
         self.__log = None
+        self.log = log
 
         self._initHelper()
 
