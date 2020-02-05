@@ -174,7 +174,7 @@ class VerifyStructure:
 
                     msg = "Error: In structure Source: {} Base Source: {}"
                     msg = msg.format(str(objFile), str(objSource))
-                    MODULELOG.error("VFS0002: Error: %s", line)
+                    MODULELOG.error("VFS0002: Error: %s", msg)
 
                     for line in self.__analysis:
                         MODULELOG.error("VFS0003: Error: %s", line)
