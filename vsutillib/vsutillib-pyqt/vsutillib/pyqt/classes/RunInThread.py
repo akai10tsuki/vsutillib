@@ -55,7 +55,6 @@ class RunInThread(QObject):
         super(RunInThread, self).__init__()
 
         self.function = function
-        self.worker = None
         self.args = args
         self.kwargs = kwargs
 
