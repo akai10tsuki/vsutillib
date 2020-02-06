@@ -227,7 +227,7 @@ class MKVCommand(object):
         return item in self.__lstCommands
 
     def __getitem__(self, index):
-        return [
+        return (
             self.__lstCommands[index],
             self.__workFiles.baseFiles,
             self.__workFiles.sourceFiles[index],
@@ -235,7 +235,7 @@ class MKVCommand(object):
             None
             if not self.__workFiles.chaptersFiles
             else self.__workFiles.chaptersFiles[index],
-        ]
+        )
 
     def __iter__(self):
         return self
