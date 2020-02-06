@@ -16,9 +16,17 @@ from .classes import (
     QthThreadWorker,
     QthThread,
     RunInThread,
+    SvgColor,
     WorkerSignals,
     Worker,
 )
 
 from .messagebox import messageBoxYesNo
-from .qtUtils import centerWidgets, pushButton, darkPalette, runFunctionInThread
+
+from .qtUtils import (
+    centerWidgets,
+    checkColor,
+    pushButton,
+    darkPalette,
+    runFunctionInThread,
+)
