@@ -2,13 +2,16 @@
 Sub-class of QTextEdit accepts drag and drop
 """
 import logging
+
 from pathlib import Path
+
 
 from PySide2.QtCore import Qt, Slot, Signal
 from PySide2.QtGui import QTextCursor
-from PySide2.QtWidgets import QTextEdit, QStyleFactory, QMenu
+from PySide2.QtWidgets import QTextEdit, QMenu
 
-import vsutillib.macos as macos
+
+from .insertTextHelpers import checkColor
 
 MODULELOG = logging.getLogger(__name__)
 MODULELOG.addHandler(logging.NullHandler())
@@ -53,7 +56,7 @@ class FileListWidget(QTextEdit):
     def __init__(self, parent):
         super(FileListWidget, self).__init__(parent)
 
-        #self.setDragEnabled(True)
+        # self.setDragEnabled(True)
         self.fileList = []
         self.bBlockDrops = False
         self.bFilesDropped = False
@@ -69,13 +72,13 @@ class FileListWidget(QTextEdit):
 
         data = event.mimeData()
         urls = data.urls()
-        if urls and urls[0].scheme() == 'file':
+        if urls and urls[0].scheme() == "file":
             event.acceptProposedAction()
 
     def dragMoveEvent(self, event):
         data = event.mimeData()
         urls = data.urls()
-        if urls and urls[0].scheme() == 'file':
+        if urls and urls[0].scheme() == "file":
             event.acceptProposedAction()
 
     def dropEvent(self, event):
@@ -89,7 +92,7 @@ class FileListWidget(QTextEdit):
             fPath = Path(filePath)
 
             if fPath.is_dir():
-                files = [x for x in fPath.glob('*.*') if x.is_file()]
+                files = [x for x in fPath.glob("*.*") if x.is_file()]
                 for x in files:
                     if x not in self.fileList:
                         self.fileList.append(x)
@@ -148,26 +151,15 @@ class FileListWidget(QTextEdit):
 
         strTmp = ""
 
-        color = None
-        replaceLine = False
-        appendLine = False
-
-        if 'color' in kwargs:
-            color = kwargs['color']
-
-        if 'replaceLine' in kwargs:
-            replaceLine = kwargs['replaceLine']
-
-        if 'appendLine' in kwargs:
-            appendLine = kwargs['appendLine']
+        color = kwargs.pop("color", None)
+        replaceLine = kwargs.pop("replaceLine", False)
+        appendLine = kwargs.pop("appendLine", False)
 
         # still no restore to default the ideal configuration
         # search will continue considering abandoning color
         # in macOS saveStype works on Windows
 
-        saveStyle = self.styleSheet()
-
-        color = _setColor(color)
+        color = checkColor(color)
 
         self.setTextColor(color)
 
@@ -180,8 +172,6 @@ class FileListWidget(QTextEdit):
             self.insertPlainText(strText)
 
         self.ensureCursorVisible()
-
-        self.setStyleSheet(QStyleFactory.create(saveStyle))
 
         if self.log:
             strTmp = strTmp + strText
@@ -247,28 +237,10 @@ class FileListWidget(QTextEdit):
         super().clear()
 
         for f in self.fileList:
-            self.insertPlainText(f.name + '\n')
+            self.insertPlainText(f.name + "\n")
 
 
-def _setColor(color):
-
-    if macos.isMacDarkMode():
-        if color is None:
-            return Qt.white
-        else:
-            if color == Qt.red:
-                return Qt.magenta
-            elif color == Qt.darkGreen:
-                return Qt.green
-            elif color == Qt.blue:
-                return Qt.cyan
-    elif color is None:
-        return Qt.black
-
-    return color
-
-
-class Actions():
+class Actions:
     """
     Actions labels for context menu
     """
