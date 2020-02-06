@@ -173,17 +173,22 @@ class VerifyStructure:
                 if self.log:
 
                     msg = "Error: In structure Source: {} Base Source: {}"
-                    msg = msg.format(str(objFile), str(objSource))
+                    msg = msg.format(objFile.fileName, objSource.fileName)
                     MODULELOG.error("VFS0002: Error: %s", msg)
 
-                    for line in self.__analysis:
-                        MODULELOG.error("VFS0003: Error: %s", line)
+                    for i, line in enumerate(self.__analysis):
+                        if i > 0:
+                            MODULELOG.error("VFS0003: Error: %s", line.strip())
+
+                    msg = "Structure not ok. Source: {} Base Source: {}"
+                    msg = msg.format(objFile.fileName, objSource.fileName)
+                    MODULELOG.debug("VFS0004: %s", msg)
 
             else:
                 if self.log:
                     msg = "Structure seems ok. Source: {} Base Source: {}"
                     msg = msg.format(objFile.fileName, objSource.fileName)
-                    MODULELOG.debug("VFS0004: %s", msg)
+                    MODULELOG.debug("VFS0005: %s", msg)
 
 
 def _detailAnalysis(lstAnalysis, mediaFile1, mediaFile2):
