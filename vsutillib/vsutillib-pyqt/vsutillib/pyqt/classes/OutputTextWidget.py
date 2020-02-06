@@ -7,13 +7,15 @@ Output widget form just to output text in color
 # OTW0004 Next log ID
 
 import logging
-import platform
+
 
 from PySide2.QtCore import Qt, Signal, Slot
 from PySide2.QtGui import QTextCursor
 from PySide2.QtWidgets import QTextEdit
 
-import vsutillib.macos as macos
+
+from .insertTextHelpers import checkColor
+
 
 MODULELOG = logging.getLogger(__name__)
 MODULELOG.addHandler(logging.NullHandler())
@@ -58,7 +60,7 @@ class OutputTextWidget(QTextEdit):
         self.__log = None
         self.log = log
 
-        self.insertTextSignal.connect(self.insertText)
+        #self.insertTextSignal.connect(self.insertText)
 
     def connectToInsertText(self, objSignal):
         """Connect to signal"""
@@ -80,33 +82,29 @@ class OutputTextWidget(QTextEdit):
 
         strTmp = ""
 
-        color = kwargs.pop('color', None)
-        replaceLine = kwargs.pop('replaceLine', False)
-        appendLine = kwargs.pop('appendLine', False)
+        color = kwargs.pop("color", None)
+        replaceLine = kwargs.pop("replaceLine", False)
+        appendLine = kwargs.pop("appendLine", False)
+        appendEnd = kwargs.pop("appendEnd", False)
 
         # still no restore to default the ideal configuration
         # search will continue considering abandoning color
 
-        if color is None:
-            if macos.isMacDarkMode() or (platform.system() == "Windows"):
-                color = Qt.white
-            else:
-                color = Qt.black
-        elif macos.isMacDarkMode() or (platform.system() == "Windows"):
-            if color == Qt.red:
-                color = Qt.magenta
-            elif color == Qt.darkGreen:
-                color = Qt.green
-            elif color == Qt.blue:
-                color = Qt.cyan
+        color = checkColor(color)
+
+        if replaceLine:
+            self.moveCursor(QTextCursor.StartOfLine, QTextCursor.KeepAnchor)
+        elif appendEnd:
+            self.moveCursor(QTextCursor.End)
 
         if color is not None:
             self.setTextColor(color)
 
         if replaceLine:
-            self.moveCursor(QTextCursor.StartOfLine, QTextCursor.KeepAnchor)
             self.insertPlainText(strText)
         elif appendLine:
+            self.append(strText)
+        elif appendEnd:
             self.append(strText)
         else:
             self.insertPlainText(strText)
