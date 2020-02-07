@@ -23,13 +23,21 @@ def checkColor(color):
         else:
             color = Qt.black
 
-    # elif isMacDarkMode() or (platform.system() == "Windows"):
+    elif isMacDarkMode():
 
-    #    if color == Qt.red:
-    #        color = Qt.magenta
-    #    elif color == Qt.darkGreen:
-    #        color = Qt.green
-    #    elif color == Qt.blue:
-    #        color = Qt.cyan
+        if color == Qt.red:
+            color = Qt.magenta
+        elif color == Qt.darkGreen:
+            color = Qt.green
+        elif color == Qt.blue:
+            color = Qt.cyan
 
     return color
+
+
+class LineOutput:
+
+    Color = "color"
+    ReplaceLine = "replaceLine"
+    AppendLine = "appendLine"
+    AppendEnd = "appendEnd"
