@@ -8,6 +8,7 @@ from .classes import (
     DualProgressBar,
     FileListWidget,
     FormatLabel,
+    LineOutput,
     OutputTextWidget,
     QActionWidget,
     QMenuWidget,
@@ -25,7 +26,6 @@ from .messagebox import messageBoxYesNo
 
 from .qtUtils import (
     centerWidgets,
-    checkColor,
     pushButton,
     darkPalette,
     runFunctionInThread,

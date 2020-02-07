@@ -6,6 +6,7 @@ from .DualProgressBar import DualProgressBar
 from .GenericThreads import QthThread, QthThreadWorker
 from .FileListWidget import FileListWidget
 from .FormatLabel import FormatLabel
+from .insertTextHelpers import LineOutput
 from .OutputTextWidget import OutputTextWidget
 from .QActionWidget import QActionWidget
 from .QMenuWidget import QMenuWidget
