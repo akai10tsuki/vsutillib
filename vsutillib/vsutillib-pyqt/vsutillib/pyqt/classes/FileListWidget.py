@@ -6,18 +6,18 @@ import logging
 from pathlib import Path
 
 
-from PySide2.QtCore import Qt, Slot, Signal
-from PySide2.QtGui import QTextCursor
-from PySide2.QtWidgets import QTextEdit, QMenu
+from PySide2.QtCore import Slot, Signal
+from PySide2.QtWidgets import QMenu
 
 
-from .insertTextHelpers import checkColor
+from .OutputTextWidget import OutputTextWidget
+
 
 MODULELOG = logging.getLogger(__name__)
 MODULELOG.addHandler(logging.NullHandler())
 
 
-class FileListWidget(QTextEdit):
+class FileListWidget(OutputTextWidget):
     """
     QTextEdit subclass that accepts dropped files
     displays only the name of the files.
@@ -25,33 +25,6 @@ class FileListWidget(QTextEdit):
     """
 
     filesDroppedUpdateSignal = Signal(list)
-    # log state
-    __log = False
-
-    @classmethod
-    def classLog(cls, setLogging=None):
-        """
-        get/set logging at class level
-        every class instance will log
-        unless overwritten
-
-        Args:
-            setLogging (bool):
-                - True class will log
-                - False turn off logging
-                - None returns current Value
-
-        Returns:
-            bool:
-
-            returns the current value set
-        """
-
-        if setLogging is not None:
-            if isinstance(setLogging, bool):
-                cls.__log = setLogging
-
-        return cls.__log
 
     def __init__(self, parent):
         super(FileListWidget, self).__init__(parent)
@@ -125,91 +98,11 @@ class FileListWidget(QTextEdit):
                     self._displayFiles()
                     self.filesDroppedUpdateSignal.emit(self.fileList)
 
-    def connectToInsertText(self, objSignal):
-        """Connect to signal"""
-
-        objSignal.connect(self.insertText)
-
     def setAcceptDrops(self, value):
 
         if not self.bBlockDrops:
             # don't check for type to raise error
             super().setAcceptDrops(value)
-
-    @Slot(str, dict)
-    def insertText(self, strText, kwargs):
-        """
-        Insert text in output window
-        Cannot use standard keyword argument kwargs
-        on emit calls, use dictionary instead
-
-        Args:
-            strText (str): text to insert on windows
-            kwargs (dict): dictionary for additional
-                commands for the insert operation
-        """
-
-        strTmp = ""
-
-        color = kwargs.pop("color", None)
-        replaceLine = kwargs.pop("replaceLine", False)
-        appendLine = kwargs.pop("appendLine", False)
-
-        # still no restore to default the ideal configuration
-        # search will continue considering abandoning color
-        # in macOS saveStype works on Windows
-
-        color = checkColor(color)
-
-        self.setTextColor(color)
-
-        if replaceLine:
-            self.moveCursor(QTextCursor.StartOfLine, QTextCursor.KeepAnchor)
-
-        if appendLine:
-            self.append(strText)
-        else:
-            self.insertPlainText(strText)
-
-        self.ensureCursorVisible()
-
-        if self.log:
-            strTmp = strTmp + strText
-            strTmp = strTmp.replace("\n", " ")
-            if strTmp != "" and strTmp.find(u"Progress:") != 0:
-                if strTmp.find(u"Warning") == 0:
-                    MODULELOG.warning("OTW0001: %s", strTmp)
-                elif strTmp.find(u"Error") == 0 or color == Qt.red:
-                    MODULELOG.error("OTW0002: %s", strTmp)
-                else:
-                    MODULELOG.info("OTW0003: %s", strTmp)
-
-    @property
-    def log(self):
-        """
-        class property can be used to override the class global
-        logging setting
-
-        Returns:
-            bool:
-
-            True if logging is enable False otherwise
-        """
-        if self.__log is not None:
-            return self.__log
-
-        return FileListWidget.classLog()
-
-    @log.setter
-    def log(self, value):
-        """
-        set instance log variable
-
-        Args:
-            value (bool): logging on if True.  Off if it False.
-        """
-        if isinstance(value, bool) or value is None:
-            self.__log = value
 
     @Slot(list)
     def setFileList(self, filesList=None):
