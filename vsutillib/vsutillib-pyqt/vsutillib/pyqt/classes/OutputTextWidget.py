@@ -14,7 +14,7 @@ from PySide2.QtGui import QTextCursor
 from PySide2.QtWidgets import QTextEdit
 
 
-from .insertTextHelpers import checkColor
+from .insertTextHelpers import checkColor, LineOutput
 
 
 MODULELOG = logging.getLogger(__name__)
@@ -82,10 +82,10 @@ class OutputTextWidget(QTextEdit):
 
         strTmp = ""
 
-        color = kwargs.pop("color", None)
-        replaceLine = kwargs.pop("replaceLine", False)
-        appendLine = kwargs.pop("appendLine", False)
-        appendEnd = kwargs.pop("appendEnd", False)
+        color = kwargs.pop(LineOutput.Color, None)
+        replaceLine = kwargs.pop(LineOutput.ReplaceLine, False)
+        appendLine = kwargs.pop(LineOutput.AppendLine, False)
+        appendEnd = kwargs.pop(LineOutput.AppendEnd, False)
 
         # still no restore to default the ideal configuration
         # search will continue considering abandoning color
@@ -120,7 +120,8 @@ class OutputTextWidget(QTextEdit):
                 elif strTmp.find(u"Error") == 0 or color == Qt.red:
                     MODULELOG.error("OTW0002: %s", strTmp)
                 else:
-                    MODULELOG.debug("OTW0003: %s", strTmp)
+                    if strTmp.strip():
+                        MODULELOG.debug("OTW0003: %s", strTmp)
 
     @property
     def log(self):
