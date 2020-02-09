@@ -58,9 +58,40 @@ class OutputTextWidget(QTextEdit):
 
         self.parent = parent
         self.__log = None
+        self.__tab = None
         self.log = log
 
         #self.insertTextSignal.connect(self.insertText)
+
+    @property
+    def log(self):
+        """
+        class property can be used to override the class global
+        logging setting
+
+        Returns:
+            bool:
+
+            True if logging is enable False otherwise
+        """
+        if self.__log is not None:
+            return self.__log
+
+        return OutputTextWidget.classLog()
+
+    @log.setter
+    def log(self, value):
+        """set instance log variable"""
+        if isinstance(value, bool) or value is None:
+            self.__log = value
+
+    @property
+    def tab(self):
+        return self.__tab
+
+    @tab.setter
+    def tab(self, value):
+        self.__tab = value
 
     def connectToInsertText(self, objSignal):
         """Connect to signal"""
@@ -114,6 +145,7 @@ class OutputTextWidget(QTextEdit):
         if self.log:
             strTmp = strTmp + strText
             strTmp = strTmp.replace("\n", " ")
+
             if strTmp != "" and strTmp.find(u"Progress:") != 0:
                 if strTmp.find(u"Warning") == 0:
                     MODULELOG.warning("OTW0001: %s", strTmp)
@@ -122,25 +154,3 @@ class OutputTextWidget(QTextEdit):
                 else:
                     if strTmp.strip():
                         MODULELOG.debug("OTW0003: %s", strTmp)
-
-    @property
-    def log(self):
-        """
-        class property can be used to override the class global
-        logging setting
-
-        Returns:
-            bool:
-
-            True if logging is enable False otherwise
-        """
-        if self.__log is not None:
-            return self.__log
-
-        return OutputTextWidget.classLog()
-
-    @log.setter
-    def log(self, value):
-        """set instance log variable"""
-        if isinstance(value, bool) or value is None:
-            self.__log = value
