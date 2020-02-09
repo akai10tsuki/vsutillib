@@ -30,11 +30,11 @@ class QPushButtonWidget(QPushButton):
             self.clicked.connect(function)
 
         if toolTip is not None:
-            self.setStatusTip(toolTip)
+            self.setToolTip(toolTip)
 
-    def setStatusTip(self, toolTip, *args, **kwargs):
+    def setToolTip(self, toolTip, *args, **kwargs):
 
         if self.toolTip is None:
             self.toolTip = toolTip
 
-        super().setStatusTip(toolTip, *args, **kwargs)
+        super().setToolTip(toolTip, *args, **kwargs)

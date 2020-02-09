@@ -29,7 +29,7 @@ class QActionWidget(QAction):
             self.setShortcut(shortcut)
 
         if tooltip is not None:
-            self.setStatusTip(tooltip)
+            self.setToolTip(tooltip)
 
     def setShortcut(self, shortcut, *args, **kwargs):
 
@@ -38,9 +38,9 @@ class QActionWidget(QAction):
 
         super().setShortcut(shortcut, *args, **kwargs)
 
-    def setStatusTip(self, tooltip, *args, **kwargs):
+    def setToolTip(self, tooltip, *args, **kwargs):
 
         if self.tooltip is None:
             self.tooltip = tooltip
 
-        super().setStatusTip(tooltip, *args, **kwargs)
+        super().setToolTip(tooltip, *args, **kwargs)
