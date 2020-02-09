@@ -4,7 +4,7 @@ ComboBox sub-class of QComboBox permits removal of highlighted item in the popup
 """
 
 
-from PySide2.QtCore import Qt, Slot, QObject, QEvent
+from PySide2.QtCore import Qt, Signal, Slot, QObject, QEvent
 from PySide2.QtWidgets import QApplication, QComboBox
 
 
@@ -16,6 +16,8 @@ class ComboLineEdit(QComboBox):
         parent (QWidget): parent widget
         popup (bool): confirm removal if True. No confirmation otherwise.
     """
+
+    itemsChangeSignal = Signal()
 
     def __init__(self, parent=None, popup=False):
         super().__init__()
@@ -52,6 +54,7 @@ class ComboLineEdit(QComboBox):
                     if self.__highlighted is not None:
                         index = self.__highlighted
                         self.removeItem(index)
+                        self.itemsChangeSignal.emit()
                         return True
             return False
 
@@ -63,8 +66,7 @@ class ComboLineEdit(QComboBox):
             modifiers = QApplication.keyboardModifiers()
             if modifiers == Qt.ControlModifier:
                 QComboBox.keyPressEvent(self, event)
-            else:
-                print('Ate the key')
+                self.itemsChangeSignal.emit()
         else:
             QComboBox.keyPressEvent(self, event)
 
