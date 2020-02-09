@@ -5,9 +5,11 @@ PySide2 related classes and functions
 # classes
 
 from .classes import (
+    ComboLineEdit,
     DualProgressBar,
     FileListWidget,
     FormatLabel,
+    GroupSignal,
     LineOutput,
     OutputTextWidget,
     QActionWidget,
@@ -18,6 +20,7 @@ from .classes import (
     QthThread,
     RunInThread,
     SvgColor,
+    TabWidget,
     WorkerSignals,
     Worker,
 )
