@@ -16,6 +16,8 @@ import logging
 from pathlib import Path
 
 from vsutillib.files import stripEncaseQuotes
+from vsutillib.misc import XLate
+
 from .verifycommand import VerifyMKVCommand
 
 MODULELOG = logging.getLogger(__name__)
@@ -77,7 +79,7 @@ class MKVCommand(object):
         if strCommand is not None:
             self._initHelper(strCommand)
 
-    def _initHelper(self, strCommand, bRemoveTitle=True):
+    def _initHelper(self, strCommand, bRemoveTitle=True): # pylint: disable=unused-argument
 
         if strCommand is None:
             self.__reset()
@@ -258,56 +260,35 @@ class MKVCommand(object):
 
     def _generateCommands(self, bRemoveTitle=True):
 
-        lstTmp = []
-        lstTmp1 = []
+        # lstCommandsNew = []
 
-        #
-        # lstTmp list of the form:
-        # [[('<OUTFILE>', file1), ('<OUTFILE>', file2), ...],
-        #  [('<SOURCE0>', file1), ('<SOURCE0>', file2), ...],
-        #  [('<SOURCE1>', file1), ('<SOURCE1>', file2), ...],
-        #  [('<CHAPTERS>', file1), ('<CHAPTERS>', file2), ...], # optional
-        #  ...]
-        # theese are the individual list by key
-        #
-        for key in self.__filesInDirsByKey:
-            filesInDir = self.__filesInDirsByKey[key]
-            z = zip([key] * len(filesInDir), filesInDir)
-            if key != _Key.outputFile:
-                lstTmp1.append(filesInDir)
-            lstTmp.append(list(z))
+        newCommandNew = self.__commandTemplate
 
-        if self.log:
-            MODULELOG.debug("MKV0006: Files by Key %s", str(lstTmp))
-
-        #
-        # list of the form:
-        # [(('<OUTFILE>', file1), ('<SOURCE0>', file1), ('<SOURCE1>', file1), ('<CHAPTERS>', file1), ...), pylint: disable=line-too-long
-        #  (('<OUTFILE>', file2), ('<SOURCE0>', file2), ('<SOURCE1>', file2), ('<CHAPTERS>', file1), ...),
-        #  ...]
-        # theese are the combined list of lstTmp unpacked and zip is applied
-        # to have all the keys for substitution at the same point
-        # chapters are optional
-        #
-        lstSourceFilesWithKey = list(zip(*lstTmp))
-        lstSourceFiles = list(zip(*lstTmp1))  # backwards compatible
-
-        #
-        # generate all the commands and store them in shlex form
-        #
+        totalCommands = len(self.__filesInDirsByKey[_Key.outputFile])
+        lstSourceFilesNew = []
 
         self.__lstCommands = []
 
-        for s in lstSourceFilesWithKey:
+        for i in range(totalCommands):
 
-            newCommand = self.__commandTemplate
+            e = {}
+            s = []
 
-            for e in s:
-                key, fileName = e
-                qf = shlex.quote(str(fileName))
-                newCommand = newCommand.replace(key, qf, 1)
+            for k, v in self.__filesInDirsByKey.items():
 
-            shellCommand = shlex.split(newCommand)
+                e[k] = shlex.quote(
+                    str(v[i])
+                )  # add the filenames as shlex.quote strings form pathlib.Path
+
+                if k != _Key.outputFile:
+                    s.append(v[i])  # save source files as pathlib.Path
+
+            xLate = XLate(e)  # instantiate regex dictionary translator
+            lstSourceFilesNew.append(s)  # Save Source Files in list
+
+            shellCommand = shlex.split(
+                xLate.xLate(newCommandNew)
+            )  # save command as shlex.split to submit to Pipe
 
             if bRemoveTitle and shellCommand:
                 # Remove title if found since this is for batch processing
@@ -319,9 +300,26 @@ class MKVCommand(object):
                     i = shellCommand.index("--title")
                     del shellCommand[i : i + 2]
 
-            self.__lstCommands.append(shellCommand)
+            self.__lstCommands.append(shellCommand)  # save command in list
 
-        self.__workFiles.sourceFiles = lstSourceFiles  # redundant for rename
+            # lstCommandsNew.append(xLate.xLate(newCommandNew))
+
+        # for command in lstCommandsNew:
+        #    shellCommand = shlex.split(command)
+
+        #    if bRemoveTitle and shellCommand:
+        # Remove title if found since this is for batch processing
+        # the title will propagate to all the files maybe erroneously.
+        # This field is preserved from the source files.
+
+        #        while "--title" in shellCommand:
+
+        #            i = shellCommand.index("--title")
+        #            del shellCommand[i : i + 2]
+
+        #    self.__lstCommands.append(shellCommand)
+
+        self.__workFiles.sourceFiles = lstSourceFilesNew  # redundant for rename
         self.__workFiles.destinationFiles = self.__filesInDirsByKey[_Key.outputFile]
 
         if self.log:
