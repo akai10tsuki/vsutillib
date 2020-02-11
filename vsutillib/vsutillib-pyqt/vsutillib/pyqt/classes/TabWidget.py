@@ -56,8 +56,6 @@ class TabWidget(QTabWidget):
                 except:  # pylint: disable=bare-except
                     pass
 
-                print("Tab Index {}".format(tabIndex))
-
     @classmethod
     def classLog(cls, setLogging=None):
         """
