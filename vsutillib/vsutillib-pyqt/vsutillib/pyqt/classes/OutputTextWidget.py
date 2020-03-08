@@ -27,6 +27,7 @@ class OutputTextWidget(QTextEdit):
     # log state
     __log = False
     insertTextSignal = Signal(str, dict)
+    setCurrentIndexSignal = Signal()
 
     @classmethod
     def classLog(cls, setLogging=None):
@@ -59,9 +60,11 @@ class OutputTextWidget(QTextEdit):
         self.parent = parent
         self.__log = None
         self.__tab = None
+        self.__tabWidget = None
         self.log = log
 
-        #self.insertTextSignal.connect(self.insertText)
+        self.insertTextSignal.connect(self.insertText)
+        self.setCurrentIndexSignal.connect(self._setCurrentIndex)
 
     @property
     def log(self):
@@ -92,6 +95,20 @@ class OutputTextWidget(QTextEdit):
     @tab.setter
     def tab(self, value):
         self.__tab = value
+
+    @property
+    def tabWidget(self):
+        return self.__tabWidget
+
+    @tabWidget.setter
+    def tabWidget(self, value):
+        self.__tabWidget = value
+
+    @Slot()
+    def _setCurrentIndex(self):
+
+        if self.tabWidget:
+            self.tabWidget.setCurrentIndex(self.tab)
 
     def connectToInsertText(self, objSignal):
         """Connect to signal"""
