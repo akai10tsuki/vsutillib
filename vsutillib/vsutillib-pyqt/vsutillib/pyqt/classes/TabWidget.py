@@ -51,8 +51,14 @@ class TabWidget(QTabWidget):
             for tw in tabWidgets:
                 tabIndex = self.addTab(tw[0], tw[1])
                 self.setTabToolTip(tabIndex, tw[2])
+
                 try:
                     tw[0].tab = tabIndex
+                except:  # pylint: disable=bare-except
+                    pass
+
+                try:
+                    tw[0].tabWidget = self
                 except:  # pylint: disable=bare-except
                     pass
 
