@@ -27,15 +27,14 @@ from pathlib import Path
 from vsutillib.files import ConfigurationSettings
 from vsutillib.log import LogRotateFileHandler
 
-data = ConfigurationSettings()  # pylint: disable=invalid-name
-
 __VERSION = (1, 5, '0')
 
+APPNAME = "vsutillib"
 VERSION = ".".join(map(str, __VERSION))
 AUTHOR = "Efrain Vergara"
 EMAIL = "akai10tsuki@gmail.com"
 
-COPYRIGHT = "2018-2019, Efrain Vergara"
+COPYRIGHT = "2018-2020, Efrain Vergara"
 LICENSE = "MIT"
 DESCRIPTION = 'Library module with miscellaneous convenience functions and classes'
 NAME = "vsutillib"
@@ -58,13 +57,14 @@ PROJECTURLS = {
     'Source': 'https://pypi.org/project/vsutillib/#files',
 }
 
-IMAGEFILESPATH = ""
-FILESROOT = ".vsutillib"
-LOGFILE = "vsutillib.log"
 CONFIGFILE = "config.xml"
+FILESROOT = "." + APPNAME
+LOGFILE = APPNAME + ".log"
+IMAGEFILESPATH = ""
 
 __version__ = VERSION
 
+data = ConfigurationSettings()  # pylint: disable=invalid-name
 
 def init(filesRoot=None,
          configFile=None,
