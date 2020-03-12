@@ -10,6 +10,7 @@ if regexsearch regular expresion is provided the first
 match will be set on regexmatch property
 """
 # RNC0001
+# pylint: disable=bad-continuation
 
 import logging
 import re
@@ -78,15 +79,18 @@ class RunCommand:
             if isinstance(setLogging, bool):
                 cls.__log = setLogging
 
-    def __init__(self,
-                 command=None,
-                 processLine=None,
-                 processArgs=None,
-                 processKWArgs=None,
-                 regexsearch=None,
-                 commandShlex=False,
-                 universalNewLines=False,
-                 log=None): # pylint: disable=too-many-arguments
+    def __init__(
+        self,
+        command=None,
+        processLine=None,
+        processArgs=None,
+        processKWArgs=None,
+        regexsearch=None,
+        commandShlex=False,
+        universalNewLines=False,
+        controlQueue=None,
+        log=None,
+    ):  # pylint: disable=too-many-arguments
 
         self.__command = None
         self.command = command  # Call class setter property
@@ -100,7 +104,7 @@ class RunCommand:
             if isinstance(processArgs, list):
                 self.__processArgs = processArgs
             else:
-                raise ValueError('processLineParam has to be a list')
+                raise ValueError("processLineParam has to be a list")
 
         self.__processKWArgs = {}
 
@@ -108,7 +112,7 @@ class RunCommand:
             if isinstance(processKWArgs, dict):
                 self.__processKWArgs = processKWArgs
             else:
-                raise ValueError('processLineParam has to be a dictionary')
+                raise ValueError("processLineParam has to be a dictionary")
 
         self.__regEx = None
         if regexsearch is not None:
@@ -313,10 +317,12 @@ class RunCommand:
 
         try:
 
-            with subprocess.Popen(cmd,
-                                  stdout=subprocess.PIPE,
-                                  universal_newlines=self.__universalNewLines,
-                                  stderr=subprocess.STDOUT) as p:
+            with subprocess.Popen(
+                cmd,
+                stdout=subprocess.PIPE,
+                universal_newlines=self.__universalNewLines,
+                stderr=subprocess.STDOUT,
+            ) as p:
 
                 try:
 
@@ -325,42 +331,44 @@ class RunCommand:
                         if self.__universalNewLines:
                             line = l
                         else:
-                            line = l.decode('utf-8')
+                            line = l.decode("utf-8")
 
                         self.__output.append(line)
                         self._regexMatch(line)
 
                         if self.__process is not None:
-                            self.__process(line, *self.__processArgs,
-                                           **self.__processKWArgs)
+                            self.__process(
+                                line, *self.__processArgs, **self.__processKWArgs
+                            )
 
                 except UnicodeDecodeError as error:
 
                     trb = traceback.format_exc()
                     msg = "Error: {}".format(error.reason)
-                    self.__output.append(str(cmd) + '\n')
+                    self.__output.append(str(cmd) + "\n")
                     self.__output.append(msg)
                     self.__output.append(trb)
 
                     if self.__process is not None:
-                        self.__process(line, *self.__processArgs,
-                                       **self.__processKWArgs)
+                        self.__process(
+                            line, *self.__processArgs, **self.__processKWArgs
+                        )
 
                     if self.log:
-                        MODULELOG.debug("RNC0001: Unicode decode error %s",
-                                        msg)
+                        MODULELOG.debug("RNC0001: Unicode decode error %s", msg)
 
                 except KeyboardInterrupt as error:
 
                     trb = traceback.format_exc()
                     msg = "Error: {}".format(error.args)
-                    self.__output.append(str(cmd) + '\n')
+                    self.__output.append(str(cmd) + "\n")
                     self.__output.append(msg)
                     self.__output.append(trb)
 
                     if self.__process is not None:
-                        self.__process(line, *self.__processArgs,
-                                       **self.__processKWArgs)
+                        self.__process(
+                            line, *self.__processArgs, **self.__processKWArgs
+                        )
 
                     if self.log:
                         MODULELOG.debug("RNC0002: Keyboard interrupt %s", msg)
@@ -388,28 +396,28 @@ class RunCommand:
 
         try:
 
-            with subprocess.Popen(cmd,
-                                  stdout=subprocess.PIPE,
-                                  bufsize=1,
-                                  stderr=subprocess.STDOUT) as p:
+            with subprocess.Popen(
+                cmd, stdout=subprocess.PIPE, bufsize=1, stderr=subprocess.STDOUT
+            ) as p:
 
                 try:
                     for l in iter(p.stdout):
 
-                        line = l.decode('utf-8')
+                        line = l.decode("utf-8")
 
                         self.__output.append(line)
                         self._regexMatch(line)
 
                         if self.__process is not None:
-                            self.__process(line, *self.__processArgs,
-                                           **self.__processKWArgs)
+                            self.__process(
+                                line, *self.__processArgs, **self.__processKWArgs
+                            )
 
                 except UnicodeDecodeError as error:
 
                     trb = traceback.format_exc()
                     msg = "Error: {}".format(error.reason)
-                    self.__output.append(str(cmd) + '\n')
+                    self.__output.append(str(cmd) + "\n")
                     self.__output.append(msg)
                     self.__output.append(trb)
 
@@ -420,7 +428,7 @@ class RunCommand:
 
                     trb = traceback.format_exc()
                     msg = "Error: {}".format(error.args)
-                    self.__output.append(str(cmd) + '\n')
+                    self.__output.append(str(cmd) + "\n")
                     self.__output.append(msg)
                     self.__output.append(trb)
 
