@@ -25,7 +25,7 @@ from .classes import (
     Worker,
 )
 
-from .messagebox import messageBoxYesNo
+from .messagebox import messageBox, messageBoxYesNo
 
 from .qtUtils import (
     centerWidgets,
