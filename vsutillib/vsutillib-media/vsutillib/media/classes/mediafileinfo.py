@@ -124,7 +124,7 @@ class MediaFileInfo(object):
                             "MFI006: Stream type mismatched %s - %s",
                             a.track_type, b.track_type)
                     bReturn = False
-                elif a.language != b.language:
+                elif (a.language != b.language) and (a.track_type != "Video"):
                     if self.log:
                         MODULELOG.debug(
                             "MFI0007: Stream language mismatched %s - %s",
