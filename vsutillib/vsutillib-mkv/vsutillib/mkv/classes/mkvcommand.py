@@ -302,23 +302,6 @@ class MKVCommand(object):
 
             self.__lstCommands.append(shellCommand)  # save command in list
 
-            # lstCommandsNew.append(xLate.xLate(newCommandNew))
-
-        # for command in lstCommandsNew:
-        #    shellCommand = shlex.split(command)
-
-        #    if bRemoveTitle and shellCommand:
-        # Remove title if found since this is for batch processing
-        # the title will propagate to all the files maybe erroneously.
-        # This field is preserved from the source files.
-
-        #        while "--title" in shellCommand:
-
-        #            i = shellCommand.index("--title")
-        #            del shellCommand[i : i + 2]
-
-        #    self.__lstCommands.append(shellCommand)
-
         self.__workFiles.sourceFiles = lstSourceFilesNew  # redundant for rename
         self.__workFiles.destinationFiles = self.__filesInDirsByKey[_Key.outputFile]
 
