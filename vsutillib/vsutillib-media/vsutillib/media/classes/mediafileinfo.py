@@ -4,6 +4,7 @@ Get file structure information from media file
 
 # MFI0001
 
+import base64
 import logging
 
 from pymediainfo import MediaInfo
@@ -62,8 +63,10 @@ class MediaFileInfo(object):
     def __init__(self, strMediaFile, log=None):
 
         self.fileName = strMediaFile
+        self.mediaInfo = None
         self.codec = ""
         self.format = ""
+        self.title = ""
         self.lstMediaTracks = []
         self.__log = None
         self.log = log
@@ -74,6 +77,7 @@ class MediaFileInfo(object):
 
         try:
             fileMediaInfo = MediaInfo.parse(self.fileName)
+            self.mediaInfo = fileMediaInfo
         except OSError:
             raise OSError("MediaInfo not found.")
 
@@ -81,6 +85,12 @@ class MediaFileInfo(object):
             if track.track_type == "General":
                 self.codec = track.codec
                 self.format = track.format
+                self.title = track.title
+                try:
+                    self.title = base64.b64decode(track.title).decode("UTF-8")
+                except: # pylint: disable=bare-except
+                    pass
+                self.title = self.title.strip()
             if track.track_type in ("Video", "Audio", "Text"):
                 self.lstMediaTracks.append(
                     MediaTrackInfo(track.streamorder, track.track_type,
