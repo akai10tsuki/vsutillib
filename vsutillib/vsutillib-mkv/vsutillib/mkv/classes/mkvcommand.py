@@ -96,13 +96,13 @@ class MKVCommand(object):
 
             strCommand = verify.bashCommand
 
-            reOutputFile = r"\-\-output\s(.*?)\s\-\-"
-            reChaptersFile = r"\-\-chapters\s(.*?)\s\-\-"
-            reSourceFile = r"('\('\s(.*?)\s'\)')"
+            #reOutputFile = r"\-\-output\s(.*?)\s\-\-"
+            #reChaptersFile = r"\-\-chapters\s(.*?)\s\-\-"
+            #reSourceFile = r"('\('\s(.*?)\s'\)')"
 
-            reOutputFileEx = re.compile(reOutputFile)
-            reChaptersFileEx = re.compile(reChaptersFile)
-            reSourcesEx = re.compile(reSourceFile)
+            reOutputFileEx = re.compile(r"--output\s(.*?)\s--")
+            reChaptersFileEx = re.compile(r"--chapters\s(.*?)\s--")
+            reSourcesEx = re.compile(r"('\('\s(.*?)\s'\)')")
 
             # search for the output file
             if match := reOutputFileEx.search(strCommand):
