@@ -21,6 +21,7 @@ r"|--compression "
 
 """
 
+import ast
 import logging
 import re
 import shlex
@@ -28,8 +29,15 @@ import shlex
 from pathlib import Path
 
 from vsutillib.media import MediaFileInfo
-from vsutillib.files import stripEncaseQuotes
 
+from ..mkvutils import (
+    convertToBashStyle,
+    numberOfTracksInCommand,
+    resolveOverwrite,
+    stripEncaseQuotes,
+    unQuote,
+)
+from .mkvclassutil import Attachment, SourceFile
 from .mkvgetattachments import MKVGetAttachments
 
 MODULELOG = logging.getLogger(__name__)
@@ -74,7 +82,9 @@ class MKVCommandParser:
     def __init__(self, strCommand=None, log=None):
 
         self.__bashCommand = None
+        self.__errorFound = False
         self.__lstAnalysis = None
+        self.__log = None
         self.__totalSourceFiles = None
         self.__strCommand = None
 
@@ -96,8 +106,38 @@ class MKVCommandParser:
         self.sourceFiles = []
         self.titles = []
 
-        self.command = strCommand
         self.log = log
+        self.command = strCommand
+
+    def __reset(self):
+
+        self.__errorFound = False
+        self.__lstAnalysis = None
+        self.__totalSourceFiles = None
+
+        # self.chaptersFile = None
+        # self.chaptersLanguage = None
+        # self.commandTemplate = None
+        # self.language = None
+        # self.mkvmerge = None
+        # self.outputFile = None
+        # self.title = None
+        # self.titleMatchString = None
+        self.trackOrder = None
+
+        self.attachments = []
+        self.attachmentFiles = []
+        self.chaptersFiles = []
+        self.filesInDirByKey = {}
+        self.outputFiles = []
+        self.sourceFiles = []
+        self.titles = []
+
+    def __bool__(self):
+        return not self.__errorFound
+
+    def __len__(self):
+        return self.__totalSourceFiles
 
     def __str__(self):
 
@@ -119,9 +159,6 @@ class MKVCommandParser:
         strCommand += " --track-order " + self.trackOrder
 
         return strCommand
-
-    def __len__(self):
-        return self.__totalSourceFiles
 
     @property
     def log(self):
@@ -188,40 +225,18 @@ class MKVCommandParser:
     @command.setter
     def command(self, value):
         if isinstance(value, str):
-            self._reset()
+            self.__reset()
             self.__strCommand = value
-            strCommand = _convertToBashStyle(
+            strCommand = convertToBashStyle(
                 self.__strCommand
             )  # Comvert command line to bash style
             self.__bashCommand = strCommand
             self._parse()
-            self._template()
-            self._attachments()
-            self._readDirs()
-            self._filesInDirByKey()
-
-    def _reset(self):
-
-        self.__lstAnalysis = None
-        self.__totalSourceFiles = None
-
-        self.chaptersFile = None
-        self.chaptersLanguage = None
-        self.commandTemplate = None
-        self.language = None
-        self.mkvmerge = None
-        self.outputFile = None
-        self.title = None
-        self.titleMatchString = None
-        self.trackOrder = None
-
-        self.attachments = []
-        self.attachmentFiles = []
-        self.chaptersFiles = []
-        self.filesInDirByKey = {}
-        self.outputFiles = []
-        self.sourceFiles = []
-        self.titles = []
+            if not self.__errorFound:
+                self._template()
+                self._attachments()
+                self._readDirs()
+                self._filesInDirByKey()
 
     def _parse(self):
 
@@ -262,10 +277,10 @@ class MKVCommandParser:
                 r"|--chapter-language "
                 r"|--language "
                 r")"
-                r"(.*?) (?='\)')"
+                r"(.*?) '\(' (.*?) '\)'"
             )
         )
-        matchFiles = reFilesEx.findall(strCommand)
+        matchFiles = reFilesEx.finditer(strCommand)
 
         reAttachmentsEx = re.compile(
             (
@@ -283,6 +298,9 @@ class MKVCommandParser:
         )
         matchChaptersFile = reChaptersFileEx.search(strCommand)
 
+        self.__errorFound = False
+        # self.trackOrder = None
+
         # To look Ok must match the 4 expected groups in the
         # command line
         # 1: mkvmerge name with fullpath
@@ -291,6 +309,29 @@ class MKVCommandParser:
         # 4: track order
         if matchCommand and (len(matchCommand.groups()) == 4):
             self.trackOrder = matchCommand.group(4)
+            self.__lstAnalysis.append("chk: Command seems ok.")
+            try:
+                d = ast.literal_eval("{" + self.trackOrder + "}")
+                trackTotal = numberOfTracksInCommand(strCommand)
+                s = self.trackOrder.split(",")
+                if trackTotal == len(s):
+                    for e in s:
+                        if not e.find(":") > 0:
+                            self.__errorFound = True
+                else:
+                    self.__errorFound = True
+                if self.__errorFound:
+                    self.__lstAnalysis.append(
+                        "err: Number of tracks {} and track order of {} don't match.".format(
+                            trackTotal, len(d)
+                        )
+                    )
+            except SyntaxError:
+                self.__lstAnalysis.append("err: Command track order bad format.")
+                self.__errorFound = True
+        else:
+            self.__lstAnalysis.append("err: Command bad format.")
+            self.__errorFound = True
 
         if matchUILanguage:
             self.language = matchUILanguage.group(1)
@@ -300,6 +341,15 @@ class MKVCommandParser:
             p = Path(f)
             if p.is_file():
                 self.mkvmerge = p
+                self.__lstAnalysis.append("chk: mkvmerge ok - {}".format(str(p)))
+            else:
+                self.__lstAnalysis.append(
+                    "err: mkvmerge not found - {}.".format(str(p))
+                )
+                self.__errorFound = True
+        else:
+            self.__lstAnalysis.append("err: mkvmerge not found.")
+            self.__errorFound = True
 
         if matchOutputFile:
             f = stripEncaseQuotes(matchOutputFile.group(1))
@@ -308,15 +358,39 @@ class MKVCommandParser:
 
             if Path(p.parent).is_dir():
                 self.outputFile = p
+                self.__lstAnalysis.append(
+                    "chk: Destination directory ok = {}".format(str(p.parent))
+                )
+            else:
+                self.outputFile = None
+                self.__errorFound = True
+                self.__lstAnalysis.append(
+                    "err: Destination directory not found - {}.".format(str(p.parent))
+                )
+        else:
+            self.__errorFound = True
+            self.__lstAnalysis.append("err: No output file found in command.")
 
         if matchFiles:
             for match in matchFiles:
-                m = match + " ')'"
-                oFile = SourceFile(m)
-                self.sourceFiles.append(oFile)
-                if self.__totalSourceFiles is None:
-                    self.__totalSourceFiles = len(oFile.filesInDir)
+                oFile = SourceFile(match.group(0))
+                if oFile:
+                    self.sourceFiles.append(oFile)
+                    if self.__totalSourceFiles is None:
+                        self.__totalSourceFiles = len(oFile.filesInDir)
+                else:
+                    self.__errorFound = True
+                    self.__lstAnalysis.append(
+                        "err: Error reading source files " + match.group(2)
+                    )
 
+        else:
+            self.__errorFound = True
+            self.__lstAnalysis.append("err: No source file found in command.")
+
+        #
+        # Optional
+        #
         if matchAttachments:
             for match in matchAttachments:
                 attachment = Attachment(match.groups(), match.span(), match.group())
@@ -328,7 +402,7 @@ class MKVCommandParser:
 
         if matchChaptersFile:
             self.chaptersLanguage = matchChaptersFile.group(1)
-            f = _unQuote(matchChaptersFile.group(2))
+            f = unQuote(matchChaptersFile.group(2))
             p = Path(f)
 
             if p.is_file():
@@ -350,14 +424,13 @@ class MKVCommandParser:
                 self.titles.append("")
 
             of = self.outputFile.parent.joinpath(f.stem + ".mkv")
-            of = _resolveOverwrite(of)
+            of = resolveOverwrite(of)
             self.outputFiles.append(of)
 
         if self.chaptersFile:
             d = self.chaptersFile.parent
             fid = [x for x in d.glob("*" + self.chaptersFile.suffix) if x.is_file()]
             self.chaptersFiles.extend(fid)
-
 
     def _filesInDirByKey(self):
 
@@ -368,10 +441,9 @@ class MKVCommandParser:
         self.filesInDirByKey[_Key.outputFile] = self.outputFiles
         self.filesInDirByKey[_Key.title] = self.titles
 
-        for index, source in self.sourceFiles:
+        for index, source in enumerate(self.sourceFiles):
             key = "<SOURCE{}>".format(str(index))
             self.filesInDirByKey[key] = source.filesInDir
-
 
     def _template(self):
 
@@ -403,206 +475,9 @@ class MKVCommandParser:
         self.commandTemplate = cmdTemplate
 
 
-class Attachment:  # pylint: disable=too-few-public-methods
-    """
-    Class to save attachment information
-
-    """
-
-    def __init__(self, attachment, span=None, matchString=None):
-
-        self.name = None
-        self.mimeType = None
-        self.fileName = None
-
-        if isinstance(attachment, tuple):
-            self.name = attachment[0]
-            self.mimeType = attachment[1]
-
-            f = _unQuote(attachment[2])
-            p = Path(f)
-
-            if p.is_file():
-                self.fileName = p
-
-        self.span = span
-        self.matchString = matchString
-
-    def __str__(self):
-
-        return self.matchString
-
-
-class SourceFile:
-    """
-     Tracks and file names
-    """
-
-    def __init__(self, strParseFile=None):
-
-        self.__ParseFile = strParseFile
-        self.options = None
-        self.tracks = []
-        self.filesInDir = []
-        self.fileName = None
-        self.matchString = None
-        if self.__ParseFile:
-            self._parse()
-
-    def _parse(self):
-
-        reTrackEx = re.compile(r"(?=--language )(.*?) (?=--language|'\(')")
-        reOptionsEx = re.compile(
-            (
-                r"(?=--audio-tracks "
-                r"|--video-tracks "
-                r"|--subtitle-tracks "
-                r"|--button-tracks "
-                r"|--track-tags  "
-                r"|--attachments "
-                r"|--no-audio "
-                r"|--no-video "
-                r"|--no-subtitles "
-                r"|--no-buttons "
-                r"|--no-track-tags "
-                r"|--no-chapters "
-                r"|--no-global-tags "
-                r"|--chapter-charset "
-                r"|--chapter-language "
-                r"|--language "
-                r")(.*?) (?='\(')"
-            )
-        )
-        reSourcesEx = re.compile(r"'\('\s(.*?)\s'\)'")
-        self.tracks = []
-        self.fileName = []
-
-        if self.__ParseFile:
-            if match := reTrackEx.finditer(self.__ParseFile):
-                for m in match:
-                    self.tracks.append(m.group(1))
-            if match := reOptionsEx.search(self.__ParseFile):
-                self.options = match.group(1)
-            if match := reSourcesEx.search(self.__ParseFile):
-                f = _unQuote(match.group(1))
-                p = Path(f)
-
-                if p.is_file():
-                    self.fileName = p
-                    self.matchString = match.group(0)
-                    d = p.parent
-                    fid = [x for x in d.glob("*" + p.suffix) if x.is_file()]
-                    self.filesInDir.extend(fid)
-
-    @property
-    def directory(self):
-        return self.fileName.parent
-
-    @property
-    def strFile(self):
-        return self.__ParseFile
-
-    @strFile.setter
-    def strFile(self, value):
-        if isinstance(value, str):
-            self.__ParseFile = value
-            self._parse()
-
-
 class _Key:
 
     attachmentFiles = "<ATTACHMENTS>"
     chaptersFile = "<CHAPTERS>"
     outputFile = "<OUTPUTFILE>"
     title = "<TITLE>"
-
-
-def _convertToBashStyle(strCommand):
-    """
-    Strip escape windows chars for the command line
-    in the end they won't be used in a shell
-    the resulting command is bash/zh like
-
-    Args:
-        strCommand (str): command generated by mkvtoolnix-gui
-
-    Returns:
-        str:
-
-        cli command converted to bash style
-    """
-
-    strTmp = strCommand
-
-    if strTmp.find(r'^"^(^"') >= 0:
-        # This is for cmd in Windows
-        strTmp = (
-            strTmp.replace("'", r"'\''")
-            .replace("^", "")
-            .replace("/", "\\")
-            .replace('"', "'")
-        )
-
-    return strTmp
-
-
-def _numberOfTracksInCommand(strCmd):
-    """
-    Every track have a --language option count
-    them to know the number of tracks
-
-    Args:
-        strCmd(str): command line
-
-    Returns:
-        int:
-
-        total number of tracks
-    """
-
-    reLanguageEx = re.compile(r"\-\-language (.*?)\s")
-    matchLanguage = reLanguageEx.findall(strCmd)
-
-    return len(matchLanguage)
-
-
-def _resolveOverwrite(fileName, strPrefix="new-"):
-
-    fileNameTmp = fileName
-
-    # Check if destination file exist and add prefix if it does
-    if fileNameTmp.is_file():
-
-        strSuffix = ""
-        n = 1
-
-        while True:
-            fileNameTmp = fileNameTmp.parent.joinpath(
-                strPrefix + fileName.stem + strSuffix + fileName.suffix
-            )
-
-            if fileNameTmp.is_file():
-                strSuffix = " ({})".format(n)
-                n += 1
-            else:
-                break
-
-    return fileNameTmp
-
-
-def _unQuote(fileName):
-    """
-    Remove start end quotes and escape ones
-    Args:
-        fileName (str): file name
-
-    Returns:
-        str:
-
-        file name without quotes if found
-    """
-
-    f = stripEncaseQuotes(fileName)
-    f = f.replace(r"'\''", "'")
-
-    return f
