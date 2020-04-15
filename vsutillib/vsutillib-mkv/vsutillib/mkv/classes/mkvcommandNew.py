@@ -9,13 +9,16 @@ path for executable and target options are parsed from the command line
 
 """
 
-import re
+#import re
 import shlex
 import logging
 
-from pathlib import Path
+#from pathlib import Path
 
-from vsutillib.files import stripEncaseQuotes
+#from vsutillib.files import stripEncaseQuotes
+from vsutillib.misc import XLate
+
+from .mkvcommandparser import MKVCommandParser
 from .verifycommand import VerifyMKVCommand
 
 MODULELOG = logging.getLogger(__name__)
@@ -67,6 +70,7 @@ class MKVCommandNew(object):
         self.__workFiles = _WorkFiles()
         self.__commandTemplate = None
         self.__filesInDirsByKey = None
+        self.__parsedCommand = None
 
         self.__log = None
         self.log = log
@@ -77,7 +81,9 @@ class MKVCommandNew(object):
         if strCommand is not None:
             self._initHelper(strCommand)
 
-    def _initHelper(self, strCommand, bRemoveTitle=True):
+    def _initHelper(
+        self, strCommand, bRemoveTitle=True
+    ):  # pylint: disable=unused-argument
 
         if strCommand is None:
             self.__reset()
@@ -90,37 +96,16 @@ class MKVCommandNew(object):
             self.__strShellCommand = strCommand
             self.__bErrorFound = False
             lstSources = []
-            bHasChaptersFile = False
 
             strCommand = verify.bashCommand
-
-            reOutputFile = r"\-\-output\s(.*?)\s\-\-"
-            reChaptersFile = r"\-\-chapters\s(.*?)\s\-\-"
-            reSourceFile = r"('\('\s(.*?)\s'\)')"
-
-            reOutputFileEx = re.compile(reOutputFile)
-            reChaptersFileEx = re.compile(reChaptersFile)
-            reSourcesEx = re.compile(reSourceFile)
-
-            # search for the output file
-            if match := reOutputFileEx.search(strCommand):
-                strOutputFile = match.group(1)
+            pCmd = MKVCommandParser(strCommand)
+            self.__parsedCommand = pCmd
 
             outputFile = verify.outputFile
+            strOutputFile = shlex.quote(str(outputFile))
 
-            # search for chapters file
-            # match = reChaptersFileEx.search(strCommand)
-            if match := reChaptersFileEx.search(strCommand):
-                strChaptersFile = match.group(1)
-                chaptersFile = verify.chaptersFile
-                bHasChaptersFile = True
-
-            # search for the source files
-            # this have to exist in the
-            # file system
-            if match := reSourcesEx.findall((strCommand)):
-                for m in match:
-                    lstSources.append(m)
+            for f in pCmd.sourceFiles:
+                lstSources.append((f.matchString, f.fileName))
 
             newCommandTemplate = strCommand
 
@@ -134,17 +119,16 @@ class MKVCommandNew(object):
                 # Set source files
                 sub, fileName = source
                 key = "<SOURCE{}>".format(str(index))
-                fileName = fileName.replace(r"'\''", "'")
-                f = Path(stripEncaseQuotes(fileName))
+                f = fileName
                 d = f.parent
-                fd = [x for x in d.glob("*" + f.suffix) if x.is_file()]
-                fd.sort(key=_strPath)
+                fid = [x for x in d.glob("*" + f.suffix) if x.is_file()]
+                fid.sort(key=_strPath)
 
                 # Check all lists have same number of files
                 if lenOfListOfFiles == 0:
-                    lenOfListOfFiles = len(fd)
+                    lenOfListOfFiles = len(fid)
 
-                elif lenOfListOfFiles != len(fd):
+                elif lenOfListOfFiles != len(fid):
                     self.__reset()
                     self.__bErrorFound = True
                     self.__strError = "List of files are not equal."
@@ -152,7 +136,7 @@ class MKVCommandNew(object):
                 # Set output files
                 if index == 0:
                     od = []
-                    for o in fd:
+                    for o in fid:
                         of = outputFile.parent.joinpath(o.stem + ".mkv")
                         of = _resolveOverwrite(of)
                         od.append(of)
@@ -162,24 +146,30 @@ class MKVCommandNew(object):
                     )
 
                 lstBaseFiles.append(f)  # backwards compatible
-                filesInDirsByKey[key] = fd
+                filesInDirsByKey[key] = fid
                 newCommandTemplate = newCommandTemplate.replace(sub, key, 1)
 
-            # Set output files
-            if bHasChaptersFile:
-                d = chaptersFile.parent
-                cd = [x for x in d.glob("*" + chaptersFile.suffix) if x.is_file()]
-                cd.sort(key=_strPath)
+            if pCmd.chaptersFile:
+                d = pCmd.chaptersFile.parent
+                fid = [x for x in d.glob("*" + pCmd.chaptersFile.suffix) if x.is_file()]
+                fid.sort(key=_strPath)
 
-                if lenOfListOfFiles != len(cd):
+                if lenOfListOfFiles != len(fid):
                     self.__reset()
                     self.__bErrorFound = True
                     self.__strError = "List of files are not equal."
 
-                filesInDirsByKey[_Key.chaptersFile] = cd
+                filesInDirsByKey[_Key.chaptersFile] = fid
 
                 newCommandTemplate = newCommandTemplate.replace(
-                    strChaptersFile, _Key.chaptersFile, 1
+                    shlex.quote(str(pCmd.chaptersFile)), _Key.chaptersFile, 1
+                )
+
+            if pCmd.attachments:
+                attachmentsMatchString = pCmd.attachmentsMatchString
+
+                newCommandTemplate = newCommandTemplate.replace(
+                    attachmentsMatchString, _Key.attachmentFiles, 1
                 )
 
             if not self.__bErrorFound:
@@ -219,6 +209,7 @@ class MKVCommandNew(object):
         self.__workFiles.clear()
         self.__commandTemplate = None
         self.__filesInDirsByKey = None
+        self.__parsedCommand = None
 
     def __bool__(self):
         return not self.__bErrorFound
@@ -251,63 +242,37 @@ class MKVCommandNew(object):
             self.__index += 1
             return self.__getitem__(self.__index - 1)
 
-            # return [self.__lstCommands[self.__index - 1],
-            #        self.__workFiles.baseFiles,
-            #        self.__workFiles.sourceFiles[self.__index - 1],
-            #        self.__workFiles.destinationFiles[self.__index - 1]]
-
     def _generateCommands(self, bRemoveTitle=True):
 
-        lstTmp = []
-        lstTmp1 = []
+        # lstCommandsNew = []
 
-        #
-        # lstTmp list of the form:
-        # [[('<OUTFILE>', file1), ('<OUTFILE>', file2), ...],
-        #  [('<SOURCE0>', file1), ('<SOURCE0>', file2), ...],
-        #  [('<SOURCE1>', file1), ('<SOURCE1>', file2), ...],
-        #  [('<CHAPTERS>', file1), ('<CHAPTERS>', file2), ...], # optional
-        #  ...]
-        # theese are the individual list by key
-        #
-        for key in self.__filesInDirsByKey:
-            filesInDir = self.__filesInDirsByKey[key]
-            z = zip([key] * len(filesInDir), filesInDir)
-            if key != _Key.outputFile:
-                lstTmp1.append(filesInDir)
-            lstTmp.append(list(z))
+        newCommandNew = self.__commandTemplate
 
-        if self.log:
-            MODULELOG.debug("MKV0006: Files by Key %s", str(lstTmp))
-
-        #
-        # list of the form:
-        # [(('<OUTFILE>', file1), ('<SOURCE0>', file1), ('<SOURCE1>', file1), ('<CHAPTERS>', file1), ...), pylint: disable=line-too-long
-        #  (('<OUTFILE>', file2), ('<SOURCE0>', file2), ('<SOURCE1>', file2), ('<CHAPTERS>', file1), ...),
-        #  ...]
-        # theese are the combined list of lstTmp unpacked and zip is applied
-        # to have all the keys for substitution at the same point
-        # chapters are optional
-        #
-        lstSourceFilesWithKey = list(zip(*lstTmp))
-        lstSourceFiles = list(zip(*lstTmp1))  # backwards compatible
-
-        #
-        # generate all the commands and store them in shlex form
-        #
+        totalCommands = len(self.__filesInDirsByKey[_Key.outputFile])
+        lstSourceFilesNew = []
 
         self.__lstCommands = []
 
-        for s in lstSourceFilesWithKey:
+        for i in range(totalCommands):
 
-            newCommand = self.__commandTemplate
+            e = {}
+            s = []
 
-            for e in s:
-                key, fileName = e
-                qf = shlex.quote(str(fileName))
-                newCommand = newCommand.replace(key, qf, 1)
+            for k, v in self.__filesInDirsByKey.items():
 
-            shellCommand = shlex.split(newCommand)
+                e[k] = shlex.quote(
+                    str(v[i])
+                )  # add the filenames as shlex.quote strings form pathlib.Path
+
+                if k != _Key.outputFile:
+                    s.append(v[i])  # save source files as pathlib.Path
+
+            xLate = XLate(e)  # instantiate regex dictionary translator
+            lstSourceFilesNew.append(s)  # Save Source Files in list
+
+            shellCommand = shlex.split(
+                xLate.xLate(newCommandNew)
+            )  # save command as shlex.split to submit to Pipe
 
             if bRemoveTitle and shellCommand:
                 # Remove title if found since this is for batch processing
@@ -319,9 +284,9 @@ class MKVCommandNew(object):
                     i = shellCommand.index("--title")
                     del shellCommand[i : i + 2]
 
-            self.__lstCommands.append(shellCommand)
+            self.__lstCommands.append(shellCommand)  # save command in list
 
-        self.__workFiles.sourceFiles = lstSourceFiles  # redundant for rename
+        self.__workFiles.sourceFiles = lstSourceFilesNew  # redundant for rename
         self.__workFiles.destinationFiles = self.__filesInDirsByKey[_Key.outputFile]
 
         if self.log:
@@ -373,6 +338,10 @@ class MKVCommandNew(object):
         if isinstance(value, str):
             self.__reset()
             self._initHelper(value, bRemoveTitle=True)
+
+    @property
+    def parsedCommand(self):
+        return self.__parsedCommand
 
     @property
     def baseFiles(self):
@@ -474,8 +443,11 @@ class _WorkFiles:
 
 class _Key:
 
-    outputFile = "<OUTPUTFILE>"
+    attachmentFiles = "<ATTACHMENTS>"
     chaptersFile = "<CHAPTERS>"
+    outputFile = "<OUTPUTFILE>"
+    title = "<TITLE>"
+
 
 
 def _resolveOverwrite(fileName, strPrefix="new-"):
