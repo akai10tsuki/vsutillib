@@ -85,12 +85,13 @@ class MediaFileInfo(object):
             if track.track_type == "General":
                 self.codec = track.codec
                 self.format = track.format
-                self.title = track.title
-                try:
-                    self.title = base64.b64decode(track.title).decode("UTF-8")
-                except: # pylint: disable=bare-except
-                    pass
-                self.title = self.title.strip()
+                if track.title is not None:
+                    self.title = track.title
+                    try:
+                        self.title = base64.b64decode(track.title).decode("UTF-8")
+                    except: # pylint: disable=bare-except
+                        pass
+                    self.title = self.title.strip()
             if track.track_type in ("Video", "Audio", "Text"):
                 self.lstMediaTracks.append(
                     MediaTrackInfo(track.streamorder, track.track_type,
