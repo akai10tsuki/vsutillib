@@ -3,9 +3,10 @@
 # MKV0001
 
 from .classes import (
+    MKVAttachment,
+    MKVAttachments,
     MKVCommand,
     MKVCommandParser,
-    MKVGetAttachments,
     VerifyStructure,
     VerifyMKVCommand,
     MKVCommandNew,
