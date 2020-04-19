@@ -138,7 +138,7 @@ def convertToBashStyle(strCommand):
             .replace('"', "'")
         )
 
-    return strTmp
+    return str(strTmp)
 
 
 def numberOfTracksInCommand(strCmd):
@@ -201,3 +201,15 @@ def unQuote(fileName):
     f = f.replace(r"'\''", "'")
 
     return f
+
+def strPath(value):
+    """
+    Convenience function to help sort
+
+    Arguments:
+        value {various types} -- value to convert to string
+
+    Returns:
+        str -- argument received converted to string
+    """
+    return str(value)
