@@ -6,7 +6,7 @@ import re
 
 from pathlib import Path
 
-from ..mkvutils import unQuote
+from ..mkvutils import strPath, unQuote
 
 
 class SourceFile:
@@ -24,7 +24,30 @@ class SourceFile:
         self.fileName = None
         self.matchString = None
 
+        # for iterator
+        self.__index = 0
+
         self.fullMatchString = fullMatchString
+
+    def __contains__(self, item):
+        return item in self.filesInDir
+
+    def __getitem__(self, index):
+        return self.filesInDir[index]
+
+    def __iter__(self):
+        return self
+
+    def __len__(self):
+        return len(self.filesInDir)
+
+    def __next__(self):
+        if self.__index >= len(self.filesInDir):
+            self.__index = 0
+            raise StopIteration
+        else:
+            self.__index += 1
+            return self.__getitem__(self.__index - 1)
 
     def _parse(self):
 
@@ -52,7 +75,7 @@ class SourceFile:
         )
         reSourcesEx = re.compile(r"'\('\s(.*?)\s'\)'")
         self.tracks = []
-        self.fileName = []
+        self.fileName = None
 
         if self.__fullMatchString:
             if match := reTrackEx.finditer(self.__fullMatchString):
@@ -71,12 +94,19 @@ class SourceFile:
                     self.matchString = match.group(0)
                     d = p.parent
                     fid = [x for x in d.glob("*" + p.suffix) if x.is_file()]
+                    fid.sort(key=strPath)
                     self.filesInDir.extend(fid)
+                else:
+                    self.__errorFound = True
             else:
                 self.__errorFound = True
 
     def __bool__(self):
         return not self.__errorFound
+
+    @property
+    def baseFile(self):
+        return self.fileName
 
     @property
     def directory(self):
@@ -93,31 +123,60 @@ class SourceFile:
             self._parse()
 
 
-class Attachment:  # pylint: disable=too-few-public-methods
+class SourceFiles:
     """
-    Class to save attachment information
-
+     One sequence of SourceFile class elements
     """
 
-    def __init__(self, attachment, span=None, matchString=None):
+    def __init__(self):
 
-        self.name = None
-        self.mimeType = None
-        self.fileName = None
+        self.__sourceFiles = []
 
-        if isinstance(attachment, tuple):
-            self.name = attachment[0]
-            self.mimeType = attachment[1]
+        # for iterator
+        self.__index = 0
 
-            f = unQuote(attachment[2])
-            p = Path(f)
+    def __bool__(self):
+        return bool(self.__sourceFiles)
 
-            if p.is_file():
-                self.fileName = p
+    def __contains__(self, item):
+        return item in self.__sourceFiles
 
-        self.span = span
-        self.matchString = matchString
+    def __getitem__(self, index):
 
-    def __str__(self):
+        if isinstance(index, (int, slice)):
+            tmp = []
+            for e in self.__sourceFiles:
+                tmp.append(e[index])
+            return tmp
 
-        return self.matchString
+        if isinstance(index, tuple):
+            return self.__sourceFiles[index[0]]
+
+        raise IndexError
+
+    def __iter__(self):
+        return self
+
+    def __len__(self):
+        if self.__sourceFiles:
+            return len(self.__sourceFiles[0])
+        return len(self.__sourceFiles)
+
+    def __next__(self):
+        if self.__index >= len(self.__sourceFiles[0]):
+            self.__index = 0
+            raise StopIteration
+        else:
+            self.__index += 1
+            return self.__getitem__(self.__index - 1)
+
+    def append(self, value):
+
+        if isinstance(value, SourceFile):
+            self.__sourceFiles.append(value)
+        else:
+            raise TypeError
+
+    @property
+    def sourceFiles(self):
+        return self.__sourceFiles
