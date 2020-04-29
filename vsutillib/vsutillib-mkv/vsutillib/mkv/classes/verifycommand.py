@@ -30,7 +30,7 @@ class VerifyMKVCommand:
 
     .. code:: Python
 
-        verify = VerifyCommand(command)
+        verify = VerifyMKVCommand(command)
 
         if verify:
             # Ok to proceed
