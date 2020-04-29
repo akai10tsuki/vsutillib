@@ -89,10 +89,14 @@ class MKVAttachments:
         self.__attachmentsFiles = []
         self.__attachmentsDirs = []
         self.__attachmentsStr = []
+        self.__attachmentsDirByEpisode = False
 
         self.__cmdLineAttachments = []
         self.__cmdLineAttachmentsFiles = []
         self.__cmdLineAttachmentsDirs = []
+
+    def __bool__(self):
+        return bool(self.__attachments)
 
     def __contains__(self, item):
         return item in self.__cmdLineAttachments
@@ -120,6 +124,10 @@ class MKVAttachments:
     @property
     def attachmentsDirs(self):
         return self.__attachmentsDirs
+
+    @property
+    def isAttachmentsDirByEpisode(self):
+        return self.__attachmentsDirByEpisode
 
     @property
     def attachmentsFiles(self):
@@ -157,7 +165,6 @@ class MKVAttachments:
                 self.__cmdLineAttachments[0].span[0],
                 self.__cmdLineAttachments[-1].span[1],
             )
-
         return span
 
     @property
@@ -214,6 +221,7 @@ class MKVAttachments:
             fid = [x for x in d.glob("*") if x.is_file()]
 
             if self.__totalSourceFiles == len(did):
+                self.__attachmentsDirByEpisode = True
                 self.__attachmentsDirs.extend(did)
                 for d in did:
                     fid = [x for x in d.glob("*") if x.is_file()]
