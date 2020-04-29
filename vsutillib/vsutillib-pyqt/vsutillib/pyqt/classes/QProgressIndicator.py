@@ -148,6 +148,7 @@ class QProgressIndicator(QWidget):
         if self.timerId != -1:
             self.killTimer(self.timerId)
 
+        self.angle = 0
         self.timerId = -1
         self.update()
 
