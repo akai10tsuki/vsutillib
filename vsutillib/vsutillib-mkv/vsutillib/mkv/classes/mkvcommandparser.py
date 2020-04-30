@@ -108,15 +108,11 @@ class MKVCommandParser:
         self.titleMatchString = None
         self.trackOrder = None
 
-        # self.attachments = []
-        # self.attachmentFiles = []
-        # self.attachmentsStr = []
         self.chaptersFiles = []
         self.filesInDirByKey = {}
-        self.oAttachments = MKVAttachments()
-        #self.outputFiles = []
         self.titles = []
 
+        self.oAttachments = MKVAttachments()
         self.oSourceFiles = SourceFiles()
 
     def __bool__(self):
@@ -212,17 +208,10 @@ class MKVCommandParser:
         if isinstance(value, str):
             self._initVars()
             self.__strCommand = value
-            strCommand = convertToBashStyle(
-                self.__strCommand
-            )  # Comvert command line to bash style
+            strCommand = convertToBashStyle(self.__strCommand)
             self.__bashCommand = strCommand
             self._parse()
             self.__readFiles = True
-            #if not self.__errorFound:
-            #    self._readDirs()
-            #    self._template()
-            #    self._filesInDirByKey()
-            #    self.generateCommands()
 
     @property
     def commandsGenerated(self):
@@ -254,7 +243,6 @@ class MKVCommandParser:
         """
 
         strCommand = self.__bashCommand
-
         self.__lstAnalysis = []
 
         rg = r"^(.*?)\s--.*?--output.(.*?)\s--.*?\s'\('\s(.*?)\s'\)'.*?--track-order\s(.*)"
@@ -285,17 +273,9 @@ class MKVCommandParser:
                 r"(.*?) '\(' (.*?) '\)'"
             )
         )
-        # reAttachmentsEx = re.compile(
-        #    (
-        #        r"--attachment-name (.*?) --attachment-mime-type "
-        #        r"(.*?) --attach-file (.*?)(?= --)"
-        #    )
-        # )
-        #reTitleEx = re.compile(r"--title (.*?)(?= --)")
         reChaptersFileEx = re.compile(
             r"--chapter-language (.*?) --chapters (.*?) (?=--)"
         )
-
         self.__errorFound = False
 
         # To look Ok must match the 4 expected groups in the
@@ -354,7 +334,6 @@ class MKVCommandParser:
             f = stripEncaseQuotes(matchOutputFile.group(1))
             f = f.replace(r"'\''", "'")
             p = Path(f)
-
             if Path(p.parent).is_dir():
                 self.outputFile = p
                 self.__lstAnalysis.append(
@@ -385,12 +364,6 @@ class MKVCommandParser:
                     if index == 0:
                         self.filesInDirByKey[_Key.outputFile] = []
                         for f in oFile.filesInDir:
-                            #mediaInfo = MediaFileInfo(str(f))
-                            #if mediaInfo:
-                            #    self.titles.append(mediaInfo.title)
-                            #else:
-                            #    self.titles.append("")
-
                             of = self.outputFile.parent.joinpath(f.stem + ".mkv")
                             of = resolveOverwrite(of)
                             self.filesInDirByKey[_Key.outputFile].append(of)
@@ -406,7 +379,6 @@ class MKVCommandParser:
                     self.__lstAnalysis.append(
                         "err: Error reading source files." + match.group(2)
                     )
-
         else:
             self.__errorFound = True
             self.__lstAnalysis.append("err: No source file found in command.")
@@ -414,15 +386,10 @@ class MKVCommandParser:
         #
         # Optional
         #
-        # if matchTitle := reTitleEx.search(strCommand):
-        #    self.titleMatchString = matchTitle.group(0)
-        #    self.title = matchTitle.group(1)
-
         if matchChaptersFile := reChaptersFileEx.search(strCommand):
             self.chaptersLanguage = matchChaptersFile.group(1)
             f = unQuote(matchChaptersFile.group(2))
             p = Path(f)
-
             if p.is_file():
                 self.chaptersFile = p
                 self.__lstAnalysis.append(
@@ -461,10 +428,6 @@ class MKVCommandParser:
             else:
                 self.titles.append("")
 
-            #of = self.outputFile.parent.joinpath(f.stem + ".mkv")
-            #of = resolveOverwrite(of)
-            #self.outputFiles.append(of)
-
         if self.chaptersFile:
             d = self.chaptersFile.parent
             fid = [x for x in d.glob("*" + self.chaptersFile.suffix) if x.is_file()]
@@ -479,49 +442,35 @@ class MKVCommandParser:
 
     def _filesInDirByKey(self):
 
-        #self.filesInDirByKey[_Key.outputFile] = self.outputFiles
-
-        #for index, source in enumerate(self.oSourceFiles.sourceFiles):
-        #    key = "<SOURCE{}>".format(str(index))
-        #    self.filesInDirByKey[key] = source.filesInDir
-
         if self.oAttachments.cmdLineAttachments:
             self.filesInDirByKey[
                 _Key.attachmentFiles
             ] = self.oAttachments.attachmentsStr
-
         self.filesInDirByKey[_Key.title] = self.titles
-
         if self.chaptersFiles:
             self.filesInDirByKey[_Key.chaptersFile] = self.chaptersFiles
 
     def _template(self):
 
         cmdTemplate = self.__bashCommand
-
         cmdTemplate = cmdTemplate.replace(
             shlex.quote(str(self.outputFile)), _Key.outputFile, 1
         )
-
         for index, sf in enumerate(self.oSourceFiles.sourceFiles):
             key = "<SOURCE{}>".format(str(index))
             cmdTemplate = cmdTemplate.replace(sf.matchString, key, 1)
-
         if self.oAttachments.cmdLineAttachments:
             cmdTemplate = cmdTemplate.replace(
                 self.oAttachments.attachmentsMatchString, _Key.attachmentFiles, 1
             )
-
         if self.title:
             cmdTemplate = cmdTemplate.replace(
                 self.titleMatchString, "--title " + _Key.title, 1
             )
-
         if self.chaptersFile:
             cmdTemplate = cmdTemplate.replace(
                 shlex.quote(str(self.chaptersFile)), _Key.chaptersFile, 1
             )
-
         self.commandTemplate = cmdTemplate
 
     def generateCommands(self):
@@ -530,37 +479,25 @@ class MKVCommandParser:
         """
 
         if not self.__errorFound:
-
             if self.__readFiles:
                 self._readDirs()
                 self._template()
                 self._filesInDirByKey()
                 self.__readFiles = False
-
-
             cmdTemplate = self.commandTemplate
-
             totalCommands = len(self.filesInDirByKey[_Key.outputFile])
-
             for i in range(totalCommands):
-
                 keyDictionary = {}
-
                 for key, sourceFiles in self.filesInDirByKey.items():
-
                     if key != _Key.attachmentFiles:
                         keyDictionary[key] = shlex.quote(str(sourceFiles[i]))
                     else:
                         keyDictionary[key] = sourceFiles[i]
-
-
                 xLate = XLate(keyDictionary)  # instantiate regex dictionary translator
-
                 strCommand = xLate.xLate(cmdTemplate)
                 shellCommand = shlex.split(
                     strCommand
                 )  # save command as shlex.split to submit to Pipe
-
                 self.__strCommands.append(strCommand)
                 self.__shellCommands.append(shellCommand)
 
