@@ -29,6 +29,7 @@ import shlex
 
 from pathlib import Path
 
+from vsutillib.files import fileQuote
 from vsutillib.media import MediaFileInfo
 from vsutillib.misc import XLate
 
@@ -99,11 +100,13 @@ class MKVCommandParser:
         self.__strCommands = []
 
         self.chaptersFile = None
+        self.chaptersFileMatchString = None
         self.chaptersLanguage = None
         self.commandTemplate = None
         self.language = None
         self.mkvmerge = None
         self.outputFile = None
+        self.outputFileMatchString = None
         self.title = None
         self.titleMatchString = None
         self.trackOrder = None
@@ -336,6 +339,7 @@ class MKVCommandParser:
             p = Path(f)
             if Path(p.parent).is_dir():
                 self.outputFile = p
+                self.outputFileMatchString = matchOutputFile.group(1)
                 self.__lstAnalysis.append(
                     "chk: Destination directory ok = {}.".format(str(p.parent))
                 )
@@ -392,6 +396,7 @@ class MKVCommandParser:
             p = Path(f)
             if p.is_file():
                 self.chaptersFile = p
+                self.chaptersFileMatchString = matchChaptersFile.group(2)
                 self.__lstAnalysis.append(
                     "chk: Chapters files directory ok = {}.".format(str(p.parent))
                 )
@@ -454,7 +459,7 @@ class MKVCommandParser:
 
         cmdTemplate = self.__bashCommand
         cmdTemplate = cmdTemplate.replace(
-            shlex.quote(str(self.outputFile)), _Key.outputFile, 1
+            self.outputFileMatchString, _Key.outputFile, 1
         )
         for index, sf in enumerate(self.oSourceFiles.sourceFiles):
             key = "<SOURCE{}>".format(str(index))
@@ -469,7 +474,7 @@ class MKVCommandParser:
             )
         if self.chaptersFile:
             cmdTemplate = cmdTemplate.replace(
-                shlex.quote(str(self.chaptersFile)), _Key.chaptersFile, 1
+                self.chaptersFileMatchString, _Key.chaptersFile, 1
             )
         self.commandTemplate = cmdTemplate
 
@@ -501,6 +506,12 @@ class MKVCommandParser:
                 self.__strCommands.append(strCommand)
                 self.__shellCommands.append(shellCommand)
 
+    def renameOutputFiles(self, newNames):
+
+        if len(newNames) == self.__totalSourceFiles:
+            self.filesInDirByKey[_Key.outputFile] = list(newNames)
+            if not self.__readFiles:
+                self.generateCommands()
 
 class _Key:
 

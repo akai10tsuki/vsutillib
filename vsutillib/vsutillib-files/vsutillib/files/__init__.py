@@ -12,6 +12,7 @@ getFilesList - get list of files in a directory
 """
 
 from .fileutil import (
+    fileQuote,
     findFileInPath,
     getFileList,
     getDirectoryList,

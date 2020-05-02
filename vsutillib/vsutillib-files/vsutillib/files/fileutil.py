@@ -4,6 +4,8 @@ Convenience functions related to files and file system
 
 import os
 import platform
+import shlex
+
 from pathlib import Path, PurePath
 
 
@@ -70,7 +72,7 @@ def getFileList(
     except OSError:
         wildcard = p.stem
         p = p.parent
-        doubleWildcard = True # wildcard found on strPath argument
+        doubleWildcard = True  # wildcard found on strPath argument
 
     try:
         if not p.is_dir():
@@ -123,6 +125,7 @@ def getFileList(
 
     return lstObjFileNames
 
+
 def getDirectoryList(
     strPath, wildcard="*", fullpath=False, recursive=False, strName=False
 ):
@@ -151,7 +154,7 @@ def getDirectoryList(
     except OSError:
         wildcard = p.stem
         p = p.parent
-        doubleWildcard = True # wildcard found on strPath argument
+        doubleWildcard = True  # wildcard found on strPath argument
 
     try:
         if not p.is_dir():
@@ -194,6 +197,7 @@ def getDirectoryList(
         return lstFilesFilter
 
     return lstObjFileNames
+
 
 def getExecutable(search):
     """
@@ -255,5 +259,12 @@ def stripEncaseQuotes(strFile):
 
     if (s[0:1] == "'") and (s[-1:] == "'"):
         s = s[1:-1]
+
+    return s
+
+def fileQuote(oFile):
+
+    f = shlex.quote(str(oFile))
+    s = f.replace("\"'\"", r"\'")
 
     return s
