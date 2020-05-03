@@ -7,7 +7,7 @@ Changelog
 Changed
 *******
 
-- modify files to bump version to 1.5.0
+- modify library files to bump version to 1.5.0
 - Using some Python 3.8 specific features drop support versions less than 3.8
 
 files package
@@ -18,6 +18,7 @@ Added
 
 - getDirectoryList function like getFilesList for directories
   accepts wildcard on directory arguments
+- MKVCommandParser
 
 Changed
 ********
