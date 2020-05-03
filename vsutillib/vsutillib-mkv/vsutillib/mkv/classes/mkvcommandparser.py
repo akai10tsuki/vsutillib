@@ -99,17 +99,17 @@ class MKVCommandParser:
         self.__shellCommands = []
         self.__strCommands = []
 
-        self.chaptersFile = None
-        self.chaptersFileMatchString = None
+        self.cliChaptersFile = None
+        self.cliChaptersFileMatchString = None
         self.chaptersLanguage = None
         self.commandTemplate = None
         self.language = None
         self.mkvmerge = None
-        self.outputFile = None
-        self.outputFileMatchString = None
-        self.title = None
-        self.titleMatchString = None
-        self.trackOrder = None
+        self.cliOutputFile = None
+        self.cliOutputFileMatchString = None
+        self.cliTitle = None
+        self.cliTitleMatchString = None
+        self.cliTrackOrder = None
 
         self.chaptersFiles = []
         self.filesInDirByKey = {}
@@ -132,30 +132,14 @@ class MKVCommandParser:
             self.filesInDirByKey[_Key.outputFile][index],
             None if not self.oAttachments else self.oAttachments.attachmentsStr[index],
             None if not self.titles else self.titles[index],
-            None if not self.chaptersFile else self.chaptersFiles[index],
+            None if not self.cliChaptersFile else self.chaptersFiles[index],
         )
 
     def __len__(self):
         return self.__totalSourceFiles
 
     def __str__(self):
-
-        strCommand = shlex.quote(str(self.mkvmerge))
-        strCommand += " --ui-language " + self.language
-        strCommand += " --output " + shlex.quote(str(self.outputFile))
-        for oFile in self.oSourceFiles.sourceFiles:
-            strCommand += " " + oFile.options
-            strCommand += " '(' " + shlex.quote(str(oFile.fileName)) + " ')'"
-        for oAttach in self.oAttachments.cmdLineAttachments:
-            strCommand += " " + str(oAttach)
-        if self.title:
-            strCommand += " --title " + self.title
-        if self.chaptersFile:
-            strCommand += " --chapter-language " + self.chaptersLanguage
-            strCommand += " --chapters " + shlex.quote(str(self.chaptersFile))
-        strCommand += " --track-order " + self.trackOrder
-
-        return strCommand
+        return self.__strCommand
 
     @property
     def log(self):
@@ -290,12 +274,12 @@ class MKVCommandParser:
         if (matchCommand := reCommandEx.match(strCommand)) and (
             len(matchCommand.groups()) == 4  # pylint: disable=used-before-assignment
         ):
-            self.trackOrder = matchCommand.group(4)
+            self.cliTrackOrder = matchCommand.group(4)
             self.__lstAnalysis.append("chk: Command seems ok.")
             try:
-                d = ast.literal_eval("{" + self.trackOrder + "}")
+                d = ast.literal_eval("{" + self.cliTrackOrder + "}")
                 trackTotal = numberOfTracksInCommand(strCommand)
-                s = self.trackOrder.split(",")
+                s = self.cliTrackOrder.split(",")
                 if trackTotal == len(s):
                     for e in s:
                         if not e.find(":") > 0:
@@ -338,13 +322,13 @@ class MKVCommandParser:
             f = f.replace(r"'\''", "'")
             p = Path(f)
             if Path(p.parent).is_dir():
-                self.outputFile = p
-                self.outputFileMatchString = matchOutputFile.group(1)
+                self.cliOutputFile = p
+                self.cliOutputFileMatchString = matchOutputFile.group(1)
                 self.__lstAnalysis.append(
                     "chk: Destination directory ok = {}.".format(str(p.parent))
                 )
             else:
-                self.outputFile = None
+                self.cliOutputFile = None
                 self.__errorFound = True
                 self.__lstAnalysis.append(
                     "err: Destination directory not found - {}.".format(str(p.parent))
@@ -368,7 +352,7 @@ class MKVCommandParser:
                     if index == 0:
                         self.filesInDirByKey[_Key.outputFile] = []
                         for f in oFile.filesInDir:
-                            of = self.outputFile.parent.joinpath(f.stem + ".mkv")
+                            of = self.cliOutputFile.parent.joinpath(f.stem + ".mkv")
                             of = resolveOverwrite(of)
                             self.filesInDirByKey[_Key.outputFile].append(of)
                     key = "<SOURCE{}>".format(str(index))
@@ -395,8 +379,8 @@ class MKVCommandParser:
             f = unQuote(matchChaptersFile.group(2))
             p = Path(f)
             if p.is_file():
-                self.chaptersFile = p
-                self.chaptersFileMatchString = matchChaptersFile.group(2)
+                self.cliChaptersFile = p
+                self.cliChaptersFileMatchString = matchChaptersFile.group(2)
                 self.__lstAnalysis.append(
                     "chk: Chapters files directory ok = {}.".format(str(p.parent))
                 )
@@ -433,9 +417,9 @@ class MKVCommandParser:
             else:
                 self.titles.append("")
 
-        if self.chaptersFile:
-            d = self.chaptersFile.parent
-            fid = [x for x in d.glob("*" + self.chaptersFile.suffix) if x.is_file()]
+        if self.cliChaptersFile:
+            d = self.cliChaptersFile.parent
+            fid = [x for x in d.glob("*" + self.cliChaptersFile.suffix) if x.is_file()]
             self.chaptersFiles.extend(fid)
 
         if self.log:
@@ -459,7 +443,7 @@ class MKVCommandParser:
 
         cmdTemplate = self.__bashCommand
         cmdTemplate = cmdTemplate.replace(
-            self.outputFileMatchString, _Key.outputFile, 1
+            self.cliOutputFileMatchString, _Key.outputFile, 1
         )
         for index, sf in enumerate(self.oSourceFiles.sourceFiles):
             key = "<SOURCE{}>".format(str(index))
@@ -468,13 +452,13 @@ class MKVCommandParser:
             cmdTemplate = cmdTemplate.replace(
                 self.oAttachments.attachmentsMatchString, _Key.attachmentFiles, 1
             )
-        if self.title:
+        if self.cliTitle:
             cmdTemplate = cmdTemplate.replace(
-                self.titleMatchString, "--title " + _Key.title, 1
+                self.cliTitleMatchString, "--title " + _Key.title, 1
             )
-        if self.chaptersFile:
+        if self.cliChaptersFile:
             cmdTemplate = cmdTemplate.replace(
-                self.chaptersFileMatchString, _Key.chaptersFile, 1
+                self.cliChaptersFileMatchString, _Key.chaptersFile, 1
             )
         self.commandTemplate = cmdTemplate
 
