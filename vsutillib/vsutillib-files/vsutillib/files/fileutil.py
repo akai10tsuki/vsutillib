@@ -111,7 +111,7 @@ def getFileList(
         if recursive:
             wc = "**/" + stripEncaseQuotes(wildcard)
 
-        print("Path = {}\nWith wildcard ={}\n".format(p, wc))
+        # print("Path = {}\nWith wildcard ={}\n".format(p, wc))
 
         lstObjFileNames = [x for x in p.glob(wc) if x.is_file()]
 
@@ -262,9 +262,10 @@ def stripEncaseQuotes(strFile):
 
     return s
 
+
 def fileQuote(oFile):
 
     f = shlex.quote(str(oFile))
-    s = f.replace("\"'\"", r"\'")
+    s = f.replace('"\'"', r"\'")
 
     return s
