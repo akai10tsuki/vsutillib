@@ -70,7 +70,7 @@ class MediaFileInfo(object):
         self.lstMediaTracks = []
         self.__log = None
         self.log = log
-
+        self.totalTracks = {"Video": 0, "Audio": 0, "Text": 0}
         self._initHelper()
 
     def _initHelper(self):
@@ -93,11 +93,11 @@ class MediaFileInfo(object):
                         pass
                     self.title = self.title.strip()
             if track.track_type in ("Video", "Audio", "Text"):
+                self.totalTracks[track.track_type] += 1
                 self.lstMediaTracks.append(
                     MediaTrackInfo(track.streamorder, track.track_type,
                                    track.language, track.default, track.forced,
                                    track.title, track.codec, track.format))
-
     def __len__(self):
         return len(self.lstMediaTracks) if self.lstMediaTracks else 0
 
@@ -215,7 +215,7 @@ class MediaFileInfo(object):
             self.__log = value
 
 
-class MediaTrackInfo(object):
+class MediaTrackInfo:
     r"""
     Convenience class used by MediaFileInfo_
     contains the media track properties
