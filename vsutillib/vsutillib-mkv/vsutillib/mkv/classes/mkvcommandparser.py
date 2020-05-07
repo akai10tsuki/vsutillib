@@ -29,7 +29,6 @@ import shlex
 
 from pathlib import Path
 
-from vsutillib.files import fileQuote
 from vsutillib.media import MediaFileInfo
 from vsutillib.misc import XLate
 
