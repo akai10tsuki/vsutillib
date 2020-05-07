@@ -7,8 +7,17 @@ from .classes import (
     MKVAttachments,
     MKVCommand,
     MKVCommandParser,
-    VerifyStructure,
-    VerifyMKVCommand,
     MKVCommandNew,
+    SourceFile,
+    SourceFiles,
+    VerifyMKVCommand,
+    VerifyStructure,
 )
-from .mkvutils import getMKVMerge, getMKVMergeVersion, stripEncaseQuotes
+from .mkvutils import (
+    getMKVMerge,
+    getMKVMergeVersion,
+    numberOfTracksInCommand,
+    resolveOverwrite,
+    stripEncaseQuotes,
+    unQuote,
+)
