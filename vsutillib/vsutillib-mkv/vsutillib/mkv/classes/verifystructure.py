@@ -150,6 +150,34 @@ class VerifyStructure:
                 objSource = MediaFileInfo(strSource, log=self.log)
                 objFile = MediaFileInfo(strFile, log=self.log)
 
+                if objSource != objFile:
+
+                    msg = "Error: In structure \n\nSource:\n{}\nBase Source:\n{}\n"
+                    msg = msg.format(str(objFile), str(objSource))
+                    self.__analysis.append(msg)
+                    self.__status = False
+                    _detailAnalysis(self.__analysis, objFile, objSource)
+
+                    if self.log:
+
+                        msg = "Error: In structure Source: {} Base Source: {}"
+                        msg = msg.format(objFile.fileName, objSource.fileName)
+                        MODULELOG.error("VFS0002: Error: %s", msg)
+
+                        for i, line in enumerate(self.__analysis):
+                            if i > 0:
+                                MODULELOG.error("VFS0003: Error: %s", line.strip())
+
+                        msg = "Structure not ok. Source: {} Base Source: {}"
+                        msg = msg.format(objFile.fileName, objSource.fileName)
+                        MODULELOG.debug("VFS0004: %s", msg)
+
+                else:
+                    if self.log:
+                        msg = "Structure seems ok. Source: {} Base Source: {}"
+                        msg = msg.format(objFile.fileName, objSource.fileName)
+                        MODULELOG.debug("VFS0005: %s", msg)
+
             except OSError as error:
 
                 msg = "Error: \n{}\n"
@@ -161,35 +189,6 @@ class VerifyStructure:
                     msg = "Error: {}"
                     msg = msg.format(error.strerror)
                     MODULELOG.error("VFS0001: %s", msg)
-
-            if objSource != objFile:
-
-                msg = "Error: In structure \n\nSource:\n{}\nBase Source:\n{}\n"
-                msg = msg.format(str(objFile), str(objSource))
-                self.__analysis.append(msg)
-                self.__status = False
-                _detailAnalysis(self.__analysis, objFile, objSource)
-
-                if self.log:
-
-                    msg = "Error: In structure Source: {} Base Source: {}"
-                    msg = msg.format(objFile.fileName, objSource.fileName)
-                    MODULELOG.error("VFS0002: Error: %s", msg)
-
-                    for i, line in enumerate(self.__analysis):
-                        if i > 0:
-                            MODULELOG.error("VFS0003: Error: %s", line.strip())
-
-                    msg = "Structure not ok. Source: {} Base Source: {}"
-                    msg = msg.format(objFile.fileName, objSource.fileName)
-                    MODULELOG.debug("VFS0004: %s", msg)
-
-            else:
-                if self.log:
-                    msg = "Structure seems ok. Source: {} Base Source: {}"
-                    msg = msg.format(objFile.fileName, objSource.fileName)
-                    MODULELOG.debug("VFS0005: %s", msg)
-
 
 def _detailAnalysis(lstAnalysis, mediaFile1, mediaFile2):
 
@@ -219,8 +218,8 @@ def _detailAnalysis(lstAnalysis, mediaFile1, mediaFile2):
                 )
                 lstAnalysis.append(msg)
             elif a.language != b.language:
-                msg = "Stream language mismatched {}: {} - {}: {}\n".format(
-                    name1, a.language, name2, b.language
+                msg = "Stream language mismatched {}: {}:{} - {}: {}:{}\n".format(
+                    name1, a.streamorder, a.language, name2, b.streamorder, b.language
                 )
                 lstAnalysis.append(msg)
             elif (a.codec != b.codec) and (a.track_type != "Audio"):
