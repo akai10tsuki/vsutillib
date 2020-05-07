@@ -13,6 +13,7 @@ match will be set on regexmatch property
 # pylint: disable=bad-continuation
 
 import logging
+import platform
 import re
 import shlex
 import subprocess
@@ -304,11 +305,101 @@ class RunCommand:
         else:
             cmd = shlex.split(self.__command)
         try:
+            if platform.system() == "Windows":
+                p = subprocess.Popen(
+                    cmd,
+                    stdout=subprocess.PIPE,
+                    universal_newlines=self.__universalNewLines,
+                    stderr=subprocess.STDOUT,
+                    creationflags=subprocess.CREATE_NO_WINDOW,
+                )
+            else:
+                p = subprocess.Popen(
+                    cmd,
+                    stdout=subprocess.PIPE,
+                    universal_newlines=self.__universalNewLines,
+                    stderr=subprocess.STDOUT,
+                )
+            try:
+                for l in p.stdout:
+                    if self.__universalNewLines:
+                        line = l
+                    else:
+                        line = l.decode("utf-8")
+                    self.__output.append(line)
+                    self._regexMatch(line)
+                    if self.__processLine is not None:
+                        self.__processLine(
+                            line, *self.__processArgs, **self.__processKWArgs
+                        )
+                    if self.__controlQueue:
+                        queueStatus = self.__controlQueue.popleft()
+                        self.__controlQueue.appendleft(queueStatus)
+                        if queueStatus in [
+                            RunStatus.Abort,
+                            RunStatus.AbortJob,
+                            RunStatus.AbortForced,
+                        ]:
+                            # print("Aborting = {}".format(queueStatus))
+                            p.kill()
+                            outs, errs = p.communicate()
+                            # if outs:
+                            #    print(outs)
+                            # if errs:
+                            #    print(errs)
+                            # print("rc = ", p.returncode)
+                            rc = p.returncode
+                            self.__returnCode = p.returncode
+                            break
+            except UnicodeDecodeError as error:
+                trb = traceback.format_exc()
+                msg = "Error: {}".format(error.reason)
+                self.__output.append(str(cmd) + "\n")
+                self.__output.append(msg)
+                self.__output.append(trb)
+                if self.__processLine is not None:
+                    self.__processLine(
+                        line, *self.__processArgs, **self.__processKWArgs
+                    )
+                if self.log:
+                    MODULELOG.debug("RNC0001: Unicode decode error %s", msg)
+            except KeyboardInterrupt as error:
+                trb = traceback.format_exc()
+                msg = "Error: {}".format(error.args)
+                self.__output.append(str(cmd) + "\n")
+                self.__output.append(msg)
+                self.__output.append(trb)
+                if self.__processLine is not None:
+                    self.__processLine(
+                        line, *self.__processArgs, **self.__processKWArgs
+                    )
+                if self.log:
+                    MODULELOG.debug("RNC0002: Keyboard interrupt %s", msg)
+                raise SystemExit(0)
+            if rcResult := p.poll():
+                self.__returnCode = rcResult
+                rc = rcResult
+        except FileNotFoundError as e:
+            self.__error = e
+
+        return rc
+
+    def _getCommandOutputBackupTwo(self):
+        """Execute command in a subprocess"""
+
+        self.__returnCode = 10000
+        rc = 1000
+        if self.__commandShlex:
+            cmd = self.__command
+        else:
+            cmd = shlex.split(self.__command)
+        try:
             with subprocess.Popen(
                 cmd,
                 stdout=subprocess.PIPE,
                 universal_newlines=self.__universalNewLines,
                 stderr=subprocess.STDOUT,
+                creationflags=0x08000000,
             ) as p:
                 try:
                     for l in p.stdout:
@@ -330,14 +421,16 @@ class RunCommand:
                                 RunStatus.AbortJob,
                                 RunStatus.AbortForced,
                             ]:
-                                print("Aborting = {}".format(queueStatus))
+                                # print("Aborting = {}".format(queueStatus))
                                 p.kill()
                                 outs, errs = p.communicate()
-                                if outs:
-                                    print(outs)
-                                if errs:
-                                    print(errs)
-                                print("rc = ", p.returncode)
+                                # if outs:
+                                #    print(outs)
+                                # if errs:
+                                #    print(errs)
+                                # print("rc = ", p.returncode)
+                                rc = p.returncode
+                                self.__returnCode = p.returncode
                                 break
                 except UnicodeDecodeError as error:
                     trb = traceback.format_exc()
@@ -367,7 +460,7 @@ class RunCommand:
                 if rcResult := p.poll():
                     self.__returnCode = rcResult
                     rc = rcResult
-                    print("Return Code = {}".format(rc))
+                # print("Return Code = {}".format(rc))
         except FileNotFoundError as e:
             self.__error = e
 
