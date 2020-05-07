@@ -20,6 +20,7 @@ class SourceFile:
         self.__errorFound = False
         self.options = None
         self.tracks = []
+        self.trackID = {}
         self.filesInDir = []
         self.fileName = None
         self.matchString = None
@@ -73,14 +74,22 @@ class SourceFile:
                 r")(.*?) (?='\(')"
             )
         )
+        reTrackIDEx = re.compile(r"--language (\d+):(.*?) ")
+        reTrackNameEx = re.compile(r"--track-name (.*)( --|'|)")
         reSourcesEx = re.compile(r"'\('\s(.*?)\s'\)'")
         self.tracks = []
         self.fileName = None
 
         if self.__fullMatchString:
             if match := reTrackEx.finditer(self.__fullMatchString):
-                for m in match:
+                for i, m in enumerate(match):
                     self.tracks.append(m.group(1))
+                    trackID = reTrackIDEx.search(m.group(1))
+                    self.trackID[i] = [trackID.group(1), trackID.group(2)]
+                    if trackName := reTrackNameEx.search(m.group(1)):
+                        self.trackID[i].append(trackName.group(1))
+                    else:
+                        self.trackID[i].append("")
             if match := reOptionsEx.search(self.__fullMatchString):
                 self.options = match.group(1)
             else:
