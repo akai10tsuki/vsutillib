@@ -51,8 +51,9 @@ setup(
     author_email=config.EMAIL,
     license="MIT",
     packages=["vsutillib." + PACKAGE, "vsutillib." + PACKAGE + ".classes"],
-    install_requires=["pymediainfo"],
+    install_requires=["pymediainfo>=4.1"],
     zip_safe=False,
+    python_requires=">=3.8, <3.9",
 )
 
 removeTmpDirs()

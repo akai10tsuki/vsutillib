@@ -52,12 +52,13 @@ setup(
     license="MIT",
     packages=["vsutillib." + PACKAGE],
     install_requires=[
-        "vsutillib.files",
-        "vsutillib.media",
-        "vsutillib.mkv",
-        "vsutillib.process",
+        "vsutillib.files>=1.5.0",
+        "vsutillib.media>=1.5.0",
+        "vsutillib.mkv>=1.5.0",
+        "vsutillib.process>=1.5.0",
     ],
     zip_safe=False,
+    python_requires=">=3.8, <3.9",
 )
 
 removeTmpDirs()

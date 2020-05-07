@@ -51,8 +51,9 @@ setup(
     author_email=config.EMAIL,
     license="MIT",
     packages=["vsutillib." + PACKAGE],
-    install_requires=["vsutillib.process"],
+    install_requires=["vsutillib.process>=1.5.0"],
     zip_safe=False,
+    python_requires=">=3.8, <3.9",
 )
 
 removeTmpDirs()

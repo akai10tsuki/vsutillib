@@ -51,8 +51,9 @@ setup(
     author_email=config.EMAIL,
     license="MIT",
     packages=["vsutillib." + PACKAGE, "vsutillib." + PACKAGE + ".classes"],
-    install_requires=["PySide2>=5.12", "vsutillib.macos"],
+    install_requires=["PySide2>=5.14", "vsutillib.macos"],
     zip_safe=False,
+    python_requires=">=3.8, <3.9",
 )
 
 removeTmpDirs()

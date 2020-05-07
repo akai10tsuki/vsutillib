@@ -53,6 +53,7 @@ setup(
     packages=["vsutillib." + PACKAGE, "vsutillib." + PACKAGE + ".classes"],
     install_requires=["vsutillib.files", "vsutillib.media", "vsutillib.process"],
     zip_safe=False,
+    python_requires=">=3.8, <3.9",
 )
 
 removeTmpDirs()
