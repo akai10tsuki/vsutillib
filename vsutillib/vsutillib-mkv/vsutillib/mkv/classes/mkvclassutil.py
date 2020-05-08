@@ -74,7 +74,7 @@ class SourceFile:
                 r")(.*?) (?='\(')"
             )
         )
-        reTrackIDEx = re.compile(r"--language (\d+):(.*?) ")
+        reTrackIDEx = re.compile(r"--language (\d+):(.*?)\W*")
         reTrackNameEx = re.compile(r"--track-name (.*)( --|'|)")
         reSourcesEx = re.compile(r"'\('\s(.*?)\s'\)'")
         self.tracks = []
@@ -84,12 +84,12 @@ class SourceFile:
             if match := reTrackEx.finditer(self.__fullMatchString):
                 for i, m in enumerate(match):
                     self.tracks.append(m.group(1))
-                    trackID = reTrackIDEx.search(m.group(1))
-                    self.trackID[i] = [trackID.group(1), trackID.group(2)]
-                    if trackName := reTrackNameEx.search(m.group(1)):
-                        self.trackID[i].append(trackName.group(1))
-                    else:
-                        self.trackID[i].append("")
+                    if trackID := reTrackIDEx.search(m.group(1)):
+                        self.trackID[i] = [trackID.group(1), trackID.group(2)]
+                        if trackName := reTrackNameEx.search(m.group(1)):
+                            self.trackID[i].append(trackName.group(1))
+                        else:
+                            self.trackID[i].append("")
             if match := reOptionsEx.search(self.__fullMatchString):
                 self.options = match.group(1)
             else:
