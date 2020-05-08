@@ -152,7 +152,7 @@ class VerifyStructure:
 
                 if objSource != objFile:
 
-                    msg = "Error: In structure \n\nSource:\n{}\nBase Source:\n{}\n"
+                    msg = "Error: In structure \n\nSource:\n{}\n\nBase Source:\n{}\n"
                     msg = msg.format(str(objFile), str(objSource))
                     self.__analysis.append(msg)
                     self.__status = False
