@@ -8,7 +8,7 @@ from .FileListWidget import FileListWidget
 from .FormatLabel import FormatLabel
 from .GenericThreads import QthThread, QthThreadWorker
 from .GroupSignal import GroupSignal
-from .insertTextHelpers import LineOutput
+from .insertTextHelpers import LineOutput, checkColor
 from .OutputTextWidget import OutputTextWidget
 from .QActionWidget import QActionWidget
 from .QMenuWidget import QMenuWidget

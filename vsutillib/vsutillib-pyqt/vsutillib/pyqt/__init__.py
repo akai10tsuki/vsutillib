@@ -5,6 +5,7 @@ PySide2 related classes and functions
 # classes
 
 from .classes import (
+    checkColor,
     ComboLineEdit,
     DualProgressBar,
     FileListWidget,
