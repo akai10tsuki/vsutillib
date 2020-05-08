@@ -35,6 +35,8 @@ from PySide2.QtCore import Qt, QSize
 from PySide2.QtGui import QPainter, QColor
 from PySide2.QtWidgets import QWidget, QApplication, QSizePolicy
 
+from .SvgColor import SvgColor
+
 
 class QProgressIndicator(QWidget):
     """
@@ -51,7 +53,7 @@ class QProgressIndicator(QWidget):
 
         self.__delay = 40
         self.__displayedWhenStopped = False
-        self.__color = Qt.black
+        self.__color = SvgColor.black
 
         # Set size and focus policy
         self.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
@@ -126,8 +128,8 @@ class QProgressIndicator(QWidget):
             p.translate(self.rect().center())
             p.rotate(self.angle - (i * 30.0))
             p.drawRoundedRect(
-                - capsuleWidth * 0.5,
-                - (innerRadius + capsuleHeight),
+                -capsuleWidth * 0.5,
+                -(innerRadius + capsuleHeight),
                 capsuleWidth,
                 capsuleHeight,
                 capsuleRadius,
@@ -154,7 +156,6 @@ class QProgressIndicator(QWidget):
 
 
 if __name__ == "__main__":
-
 
     from PySide2.QtWidgets import QGridLayout, QMainWindow, QPushButton
 
