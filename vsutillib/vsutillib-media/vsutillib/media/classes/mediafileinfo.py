@@ -177,7 +177,7 @@ class MediaFileInfo(object):
 
     def __str__(self):
 
-        tmpStr = "File Nme: {}\nFile Format: -{}-\n\n".format(
+        tmpStr = "File Name: {}\nFile Format: -{}-\n\n".format(
             self.fileName, self.format)
         tmpNum = 1
 
@@ -187,7 +187,7 @@ class MediaFileInfo(object):
                                                 track.track_type)
             tmpStr += "Codec: {}\n".format(track.codec)
             tmpStr += "Language: {}\n".format(track.language)
-            tmpStr += "Format: {}\n".format(track.format)
+            tmpStr += "Format: {}".format(track.format)
             tmpNum += 1
 
         return tmpStr
