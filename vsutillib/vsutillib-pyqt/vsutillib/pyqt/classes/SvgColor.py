@@ -1,5 +1,8 @@
 """
 class QTColor defines the recognize SVG color keywords
+
+colors https://en.wikipedia.org/wiki/Web_colors
+
 """
 
 from PySide2.QtGui import QColor
@@ -141,7 +144,6 @@ class SvgColor:
     skyblue = QColor(135, 206, 235)
     slateblue = QColor(106, 90, 205)
     slategray = QColor(112, 128, 144)
-    slategrey = QColor(112, 128, 144)
     snow = QColor(255, 250, 250)
     springgreen = QColor(0, 255, 127)
     steelblue = QColor(70, 130, 180)
