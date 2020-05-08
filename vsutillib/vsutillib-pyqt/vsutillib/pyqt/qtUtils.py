@@ -14,7 +14,7 @@ from PySide2.QtWidgets import QDesktopWidget, QPushButton, QToolTip
 
 from vsutillib.macos import isMacDarkMode
 
-from .classes import RunInThread
+from .classes import RunInThread, SvgColor
 
 MODULELOG = logging.getLogger(__name__)
 MODULELOG.addHandler(logging.NullHandler())
@@ -70,7 +70,7 @@ def darkPalette():
     palette.setColor(QPalette.Text, Qt.white)
     palette.setColor(QPalette.Button, QColor(53, 53, 53))
     palette.setColor(QPalette.ButtonText, Qt.white)
-    palette.setColor(QPalette.BrightText, Qt.cyan)
+    palette.setColor(QPalette.BrightText, SvgColor.cyan) # Qt.cyan
     palette.setColor(QPalette.Link, QColor(42, 130, 218))
     palette.setColor(QPalette.Highlight, Qt.darkCyan)  # QColor(42, 130, 218)
     palette.setColor(QPalette.HighlightedText, Qt.white)
