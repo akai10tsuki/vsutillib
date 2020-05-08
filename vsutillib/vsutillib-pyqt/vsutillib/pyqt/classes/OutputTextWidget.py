@@ -15,7 +15,7 @@ from PySide2.QtWidgets import QTextEdit
 
 
 from .insertTextHelpers import checkColor, LineOutput
-
+from .SvgColor import SvgColor
 
 MODULELOG = logging.getLogger(__name__)
 MODULELOG.addHandler(logging.NullHandler())
@@ -28,6 +28,7 @@ class OutputTextWidget(QTextEdit):
     __log = False
     insertTextSignal = Signal(str, dict)
     setCurrentIndexSignal = Signal()
+    isDarkMode = True
 
     @classmethod
     def classLog(cls, setLogging=None):
@@ -138,7 +139,7 @@ class OutputTextWidget(QTextEdit):
         # still no restore to default the ideal configuration
         # search will continue considering abandoning color
 
-        color = checkColor(color)
+        color = checkColor(color, OutputTextWidget.isDarkMode)
 
         if replaceLine:
             self.moveCursor(QTextCursor.StartOfLine, QTextCursor.KeepAnchor)
