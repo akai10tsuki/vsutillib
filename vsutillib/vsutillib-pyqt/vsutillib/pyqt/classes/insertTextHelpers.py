@@ -13,24 +13,31 @@ from PySide2.QtCore import Qt
 
 from vsutillib.macos import isMacDarkMode
 
+from .SvgColor import SvgColor
 
-def checkColor(color):
+
+def checkColor(color, isDarkMode=False):
 
     if color is None:
 
-        if isMacDarkMode() or (platform.system() == "Windows"):
-            color = Qt.white
+        if isMacDarkMode() or isDarkMode:
+            color = SvgColor.white
         else:
-            color = Qt.black
+            color = SvgColor.black
 
     elif isMacDarkMode():
 
-        if color == Qt.red:
-            color = Qt.magenta
-        elif color == Qt.darkGreen:
-            color = Qt.green
-        elif color == Qt.blue:
-            color = Qt.cyan
+        if color == SvgColor.red:
+            color = SvgColor.magenta
+        elif color == SvgColor.darkgreen:
+            color = SvgColor.green
+        elif color == SvgColor.blue:
+            color = SvgColor.cyan
+
+    elif not isDarkMode:
+
+        if color == SvgColor.cyan:
+            color = SvgColor.dodgerblue
 
     return color
 
