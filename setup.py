@@ -34,9 +34,9 @@ def removeTmpDirs():
     """
     delete build directory setup was including files from other builds
     """
-    p = Path('.')
-    eggDirs = [x for x in p.glob('*.egg-info') if x.is_dir()]
-    eggDirs.append(Path('build'))
+    p = Path(".")
+    eggDirs = [x for x in p.glob("*.egg-info") if x.is_dir()]
+    eggDirs.append(Path("build"))
 
     for d in eggDirs:
         if d.is_dir():
@@ -47,8 +47,8 @@ def readme():
     """get README.rst"""
 
     try:
-        with io.open(os.path.join(ROOT, 'README.rst'), encoding='utf-8') as f:
-            long_description = '\n' + f.read()
+        with io.open(os.path.join(ROOT, "README.rst"), encoding="utf-8") as f:
+            long_description = "\n" + f.read()
     except FileNotFoundError:
         long_description = config.DESCRIPTION
     return long_description
@@ -62,41 +62,34 @@ setup(
     author=config.AUTHOR,  # Optional
     author_email=config.EMAIL,  # Optional
     url=config.PYPI,
-    license='MIT',
+    license="MIT",
     classifiers=[  # Optional
         # Trove classifiers
         # Full list: https://pypi.python.org/pypi?%3Aaction=list_classifiers
-        'Development Status :: 5 - Production/Stable',
-        'Environment :: Console',
-        'Environment :: MacOS X',
-        'Environment :: Win32 (MS Windows)',
-        'Environment :: X11 Applications :: Qt',
-
+        "Development Status :: 5 - Production/Stable",
+        "Environment :: Console",
+        "Environment :: MacOS X",
+        "Environment :: Win32 (MS Windows)",
+        "Environment :: X11 Applications :: Qt",
         # Indicate who your project is intended for
-        'Intended Audience :: Developers',
-        'Topic :: Multimedia :: Video',
-        'Topic :: Software Development :: Libraries',
-
+        "Intended Audience :: Developers",
+        "Topic :: Multimedia :: Video",
+        "Topic :: Software Development :: Libraries",
         # Pick your license as you wish
-        'License :: OSI Approved :: MIT License',
-
+        "License :: OSI Approved :: MIT License",
         # Operating Systems
-        'Operating System :: MacOS :: MacOS X',
-        'Operating System :: Microsoft :: Windows :: Windows 10',
-        'Operating System :: POSIX :: Linux',
-
+        "Operating System :: MacOS :: MacOS X",
+        "Operating System :: Microsoft :: Windows :: Windows 10",
+        "Operating System :: POSIX :: Linux",
         # Specify the Python versions you support here. In particular, ensure
         # that you indicate whether you support Python 2, Python 3 or both.
-        'Programming Language :: Python :: 3.5',
-        'Programming Language :: Python :: 3.6',
-        'Programming Language :: Python :: 3.7',
-
+        "Programming Language :: Python :: 3.8",
         # Implementation
         "Programming Language :: Python :: Implementation :: CPython",
     ],
     keywords=config.KEYWORDS,  # Optional
-    packages=['vsutillib'],
-    python_requires='>=3.5, <4',
+    packages=["vsutillib"],
+    python_requires=">=3.8, <3.9",
     include_package_data=True,
     project_urls=config.PROJECTURLS,
 )

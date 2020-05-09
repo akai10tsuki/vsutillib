@@ -7,16 +7,21 @@ manual entry or edits after paste
 MKVCommand will find the real errors
   number of source files not matching
 """
+# VMC0001
 
 import ast
+import logging
 import re
 
 from pathlib import Path
 
 from ..mkvutils import stripEncaseQuotes
 
+MODULELOG = logging.getLogger(__name__)
+MODULELOG.addHandler(logging.NullHandler())
 
-class VerifyMKVCommand():
+
+class VerifyMKVCommand:
     """
     Convenience class use by MKVCommand_
 
@@ -25,7 +30,7 @@ class VerifyMKVCommand():
 
     .. code:: Python
 
-        verify = VerifyCommand(command)
+        verify = VerifyMKVCommand(command)
 
         if verify:
             # Ok to proceed
@@ -66,7 +71,7 @@ class VerifyMKVCommand():
 
         return cls.__log
 
-    def __init__(self, strCommand=None):
+    def __init__(self, strCommand=None, log=None):
 
         self.__lstAnalysis = None
         self.__errorFound = False
@@ -74,6 +79,9 @@ class VerifyMKVCommand():
         self.__bashCommand = None
         self.__outputFile = None
         self.__chaptersFile = None
+        self.__log = None
+
+        self.log = log
 
         if strCommand is not None:
             self.__strCommand = strCommand
@@ -91,7 +99,8 @@ class VerifyMKVCommand():
     def __analyse(self):
 
         strCommand = _convertToBashStyle(
-            self.__strCommand)  # Comvert line to bash style
+            self.__strCommand
+        )  # Comvert line to bash style
 
         self.__bashCommand = strCommand
 
@@ -138,21 +147,22 @@ class VerifyMKVCommand():
                 d = ast.literal_eval("{" + trackOrder + "}")
                 trackTotal = _numberOfTracksInCommand(strCommand)
 
-                s = trackOrder.split(',')
+                s = trackOrder.split(",")
                 if trackTotal == len(s):
                     for e in s:
-                        if not e.find(':') > 0:
+                        if not e.find(":") > 0:
                             bOk = False
                 else:
                     bOk = False
 
                 if not bOk:
                     self.__lstAnalysis.append(
-                        "err: Number of tracks {} and track order of {} don't match."
-                        .format(trackTotal, len(d)))
+                        "err: Number of tracks {} and track order of {} don't match.".format(
+                            trackTotal, len(d)
+                        )
+                    )
             except SyntaxError:
-                self.__lstAnalysis.append(
-                    "err: Command track order bad format.")
+                self.__lstAnalysis.append("err: Command track order bad format.")
                 bOk = False
 
         if matchExecutable:
@@ -160,11 +170,11 @@ class VerifyMKVCommand():
             p = Path(f)
             if not p.is_file():
                 self.__lstAnalysis.append(
-                    "err: mkvmerge not found - {}.".format(str(p)))
+                    "err: mkvmerge not found - {}.".format(str(p))
+                )
                 bOk = False
             else:
-                self.__lstAnalysis.append("chk: mkvmerge ok - {}".format(
-                    str(p)))
+                self.__lstAnalysis.append("chk: mkvmerge ok - {}".format(str(p)))
         else:
             self.__lstAnalysis.append("err: mkvmerge not found.")
             bOk = False
@@ -177,12 +187,13 @@ class VerifyMKVCommand():
 
             if not Path(p.parent).is_dir():
                 self.__lstAnalysis.append(
-                    "err: Destination directory not found - {}.".format(
-                        str(p.parent)))
+                    "err: Destination directory not found - {}.".format(str(p.parent))
+                )
                 bOk = False
             else:
                 self.__lstAnalysis.append(
-                    "chk: Destination directory ok = {}".format(str(p.parent)))
+                    "chk: Destination directory ok = {}".format(str(p.parent))
+                )
                 self.__outputFile = p
         else:
             self.__lstAnalysis.append("err: Destination directory not found.")
@@ -197,21 +208,23 @@ class VerifyMKVCommand():
 
                 if not Path(p.parent).is_dir():
                     self.__lstAnalysis.append(
-                        "err: Source directory {} not found {}".format(
-                            n, str(p.parent)))
+                        "err: Source directory {} not found {}".format(n, str(p.parent))
+                    )
                     bOk = False
                 else:
                     self.__lstAnalysis.append(
-                        "chk: Source directory {} ok = {}".format(
-                            n, str(p.parent)))
+                        "chk: Source directory {} ok = {}".format(n, str(p.parent))
+                    )
 
                 if not Path(p).is_file():
                     self.__lstAnalysis.append(
-                        "err: Source file {} not found {}".format(n, str(p)))
+                        "err: Source file {} not found {}".format(n, str(p))
+                    )
                     bOk = False
                 else:
                     self.__lstAnalysis.append(
-                        "chk: Source file {} ok = {}".format(n, str(p)))
+                        "chk: Source file {} ok = {}".format(n, str(p))
+                    )
 
                 n += 1
 
@@ -231,11 +244,11 @@ class VerifyMKVCommand():
 
             if not p.is_file():
                 self.__lstAnalysis.append(
-                    "err: Chapters file not found - {}.".format(str(p)))
+                    "err: Chapters file not found - {}.".format(str(p))
+                )
                 bOk = False
             else:
-                self.__lstAnalysis.append("chk: Chapters file ok - {}".format(
-                    str(p)))
+                self.__lstAnalysis.append("chk: Chapters file ok - {}".format(str(p)))
                 self.__chaptersFile = p
 
         # This check if for optional attachments files
@@ -245,14 +258,24 @@ class VerifyMKVCommand():
             p = Path(p)
             if not p.is_file():
                 self.__lstAnalysis.append(
-                    "err: Attachment {} not found - {}".format(n, str(p)))
+                    "err: Attachment {} not found - {}".format(n, str(p))
+                )
                 bOk = False
             else:
-                self.__lstAnalysis.append("chk: Attachment {} ok = {}".format(
-                    n, str(p)))
+                self.__lstAnalysis.append(
+                    "chk: Attachment {} ok = {}".format(n, str(p))
+                )
             n += 1
 
         self.__errorFound = not bOk
+
+        if self.log:
+
+            for line in self.__lstAnalysis:
+                if line.find("chk:") >= 0:
+                    MODULELOG.debug("VMC0001: %s", line)
+                elif line.find("err:") >= 0:
+                    MODULELOG.error("VMC0001: %s", line)
 
     @property
     def log(self):
@@ -359,8 +382,12 @@ def _convertToBashStyle(strCommand):
 
     if strTmp.find(r'^"^(^"') >= 0:
         # This is for cmd in Windows
-        strTmp = strTmp.replace("'", r"'\''").replace('^', '').replace(
-            '/', '\\').replace('"', "'")
+        strTmp = (
+            strTmp.replace("'", r"'\''")
+            .replace("^", "")
+            .replace("/", "\\")
+            .replace('"', "'")
+        )
 
     return strTmp
 

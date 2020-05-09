@@ -10,8 +10,10 @@ if regexsearch regular expresion is provided the first
 match will be set on regexmatch property
 """
 # RNC0001
+# pylint: disable=bad-continuation
 
 import logging
+import platform
 import re
 import shlex
 import subprocess
@@ -78,20 +80,24 @@ class RunCommand:
             if isinstance(setLogging, bool):
                 cls.__log = setLogging
 
-    def __init__(self,
-                 command=None,
-                 processLine=None,
-                 processArgs=None,
-                 processKWArgs=None,
-                 regexsearch=None,
-                 commandShlex=False,
-                 universalNewLines=False):
+    def __init__(
+        self,
+        command=None,
+        processLine=None,
+        processArgs=None,
+        processKWArgs=None,
+        regexsearch=None,
+        commandShlex=False,
+        universalNewLines=False,
+        controlQueue=None,
+        log=None,
+    ):  # pylint: disable=too-many-arguments
 
         self.__command = None
-        self.command = command
+        self.command = command  # Call class setter property
 
         self.__commandShlex = commandShlex
-        self.__process = processLine
+        self.__processLine = processLine
         self.__universalNewLines = universalNewLines
         self.__processArgs = []
 
@@ -99,7 +105,7 @@ class RunCommand:
             if isinstance(processArgs, list):
                 self.__processArgs = processArgs
             else:
-                raise ValueError('processLineParam has to be a list')
+                raise ValueError("processLineParam has to be a list")
 
         self.__processKWArgs = {}
 
@@ -107,7 +113,7 @@ class RunCommand:
             if isinstance(processKWArgs, dict):
                 self.__processKWArgs = processKWArgs
             else:
-                raise ValueError('processLineParam has to be a dictionary')
+                raise ValueError("processLineParam has to be a dictionary")
 
         self.__regEx = None
         if regexsearch is not None:
@@ -120,8 +126,10 @@ class RunCommand:
 
         self.__error = ""
         self.__output = []
+        self.__controlQueue = controlQueue
         self.__returnCode = None
         self.__regexmatch = None
+        self.__log = None
 
     def __bool__(self):
         if self.__command:
@@ -152,6 +160,12 @@ class RunCommand:
 
     @property
     def command(self):
+        """return current command set in class"""
+
+        return self.__command
+
+    @command.setter
+    def command(self, value):
         """
         command to execute
 
@@ -163,11 +177,6 @@ class RunCommand:
 
             current command set
         """
-        return self.__command
-
-    @command.setter
-    def command(self, value):
-        """return current command set in class"""
         self.__command = None
         self._reset(value)
 
@@ -252,12 +261,9 @@ class RunCommand:
         """
 
         self._reset()
-
         self._getCommandOutput()
-
         if self.__output:
             return True
-
         return False
 
     def _reset(self, command=None):
@@ -272,34 +278,22 @@ class RunCommand:
     def _regexMatch(self, line):
         """Have to set the size of in case of list"""
 
-        m = None
-
         if isinstance(self.__regEx, list):
-
             for index, regex in enumerate(self.__regEx):
-                m = regex.search(line)
-
-                if m is not None:
+                if m := regex.search(line):
                     if self.__regexmatch is None:
                         self.__regexmatch = [None] * len(self.__regEx)
-
                     tmpList = []
                     for i in m.groups():
                         tmpList.append(i)
-
                     self.__regexmatch[index] = tmpList
-
         else:
-
             if self.__regEx:
-                m = self.__regEx.search(line)
-
-            if m is not None:
-                if self.__regexmatch is None:
-                    self.__regexmatch = []
-
-                for i in m.groups():
-                    self.__regexmatch.append(i)
+                if m := self.__regEx.search(line):
+                    if self.__regexmatch is None:
+                        self.__regexmatch = []
+                    for i in m.groups():
+                        self.__regexmatch.append(i)
 
     def _getCommandOutput(self):
         """Execute command in a subprocess"""
@@ -310,69 +304,163 @@ class RunCommand:
             cmd = self.__command
         else:
             cmd = shlex.split(self.__command)
-
         try:
+            if platform.system() == "Windows":
+                p = subprocess.Popen(
+                    cmd,
+                    stdout=subprocess.PIPE,
+                    universal_newlines=self.__universalNewLines,
+                    stderr=subprocess.STDOUT,
+                    creationflags=subprocess.CREATE_NO_WINDOW,
+                )
+            else:
+                p = subprocess.Popen(
+                    cmd,
+                    stdout=subprocess.PIPE,
+                    universal_newlines=self.__universalNewLines,
+                    stderr=subprocess.STDOUT,
+                )
+            try:
+                for l in p.stdout:
+                    if self.__universalNewLines:
+                        line = l
+                    else:
+                        line = l.decode("utf-8")
+                    self.__output.append(line)
+                    self._regexMatch(line)
+                    if self.__processLine is not None:
+                        self.__processLine(
+                            line, *self.__processArgs, **self.__processKWArgs
+                        )
+                    if self.__controlQueue:
+                        queueStatus = self.__controlQueue.popleft()
+                        self.__controlQueue.appendleft(queueStatus)
+                        if queueStatus in [
+                            RunStatus.Abort,
+                            RunStatus.AbortJob,
+                            RunStatus.AbortForced,
+                        ]:
+                            # print("Aborting = {}".format(queueStatus))
+                            p.kill()
+                            outs, errs = p.communicate()
+                            # if outs:
+                            #    print(outs)
+                            # if errs:
+                            #    print(errs)
+                            # print("rc = ", p.returncode)
+                            rc = p.returncode
+                            self.__returnCode = p.returncode
+                            break
+            except UnicodeDecodeError as error:
+                trb = traceback.format_exc()
+                msg = "Error: {}".format(error.reason)
+                self.__output.append(str(cmd) + "\n")
+                self.__output.append(msg)
+                self.__output.append(trb)
+                if self.__processLine is not None:
+                    self.__processLine(
+                        line, *self.__processArgs, **self.__processKWArgs
+                    )
+                if self.log:
+                    MODULELOG.debug("RNC0001: Unicode decode error %s", msg)
+            except KeyboardInterrupt as error:
+                trb = traceback.format_exc()
+                msg = "Error: {}".format(error.args)
+                self.__output.append(str(cmd) + "\n")
+                self.__output.append(msg)
+                self.__output.append(trb)
+                if self.__processLine is not None:
+                    self.__processLine(
+                        line, *self.__processArgs, **self.__processKWArgs
+                    )
+                if self.log:
+                    MODULELOG.debug("RNC0002: Keyboard interrupt %s", msg)
+                raise SystemExit(0)
+            if rcResult := p.poll():
+                self.__returnCode = rcResult
+                rc = rcResult
+        except FileNotFoundError as e:
+            self.__error = e
 
-            with subprocess.Popen(cmd,
-                                  stdout=subprocess.PIPE,
-                                  bufsize=1,
-                                  universal_newlines=self.__universalNewLines,
-                                  stderr=subprocess.STDOUT) as p:
+        return rc
 
+    def _getCommandOutputBackupTwo(self):
+        """Execute command in a subprocess"""
+
+        self.__returnCode = 10000
+        rc = 1000
+        if self.__commandShlex:
+            cmd = self.__command
+        else:
+            cmd = shlex.split(self.__command)
+        try:
+            with subprocess.Popen(
+                cmd,
+                stdout=subprocess.PIPE,
+                universal_newlines=self.__universalNewLines,
+                stderr=subprocess.STDOUT,
+                creationflags=0x08000000,
+            ) as p:
                 try:
-
                     for l in p.stdout:
-
                         if self.__universalNewLines:
                             line = l
                         else:
-                            line = l.decode('utf-8')
-
+                            line = l.decode("utf-8")
                         self.__output.append(line)
                         self._regexMatch(line)
-
-                        if self.__process is not None:
-                            self.__process(line, *self.__processArgs,
-                                           **self.__processKWArgs)
-
+                        if self.__processLine is not None:
+                            self.__processLine(
+                                line, *self.__processArgs, **self.__processKWArgs
+                            )
+                        if self.__controlQueue:
+                            queueStatus = self.__controlQueue.popleft()
+                            self.__controlQueue.appendleft(queueStatus)
+                            if queueStatus in [
+                                RunStatus.Abort,
+                                RunStatus.AbortJob,
+                                RunStatus.AbortForced,
+                            ]:
+                                # print("Aborting = {}".format(queueStatus))
+                                p.kill()
+                                outs, errs = p.communicate()
+                                # if outs:
+                                #    print(outs)
+                                # if errs:
+                                #    print(errs)
+                                # print("rc = ", p.returncode)
+                                rc = p.returncode
+                                self.__returnCode = p.returncode
+                                break
                 except UnicodeDecodeError as error:
-
                     trb = traceback.format_exc()
                     msg = "Error: {}".format(error.reason)
-                    self.__output.append(str(cmd) + '\n')
+                    self.__output.append(str(cmd) + "\n")
                     self.__output.append(msg)
                     self.__output.append(trb)
-
-                    if self.__process is not None:
-                        self.__process(line, *self.__processArgs,
-                                       **self.__processKWArgs)
-
+                    if self.__processLine is not None:
+                        self.__processLine(
+                            line, *self.__processArgs, **self.__processKWArgs
+                        )
                     if self.log:
-                        MODULELOG.debug("RNC0001: Unicode decode error %s",
-                                        msg)
-
+                        MODULELOG.debug("RNC0001: Unicode decode error %s", msg)
                 except KeyboardInterrupt as error:
-
                     trb = traceback.format_exc()
                     msg = "Error: {}".format(error.args)
-                    self.__output.append(str(cmd) + '\n')
+                    self.__output.append(str(cmd) + "\n")
                     self.__output.append(msg)
                     self.__output.append(trb)
-
-                    if self.__process is not None:
-                        self.__process(line, *self.__processArgs,
-                                       **self.__processKWArgs)
-
+                    if self.__processLine is not None:
+                        self.__processLine(
+                            line, *self.__processArgs, **self.__processKWArgs
+                        )
                     if self.log:
                         MODULELOG.debug("RNC0002: Keyboard interrupt %s", msg)
-
                     raise SystemExit(0)
-
-                rcResult = p.poll()
-                if rcResult is not None:
+                if rcResult := p.poll():
                     self.__returnCode = rcResult
                     rc = rcResult
-
+                # print("Return Code = {}".format(rc))
         except FileNotFoundError as e:
             self.__error = e
 
@@ -387,56 +475,63 @@ class RunCommand:
             cmd = self.__command
         else:
             cmd = shlex.split(self.__command)
-
         try:
-
-            with subprocess.Popen(cmd,
-                                  stdout=subprocess.PIPE,
-                                  bufsize=1,
-                                  stderr=subprocess.STDOUT) as p:
-
+            with subprocess.Popen(
+                cmd, stdout=subprocess.PIPE, bufsize=1, stderr=subprocess.STDOUT
+            ) as p:
                 try:
                     for l in iter(p.stdout):
-
-                        line = l.decode('utf-8')
-
+                        line = l.decode("utf-8")
                         self.__output.append(line)
                         self._regexMatch(line)
-
-                        if self.__process is not None:
-                            self.__process(line, *self.__processArgs,
-                                           **self.__processKWArgs)
-
+                        if self.__processLine is not None:
+                            self.__processLine(
+                                line, *self.__processArgs, **self.__processKWArgs
+                            )
                 except UnicodeDecodeError as error:
-
                     trb = traceback.format_exc()
                     msg = "Error: {}".format(error.reason)
-                    self.__output.append(str(cmd) + '\n')
+                    self.__output.append(str(cmd) + "\n")
                     self.__output.append(msg)
                     self.__output.append(trb)
-
-                    if self.__process is not None:
-                        self.__process(line)
-
+                    if self.__processLine is not None:
+                        self.__processLine(line)
                 except KeyboardInterrupt as error:
-
                     trb = traceback.format_exc()
                     msg = "Error: {}".format(error.args)
-                    self.__output.append(str(cmd) + '\n')
+                    self.__output.append(str(cmd) + "\n")
                     self.__output.append(msg)
                     self.__output.append(trb)
-
-                    if self.__process is not None:
-                        self.__process(line)
-
+                    if self.__processLine is not None:
+                        self.__processLine(line)
                     raise SystemExit(0)
-
                 rcResult = p.poll()
                 if rcResult is not None:
                     self.__returnCode = rcResult
                     rc = rcResult
-
         except FileNotFoundError as e:
             self.__error = e
 
         return rc
+
+
+class RunStatus:
+    """Key values for job related work"""
+
+    Abort = "Abort"
+    Aborted = "Aborted"
+    AbortForced = "AbortForced"
+    AbortJob = "AbortJob"
+    AbortJobError = "AbortJobError"
+    AddToQueue = "AddToQueue"
+    Blocked = "Blocked"
+    Done = "Done"
+    DoneWithError = "DoneWithError"
+    Error = "Error"
+    Queue = "Queue"
+    Running = "Running"
+    Skip = "Skip"
+    Skipped = "Skipped"
+    Stop = "Stop"
+    Stopped = "Stopped"
+    Waiting = "Waiting"

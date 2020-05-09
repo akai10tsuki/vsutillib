@@ -9,22 +9,23 @@ path for executable and target options are parsed from the command line
 
 """
 
-import re
+#import re
 import shlex
 import logging
 
-from pathlib import Path
+#from pathlib import Path
 
-from vsutillib.files import stripEncaseQuotes
+#from vsutillib.files import stripEncaseQuotes
 from vsutillib.misc import XLate
 
+from .mkvcommandparser import MKVCommandParser
 from .verifycommand import VerifyMKVCommand
 
 MODULELOG = logging.getLogger(__name__)
 MODULELOG.addHandler(logging.NullHandler())
 
 
-class MKVCommand(object):
+class MKVCommandNew(object):
     """
     Class to work with **mkvmerge** command part of MKVToolnix_
 
@@ -69,6 +70,7 @@ class MKVCommand(object):
         self.__workFiles = _WorkFiles()
         self.__commandTemplate = None
         self.__filesInDirsByKey = None
+        self.__parsedCommand = None
 
         self.__log = None
         self.log = log
@@ -79,7 +81,9 @@ class MKVCommand(object):
         if strCommand is not None:
             self._initHelper(strCommand)
 
-    def _initHelper(self, strCommand, bRemoveTitle=True): # pylint: disable=unused-argument
+    def _initHelper(
+        self, strCommand, bRemoveTitle=True
+    ):  # pylint: disable=unused-argument
 
         if strCommand is None:
             self.__reset()
@@ -92,37 +96,16 @@ class MKVCommand(object):
             self.__strShellCommand = strCommand
             self.__bErrorFound = False
             lstSources = []
-            bHasChaptersFile = False
 
             strCommand = verify.bashCommand
-
-            #reOutputFile = r"\-\-output\s(.*?)\s\-\-"
-            #reChaptersFile = r"\-\-chapters\s(.*?)\s\-\-"
-            #reSourceFile = r"('\('\s(.*?)\s'\)')"
-
-            reOutputFileEx = re.compile(r"--output\s(.*?)\s--")
-            reChaptersFileEx = re.compile(r"--chapters\s(.*?)\s--")
-            reSourcesEx = re.compile(r"('\('\s(.*?)\s'\)')")
-
-            # search for the output file
-            if match := reOutputFileEx.search(strCommand):
-                strOutputFile = match.group(1)
+            pCmd = MKVCommandParser(strCommand)
+            self.__parsedCommand = pCmd
 
             outputFile = verify.outputFile
+            strOutputFile = shlex.quote(str(outputFile))
 
-            # search for chapters file
-            # match = reChaptersFileEx.search(strCommand)
-            if match := reChaptersFileEx.search(strCommand):
-                strChaptersFile = match.group(1)
-                chaptersFile = verify.chaptersFile
-                bHasChaptersFile = True
-
-            # search for the source files
-            # this have to exist in the
-            # file system
-            if match := reSourcesEx.findall((strCommand)):
-                for m in match:
-                    lstSources.append(m)
+            for f in pCmd.sourceFiles:
+                lstSources.append((f.matchString, f.fileName))
 
             newCommandTemplate = strCommand
 
@@ -136,17 +119,16 @@ class MKVCommand(object):
                 # Set source files
                 sub, fileName = source
                 key = "<SOURCE{}>".format(str(index))
-                fileName = fileName.replace(r"'\''", "'")
-                f = Path(stripEncaseQuotes(fileName))
+                f = fileName
                 d = f.parent
-                fd = [x for x in d.glob("*" + f.suffix) if x.is_file()]
-                fd.sort(key=_strPath)
+                fid = [x for x in d.glob("*" + f.suffix) if x.is_file()]
+                fid.sort(key=_strPath)
 
                 # Check all lists have same number of files
                 if lenOfListOfFiles == 0:
-                    lenOfListOfFiles = len(fd)
+                    lenOfListOfFiles = len(fid)
 
-                elif lenOfListOfFiles != len(fd):
+                elif lenOfListOfFiles != len(fid):
                     self.__reset()
                     self.__bErrorFound = True
                     self.__strError = "List of files are not equal."
@@ -154,7 +136,7 @@ class MKVCommand(object):
                 # Set output files
                 if index == 0:
                     od = []
-                    for o in fd:
+                    for o in fid:
                         of = outputFile.parent.joinpath(o.stem + ".mkv")
                         of = _resolveOverwrite(of)
                         od.append(of)
@@ -164,24 +146,30 @@ class MKVCommand(object):
                     )
 
                 lstBaseFiles.append(f)  # backwards compatible
-                filesInDirsByKey[key] = fd
+                filesInDirsByKey[key] = fid
                 newCommandTemplate = newCommandTemplate.replace(sub, key, 1)
 
-            # Set output files
-            if bHasChaptersFile:
-                d = chaptersFile.parent
-                cd = [x for x in d.glob("*" + chaptersFile.suffix) if x.is_file()]
-                cd.sort(key=_strPath)
+            if pCmd.chaptersFile:
+                d = pCmd.chaptersFile.parent
+                fid = [x for x in d.glob("*" + pCmd.chaptersFile.suffix) if x.is_file()]
+                fid.sort(key=_strPath)
 
-                if lenOfListOfFiles != len(cd):
+                if lenOfListOfFiles != len(fid):
                     self.__reset()
                     self.__bErrorFound = True
                     self.__strError = "List of files are not equal."
 
-                filesInDirsByKey[_Key.chaptersFile] = cd
+                filesInDirsByKey[_Key.chaptersFile] = fid
 
                 newCommandTemplate = newCommandTemplate.replace(
-                    strChaptersFile, _Key.chaptersFile, 1
+                    shlex.quote(str(pCmd.chaptersFile)), _Key.chaptersFile, 1
+                )
+
+            if pCmd.attachments:
+                attachmentsMatchString = pCmd.attachmentsMatchString
+
+                newCommandTemplate = newCommandTemplate.replace(
+                    attachmentsMatchString, _Key.attachmentFiles, 1
                 )
 
             if not self.__bErrorFound:
@@ -221,6 +209,7 @@ class MKVCommand(object):
         self.__workFiles.clear()
         self.__commandTemplate = None
         self.__filesInDirsByKey = None
+        self.__parsedCommand = None
 
     def __bool__(self):
         return not self.__bErrorFound
@@ -252,11 +241,6 @@ class MKVCommand(object):
         else:
             self.__index += 1
             return self.__getitem__(self.__index - 1)
-
-            # return [self.__lstCommands[self.__index - 1],
-            #        self.__workFiles.baseFiles,
-            #        self.__workFiles.sourceFiles[self.__index - 1],
-            #        self.__workFiles.destinationFiles[self.__index - 1]]
 
     def _generateCommands(self, bRemoveTitle=True):
 
@@ -328,7 +312,7 @@ class MKVCommand(object):
         if self.__log is not None:
             return self.__log
 
-        return MKVCommand.classLog()
+        return MKVCommandNew.classLog()
 
     @log.setter
     def log(self, value):
@@ -354,6 +338,10 @@ class MKVCommand(object):
         if isinstance(value, str):
             self.__reset()
             self._initHelper(value, bRemoveTitle=True)
+
+    @property
+    def parsedCommand(self):
+        return self.__parsedCommand
 
     @property
     def baseFiles(self):
@@ -455,8 +443,11 @@ class _WorkFiles:
 
 class _Key:
 
-    outputFile = "<OUTPUTFILE>"
+    attachmentFiles = "<ATTACHMENTS>"
     chaptersFile = "<CHAPTERS>"
+    outputFile = "<OUTPUTFILE>"
+    title = "<TITLE>"
+
 
 
 def _resolveOverwrite(fileName, strPrefix="new-"):

@@ -12,13 +12,13 @@ from vsutillib.media import MediaFileInfo
 from vsutillib.mkv import MKVCommand, VerifyStructure
 from vsutillib.process import RunCommand
 
-VERSION = "1.0"
+VERSION = "1.5.0"
 
 
 def displayMKVRun(line):
     """
     Convenience function used by mkvrun
-    used to display lines of the mkvmerge
+    to display lines of the mkvmerge
     execution
 
     Args:
@@ -26,11 +26,11 @@ def displayMKVRun(line):
     """
 
     if line.find("Progress:") >= 0:
-        print("\r" + line[:-1], end='')
-    elif line.find('The cue') == 0:
-        print("\n" + line, end='')
+        print("\r" + line[:-1], end="")
+    elif line.find("The cue") == 0:
+        print("\n" + line, end="")
     else:
-        print(line, end='')
+        print(line, end="")
 
 
 def mkvVerifyStructure(lstBaseFiles, lstFiles, msgs):
@@ -95,43 +95,42 @@ def mkvrun():
     """
 
     parser = argparse.ArgumentParser(
-        description='mkvmerge-gui generated command line batch run utility')
+        description="mkvmerge-gui generated command line batch run utility"
+    )
 
     parser.add_argument(
-        'command',
-        help=
-        'mkvmerge-gui "command" line - used Linux/Unix shell enclose it in double quotes'
+        "command",
+        help='mkvmerge-gui "command" line - used Linux/Unix shell enclose it in double quotes',
     )
-    parser.add_argument('--version',
-                        action='version',
-                        version='%(prog)s ' + VERSION)
+    parser.add_argument("--version", action="version", version="%(prog)s " + VERSION)
 
     args = parser.parse_args()
 
     if args.command:
-        print('command read: [{}]'.format(args.command))
+        print("command read: [{}]".format(args.command))
 
-    f = open("log.txt", mode='w', encoding='utf-8')
+    f = open("log.txt", mode="w", encoding="utf-8")
 
     mkv = MKVCommand()
     mkv.command = args.command
 
     verify = VerifyStructure()
 
-    cli = RunCommand(processLine=displayMKVRun,
-                     commandShlex=True,
-                     universalNewLines=True)
+    cli = RunCommand(
+        processLine=displayMKVRun, commandShlex=True, universalNewLines=True
+    )
 
     if mkv:
 
-        for cmd, baseFiles, sourceFiles, destinationFiles in mkv:
+        for cmd, baseFiles, sourceFiles, destinationFiles, _ in mkv:
 
             verify.verifyStructure(baseFiles, sourceFiles)
 
             if verify:
 
-                msg = '\nCommand: {}\nBase Files: {}\nSource Files: {}\nDestination Files: {}\n\n'.format(  # pylint: disable=line-too-long
-                    cmd, baseFiles, sourceFiles, destinationFiles)
+                msg = "\nCommand: {}\nBase Files: {}\nSource Files: {}\nDestination Files: {}\n\n".format(  # pylint: disable=line-too-long
+                    cmd, baseFiles, sourceFiles, destinationFiles
+                )
                 print(msg)
                 f.write(msg)
 
@@ -142,7 +141,7 @@ def mkvrun():
                     f.write(str(l))
 
             else:
-                msg = '\nDestination Files: {}\n'.format(destinationFiles)
+                msg = "\nDestination Files: {}\n".format(destinationFiles)
                 f.write(msg)
                 for m in verify.analysis:
                     print(m)

@@ -9,24 +9,42 @@ Args:
     icon (QIcon): standard icons for QMessageBox
         question mark, warning ...
 Returns:
-    QMessageBox.button: standar QMessageBox button
+    QMessageBox.button: standard QMessageBox button
 
 """
 
 from PySide2.QtWidgets import QMessageBox
 
-def messageBoxYesNo(self, title, text, icon):
 
+def messageBox(self, title, text, icon=QMessageBox.Information):
     """
-    Save window state before exit
+    Working on generic message box
     """
 
     m = QMessageBox(self)
     m.setWindowTitle(title)
     m.setText(text)
     m.setIcon(icon)
-    yesButton = m.addButton('Yes', QMessageBox.ButtonRole.YesRole)
-    noButton = m.addButton('No', QMessageBox.ButtonRole.NoRole)
+    # yesButton = m.addButton('Yes', QMessageBox.ButtonRole.YesRole)
+    # noButton = m.addButton('No', QMessageBox.ButtonRole.NoRole)
+    m.setDefaultButton(QMessageBox.Ok)
+    m.setFont(self.font())
+    m.exec_()
+
+    return QMessageBox.Ok
+
+
+def messageBoxYesNo(self, title, text, icon):
+    """
+    Yes | No message box
+    """
+
+    m = QMessageBox(self)
+    m.setWindowTitle(title)
+    m.setText(text)
+    m.setIcon(icon)
+    yesButton = m.addButton("Yes", QMessageBox.ButtonRole.YesRole)
+    noButton = m.addButton("No", QMessageBox.ButtonRole.NoRole)
     m.setDefaultButton(noButton)
     m.setFont(self.font())
     m.exec_()

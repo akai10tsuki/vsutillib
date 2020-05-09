@@ -1,83 +1,97 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+"""
+Apply a CLI command to all files in a directory
+and subdirectory
+
+User has control to select what wiles with
+wildcards also to run on subdirectories or not
+
+ie.
+python -m apply2files -c wavpack -a '-y --import-id3 --allow-huge-tags' -w '*.dsf' .
+
+Raises:
+    ValueError: [description]
+
+Returns:
+    [type] -- [description]
+"""
 import argparse
 import sys
 import shlex
 from pathlib import Path
 
 from vsutillib.process import RunCommand
-from vsutillib.files import getFileList
+from vsutillib.files import getFileList, getDirectoryList
 
-VERSION = '1.0.1'
-
-
-class Command(object):
-    """Command"""
-
-    command = None
-    arguments = None
-    wildcard = None
-    append = None
+VERSION = "1.5.0"
 
 
 def parserArguments():
     """construct parser"""
 
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(
+        description=(
+            "apply commnad 'COMMAND' to all files "
+            "found in directory is recursive by default"
+        )
+    )
 
-    parser.add_argument('directory',
-                        nargs='+',
-                        help='enter directory to process')
-    parser.add_argument('-a',
-                        '--arguments',
-                        action='store',
-                        default='',
-                        help='optional arguments pass to command before file')
-    parser.add_argument('-p',
-                        '--append',
-                        action='store',
-                        default='',
-                        help='optional arguments pass to command after file')
-    parser.add_argument('-d',
-                        '--debug',
-                        action='store_true',
-                        default=False,
-                        help='just print commands')
-    parser.add_argument('-v',
-                        '--verbose',
-                        action='store_true',
-                        default=False,
-                        help='increase verbosity')
-    parser.add_argument('-c',
-                        '--command',
-                        action='store',
-                        default='',
-                        help='command to apply')
-    parser.add_argument('-l',
-                        '--logfile',
-                        action='store',
-                        default='commandLog.txt',
-                        help='file to log output')
-    parser.add_argument('-w',
-                        '--wildcard',
-                        action='store',
-                        default='*',
-                        help='wildcard to select files to process')
-    parser.add_argument('--version',
-                        action='version',
-                        version='%(prog)s ' + VERSION)
+    parser.add_argument("directory", nargs="+", help="enter directory to process")
+    parser.add_argument(
+        "-a",
+        "--arguments",
+        action="store",
+        default="",
+        help="optional arguments pass to command before file",
+    )
+    parser.add_argument(
+        "-p",
+        "--append",
+        action="store",
+        default="",
+        help="optional arguments pass to command after file",
+    )
+    parser.add_argument(
+        "-d", "--debug", action="store_true", default=False, help="just print commands"
+    )
+    parser.add_argument(
+        "-v", "--verbose", action="store_true", default=False, help="increase verbosity"
+    )
+    parser.add_argument(
+        "-c", "--command", action="store", default="", help="command to apply"
+    )
+    parser.add_argument(
+        "-l",
+        "--logfile",
+        action="store",
+        default="commandLog.txt",
+        help="file to log output",
+    )
+    parser.add_argument(
+        "-w",
+        "--wildcard",
+        action="store",
+        default="*",
+        help="wildcard to select files to process",
+    )
+    parser.add_argument("--version", action="version", version="%(prog)s " + VERSION)
 
     group = parser.add_mutually_exclusive_group()
-    group.add_argument('-o',
-                       '--onlycurrentdir',
-                       action='store_true',
-                       default=False,
-                       help='don\'t proccess subdirectories')
-    group.add_argument('-s',
-                       '--onlysubdir',
-                       action='store_true',
-                       default=False,
-                       help='don\'t proccess current working directory')
+    group.add_argument(
+        "-o",
+        "--onlycurrentdir",
+        action="store_true",
+        default=False,
+        help="don't proccess subdirectories",
+    )
+    group.add_argument(
+        "-s",
+        "--onlysubdir",
+        action="store_true",
+        default=False,
+        help="don't proccess current working directory",
+    )
 
     return parser
 
@@ -87,6 +101,69 @@ def printToConsoleAndFile(oFile, msg):
     if oFile:
         oFile.write(msg.encode())
     print(msg)
+
+
+def setLogFile(logFileName):
+    """
+    Setup logging file
+
+    Arguments:
+        logFileName {str} -- name of log file
+
+    Returns:
+        Pathlib.Path -- Pathlib object logfile
+    """
+
+    lFile = Path(logFileName)
+
+    if Path(lFile.parent).is_dir():
+        lFile.touch(exist_ok=True)
+    else:
+        # cannot create log file
+        # on command line
+        lFile = Path("commandLog.txt")
+        lFile.touch(exist_ok=True)
+
+    return lFile
+
+
+def verifyDirectories(args, logFile):
+    """
+    Verify that the directories in the argument are valid
+    """
+
+    fCheckOk = True
+    goodDirectory = []
+
+    for d in args.directory:
+
+        p = Path(d)
+
+        try:
+            if not p.is_dir():
+                msg = "Invalid directory {}\n".format(str(p))
+                printToConsoleAndFile(logFile, msg)
+                fCheckOk = False
+        except OSError as error:
+            if wildcardDirs := getDirectoryList(d):
+                for g in wildcardDirs:
+                    goodDirectory.append(str(g))
+                continue
+
+            msg = error.strerror
+            fCheckOk = False
+
+        if not fCheckOk:
+            msg = "\n\nInput: {}"
+            msg = msg.format(d)
+            printToConsoleAndFile(logFile, msg)
+            raise ValueError(msg)
+
+        goodDirectory.append(d)
+
+    args.directory = goodDirectory
+
+    return fCheckOk
 
 
 def apply2files():
@@ -122,70 +199,22 @@ def apply2files():
 
     """
 
-    cmd = Command()
+    args = parserArguments().parse_args()
 
-    parser = parserArguments()
-    args = parser.parse_args()
+    logFile = setLogFile(args.logfile).open(mode="wb")
 
-    cwd = Path.cwd()
-    lFile = Path(args.logfile)
-    logFile = None
-
-    if Path(lFile.parent).is_dir():
-        lFile.touch(exist_ok=True)
-    else:
-        # cannot create log file
-        # on command line
-        lFile = Path('commandLog.txt')
-        lFile.touch(exist_ok=True)
-
-    logFile = lFile.open(mode='wb')
-
-    cmd.command = args.command
-    if not cmd.command:
-        print('Nothing to do.')
+    if not args.command:
+        print("Nothing to do.")
         return None
 
-    cmd.arguments = args.arguments
-    cmd.append = args.append
-
-    cmd.wildcard = None
-    if args.wildcard:
-        cmd.wildcard = args.wildcard
-    else:
-        cmd.wildcard = ''
-
-    debug = args.debug
     recursive = (not args.onlycurrentdir) and (not args.onlysubdir)
-    subdironly = args.onlysubdir
 
-    print('Recursive {} subdironly {}'.format(recursive, subdironly))
+    print("Recursive {} subdironly {}".format(recursive, args.onlysubdir))
 
-    msg = 'Current directory {}\n'.format(str(cwd))
+    msg = "Current directory {}\n".format(str(Path.cwd()))
     printToConsoleAndFile(logFile, msg)
 
-    fCheckOk = True
-    for d in args.directory:
-
-        p = Path(d)
-
-        try:
-            if not p.is_dir():
-                msg = 'Invalid directory {}\n'.format(str(p))
-                printToConsoleAndFile(logFile, msg)
-                fCheckOk = False
-
-        except OSError as error:
-            msg = error.strerror
-            fCheckOk = False
-
-        if not fCheckOk:
-            msg += "\n\nInput: {}"
-            msg = msg.format(str(d))
-            raise ValueError(msg)
-
-    if not fCheckOk:
-        printToConsoleAndFile(logFile, msg)
+    if not verifyDirectories(args, logFile):
         return
 
     processLine = None
@@ -196,23 +225,18 @@ def apply2files():
 
     for d in args.directory:
 
-        msg = 'Working\n\nDirectory: [{}]\nWildcard:  {}\n\n'.format(
-            str(Path(d).resolve()), cmd.wildcard)
+        msg = "Working\n\nDirectory: [{}]\nWildcard:  {}\n\n".format(
+            str(Path(d).resolve()), args.wildcard
+        )
         printToConsoleAndFile(logFile, msg)
 
-        filesList = getFileList(d,
-                                wildcard=cmd.wildcard,
-                                fullpath=True,
-                                recursive=recursive)
-
-        nTotalFiles = len(filesList)
-
-        count = 0
-        noMatchFiles = []
+        filesList = getFileList(
+            d, wildcard=args.wildcard, fullpath=True, recursive=recursive
+        )
 
         for of in filesList:
 
-            if subdironly:
+            if args.onlysubdir:
                 if of.resolve().parent == Path.cwd():
                     print("By pass.")
                     continue
@@ -221,31 +245,29 @@ def apply2files():
 
             qf = shlex.quote(f)
 
-            cliCommand = cmd.command + " " + cmd.arguments + " " + qf + " " + cmd.append
+            cliCommand = (
+                args.command + " " + args.arguments + " " + qf + " " + args.append
+            )
             cli.command = cliCommand
 
-            msg = 'Processing file [{}]\n'.format(f)
+            msg = "Processing file [{}]\n".format(f)
             printToConsoleAndFile(logFile, msg)
 
-            if debug:
+            if args.debug:
 
-                msg = 'Debug Command: {}\n\n'.format(cliCommand)
+                msg = "Debug Command: {}\n\n".format(cliCommand)
                 printToConsoleAndFile(logFile, msg)
 
             else:
 
-                if cli.run():
+                cli.run()
 
-                    if cli.output:
-                        for line in cli.output:
-                            logFile.write(line.encode())
-                        logFile.write('\n\n'.encode())
+                if cli.output:
+                    for line in cli.output:
+                        logFile.write(line.encode())
+                    logFile.write("\n\n".encode())
 
-        if count != nTotalFiles:
-            msg = 'Bummer..'
-            for f in noMatchFiles:
-                msg = 'Check file \'{}\'\n'.format(f)
-                logFile.write(msg.encode())
+    return None
 
 
 if __name__ == "__main__":

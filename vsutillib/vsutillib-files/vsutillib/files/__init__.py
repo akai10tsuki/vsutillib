@@ -11,5 +11,12 @@ getFilesList - get list of files in a directory
     can be recursive
 """
 
-from .fileutil import findFileInPath, getFileList, getExecutable
+from .fileutil import (
+    fileQuote,
+    findFileInPath,
+    getFileList,
+    getDirectoryList,
+    getExecutable,
+    stripEncaseQuotes,
+)
 from .classes import ConfigurationSettings

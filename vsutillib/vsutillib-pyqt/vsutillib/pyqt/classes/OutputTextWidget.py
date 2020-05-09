@@ -8,11 +8,14 @@ Output widget form just to output text in color
 
 import logging
 
-from PySide2.QtCore import Qt, Slot
-from PySide2.QtGui import QTextCursor
-from PySide2.QtWidgets import QTextEdit, QStyleFactory
 
-import vsutillib.macos as macos
+from PySide2.QtCore import Qt, Signal, Slot
+from PySide2.QtGui import QTextCursor
+from PySide2.QtWidgets import QTextEdit
+
+
+from .insertTextHelpers import checkColor, LineOutput
+from .SvgColor import SvgColor
 
 MODULELOG = logging.getLogger(__name__)
 MODULELOG.addHandler(logging.NullHandler())
@@ -23,6 +26,9 @@ class OutputTextWidget(QTextEdit):
 
     # log state
     __log = False
+    insertTextSignal = Signal(str, dict)
+    setCurrentIndexSignal = Signal()
+    isDarkMode = True
 
     @classmethod
     def classLog(cls, setLogging=None):
@@ -49,90 +55,17 @@ class OutputTextWidget(QTextEdit):
 
         return cls.__log
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, log=None):
         super(OutputTextWidget, self).__init__(parent)
 
         self.parent = parent
         self.__log = None
+        self.__tab = None
+        self.__tabWidget = None
+        self.log = log
 
-    def connectToInsertText(self, objSignal):
-        """Connect to signal"""
-
-        objSignal.connect(self.insertText)
-
-    @Slot(str, dict)
-    def insertText(self, strText, kwargs):
-        """
-        Insert text in output window
-        Cannot use standard keyword argument kwargs
-        on emit calls, use dictionary instead
-
-        :param strText: text to insert on windows
-        :type strText: str
-        :param kwargs: dictionary for additional
-        commands for the insert operation
-        :type kwargs: dictionary
-        """
-
-        strTmp = ""
-
-        color = None
-        replaceLine = False
-        appendLine = False
-
-        if 'color' in kwargs:
-            color = kwargs['color']
-
-        if 'replaceLine' in kwargs:
-            replaceLine = kwargs['replaceLine']
-
-        if 'appendLine' in kwargs:
-            appendLine = kwargs['appendLine']
-
-        # still no restore to default the ideal configuration
-        # search will continue considering abandoning color
-        # in macOS
-
-        saveStyle = self.styleSheet()
-
-        if macos.isMacDarkMode() and (color is None):
-            color = Qt.white
-        elif color is None:
-            color = Qt.black
-
-        if macos.isMacDarkMode() and (color is not None):
-            if color == Qt.red:
-                color = Qt.magenta
-            elif color == Qt.darkGreen:
-                color = Qt.green
-            elif color == Qt.blue:
-                color = Qt.cyan
-
-        if color is not None:
-            self.setTextColor(color)
-
-        if replaceLine:
-            self.moveCursor(QTextCursor.StartOfLine, QTextCursor.KeepAnchor)
-            self.insertPlainText(strText)
-        elif appendLine:
-            self.append(strText)
-        else:
-            self.insertPlainText(strText)
-
-        self.ensureCursorVisible()
-
-        self.setStyleSheet(QStyleFactory.create(saveStyle))
-
-        if self.log:
-            strTmp = strTmp + strText
-            strTmp = strTmp.replace("\n", " ")
-            if strTmp != "" and strTmp.find(u"Progress:") != 0:
-                if strTmp.find(u"Warning") == 0:
-                    MODULELOG.warning("OTW0001: %s", strTmp)
-                elif strTmp.find(u"Error") == 0 or color == Qt.red:
-                    MODULELOG.error("OTW0002: %s", strTmp)
-                else:
-                    MODULELOG.info("OTW0003: %s", strTmp)
+        self.insertTextSignal.connect(self.insertText)
+        self.setCurrentIndexSignal.connect(self._setCurrentIndex)
 
     @property
     def log(self):
@@ -155,3 +88,87 @@ class OutputTextWidget(QTextEdit):
         """set instance log variable"""
         if isinstance(value, bool) or value is None:
             self.__log = value
+
+    @property
+    def tab(self):
+        return self.__tab
+
+    @tab.setter
+    def tab(self, value):
+        self.__tab = value
+
+    @property
+    def tabWidget(self):
+        return self.__tabWidget
+
+    @tabWidget.setter
+    def tabWidget(self, value):
+        self.__tabWidget = value
+
+    @Slot()
+    def _setCurrentIndex(self):
+
+        if self.tabWidget:
+            self.tabWidget.setCurrentIndex(self.tab)
+
+    def connectToInsertText(self, objSignal):
+        """Connect to signal"""
+
+        objSignal.connect(self.insertText)
+
+    @Slot(str, dict)
+    def insertText(self, strText, kwargs):
+        """
+        insertText - Insert text in output window.
+        Cannot use standard keyword arguments on
+        emit calls using a dictionary argument instead
+
+        Args:
+            strText (str): text to insert on output window
+            kwargs (dict): additional arguments in dictionary
+                           used like **kwargs
+        """
+
+        strTmp = ""
+
+        color = kwargs.pop(LineOutput.Color, None)
+        replaceLine = kwargs.pop(LineOutput.ReplaceLine, False)
+        appendLine = kwargs.pop(LineOutput.AppendLine, False)
+        appendEnd = kwargs.pop(LineOutput.AppendEnd, False)
+
+        # still no restore to default the ideal configuration
+        # search will continue considering abandoning color
+
+        color = checkColor(color, OutputTextWidget.isDarkMode)
+
+        if replaceLine:
+            self.moveCursor(QTextCursor.StartOfLine, QTextCursor.KeepAnchor)
+        elif appendEnd:
+            self.moveCursor(QTextCursor.End)
+
+        if color is not None:
+            self.setTextColor(color)
+
+        if replaceLine:
+            self.insertPlainText(strText)
+        elif appendLine:
+            self.append(strText)
+        elif appendEnd:
+            self.append(strText)
+        else:
+            self.insertPlainText(strText)
+
+        self.ensureCursorVisible()
+
+        if self.log:
+            strTmp = strTmp + strText
+            strTmp = strTmp.replace("\n", " ")
+
+            if strTmp != "" and strTmp.find(u"Progress:") != 0:
+                if strTmp.find(u"Warning") == 0:
+                    MODULELOG.warning("OTW0001: %s", strTmp)
+                elif strTmp.find(u"Error") == 0 or color == Qt.red:
+                    MODULELOG.error("OTW0002: %s", strTmp)
+                else:
+                    if strTmp.strip():
+                        MODULELOG.debug("OTW0003: %s", strTmp)

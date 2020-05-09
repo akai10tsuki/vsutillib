@@ -38,7 +38,7 @@ class ProcessWorker(multiprocessing.Process):
 
         try:
             self.function(*self.args, **self.kwargs)
-        except: # pylint: disable=bare-except
+        except:  # pylint: disable=bare-except
             traceback.print_exc()
         return
 

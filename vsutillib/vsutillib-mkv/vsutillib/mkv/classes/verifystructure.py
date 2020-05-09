@@ -2,8 +2,11 @@
 Verify structure of media files for inconsistencies
 against the source base files use for the templates
 """
+# VFS0001
 
 import logging
+
+from pathlib import Path
 
 from vsutillib.media import MediaFileInfo
 
@@ -11,7 +14,7 @@ MODULELOG = logging.getLogger(__name__)
 MODULELOG.addHandler(logging.NullHandler())
 
 
-class VerifyStructure():
+class VerifyStructure:
     """
     Convenience class use by MKVCommand_ to verify structure
     of media files against base files.
@@ -61,12 +64,13 @@ class VerifyStructure():
             if isinstance(setLogging, bool):
                 cls.__log = setLogging
 
-    def __init__(self, lstBaseFiles=None, lstFiles=None):
-
-        MediaFileInfo.log = self.log
+    def __init__(self, lstBaseFiles=None, lstFiles=None, log=None):
 
         self.__analysis = None
+        self.__log = None
         self.__status = None
+
+        self.log = log
 
         if (lstBaseFiles is not None) and (lstFiles is not None):
             self.verifyStructure(lstBaseFiles, lstFiles)
@@ -75,10 +79,8 @@ class VerifyStructure():
         return self.__status
 
     def __str__(self):
-        msgs = ""
-        for m in self.__analysis:
-            msgs += m
-        return msgs
+
+        return "".join(self.__analysis)
 
     @property
     def log(self):
@@ -145,8 +147,36 @@ class VerifyStructure():
 
             try:
 
-                objSource = MediaFileInfo(strSource)
-                objFile = MediaFileInfo(strFile)
+                objSource = MediaFileInfo(strSource, log=self.log)
+                objFile = MediaFileInfo(strFile, log=self.log)
+
+                if objSource != objFile:
+
+                    msg = "Error: In structure \n\nSource:\n{}\n\nBase Source:\n{}\n"
+                    msg = msg.format(str(objFile), str(objSource))
+                    self.__analysis.append(msg)
+                    self.__status = False
+                    _detailAnalysis(self.__analysis, objFile, objSource)
+
+                    if self.log:
+
+                        msg = "Error: In structure Source: {} Base Source: {}"
+                        msg = msg.format(objFile.fileName, objSource.fileName)
+                        MODULELOG.error("VFS0002: Error: %s", msg)
+
+                        for i, line in enumerate(self.__analysis):
+                            if i > 0:
+                                MODULELOG.error("VFS0003: Error: %s", line.strip())
+
+                        msg = "Structure not ok. Source: {} Base Source: {}"
+                        msg = msg.format(objFile.fileName, objSource.fileName)
+                        MODULELOG.debug("VFS0004: %s", msg)
+
+                else:
+                    if self.log:
+                        msg = "Structure seems ok. Source: {} Base Source: {}"
+                        msg = msg.format(objFile.fileName, objSource.fileName)
+                        MODULELOG.debug("VFS0005: %s", msg)
 
             except OSError as error:
 
@@ -155,8 +185,50 @@ class VerifyStructure():
                 self.__analysis.append(msg)
                 self.__status = False
 
-            if objSource != objFile:
-                msg = "Error: In structure \n\nSource:\n{}\nBase Source:\n{}\n"
-                msg = msg.format(str(objFile), str(objSource))
-                self.__analysis.append(msg)
-                self.__status = False
+                if self.log:
+                    msg = "Error: {}"
+                    msg = msg.format(error.strerror)
+                    MODULELOG.error("VFS0001: %s", msg)
+
+def _detailAnalysis(lstAnalysis, mediaFile1, mediaFile2):
+
+    name1 = Path(mediaFile1.fileName).name
+    name2 = Path(mediaFile2.fileName).name
+
+    if mediaFile1.codec != mediaFile2.codec:
+        msg = "Codec mismatched {}: {} - {}: {}\n".format(
+            name1, mediaFile1.codec, name2, mediaFile2.codec
+        )
+        lstAnalysis.append(msg)
+    elif len(mediaFile1) != len(mediaFile2):
+        msg = "Number of tracks mismatched {}: {} - {}: {}\n".format(
+            name1, len(mediaFile1), name2, len(mediaFile2)
+        )
+        lstAnalysis.append(msg)
+    elif len(mediaFile1) == len(mediaFile2):
+        for a, b in zip(mediaFile1.lstMediaTracks, mediaFile2.lstMediaTracks):
+            if a.streamorder != b.streamorder:
+                msg = "Stream order mismatched {}: {} - {}: {}\n".format(
+                    name1, a.streamorder, name2, b.streamorder
+                )
+                lstAnalysis.append(msg)
+            elif a.track_type != b.track_type:
+                msg = "Stream type mismatched {}: {} - {}: {}\n".format(
+                    name1, a.track_type, name2, b.track_type
+                )
+                lstAnalysis.append(msg)
+            elif a.language != b.language:
+                msg = "Stream language mismatched {}: {}:{} - {}: {}:{}\n".format(
+                    name1, a.streamorder, a.language, name2, b.streamorder, b.language
+                )
+                lstAnalysis.append(msg)
+            elif (a.codec != b.codec) and (a.track_type != "Audio"):
+                msg = "Codec mismatched {}: {} - {}: {}\n".format(
+                    name1, a.codec, name2, b.codec
+                )
+                lstAnalysis.append(msg)
+            elif a.format != b.format:
+                msg = "Stream format mismatched {}: {} - {}: {}\n".format(
+                    name1, a.format, name2, b.format
+                )
+                lstAnalysis.append(msg)

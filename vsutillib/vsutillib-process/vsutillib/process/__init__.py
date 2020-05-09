@@ -10,3 +10,5 @@ from .classes import (
     RunCommand,
     ThreadWorker
 )
+
+from .utils import isThreadRunning

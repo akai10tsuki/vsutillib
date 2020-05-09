@@ -27,30 +27,29 @@ from pathlib import Path
 from vsutillib.files import ConfigurationSettings
 from vsutillib.log import LogRotateFileHandler
 
-data = ConfigurationSettings()  # pylint: disable=invalid-name
+__VERSION = (1, 5, '0')
 
-__VERSION = (1, 0, '2')
-
+APPNAME = "vsutillib"
 VERSION = ".".join(map(str, __VERSION))
 AUTHOR = "Efrain Vergara"
 EMAIL = "akai10tsuki@gmail.com"
 
-COPYRIGHT = "2018-2019, Efrain Vergara"
+COPYRIGHT = "2018-2020, Efrain Vergara"
 LICENSE = "MIT"
 DESCRIPTION = 'Library module with miscellaneous convenience functions and classes'
 NAME = "vsutillib"
 KEYWORDS = 'mkv multimedia video audio configuration'
 REQUIRED = [
-    'vsutillib-files>=1.0.1',
-    'vsutillib-log>=1.0.1',
-    'vsutillib-macos>=1.0.1',
-    'vsutillib-media>=1.0.1',
-    'vsutillib-mkv>=1.0.1'
-    'vsutillib-network>=1.0.1',
-    'vsutillib-process>=1.0.1',
-    'vsutillib-pyqt>=1.0.1',
-    'vsutillib-scripts>=1.0.1'
-    'vsutillib-vsxml>=1.0.1',
+    'vsutillib-files>=1.5.0',
+    'vsutillib-log>=1.5.0',
+    'vsutillib-macos>=1.5.0',
+    'vsutillib-media>=1.5.0',
+    'vsutillib-mkv>=1.5.0'
+    'vsutillib-network>=1.5.0',
+    'vsutillib-process>=1.5.0',
+    'vsutillib-pyqt>=1.5.0',
+    'vsutillib-scripts>=1.5.0'
+    'vsutillib-vsxml>=1.5.0',
 ]
 URL = 'https://github.com/akai10tsuki/vsutillib'
 PYPI = 'https://pypi.org/project/vsutillib/'
@@ -58,13 +57,14 @@ PROJECTURLS = {
     'Source': 'https://pypi.org/project/vsutillib/#files',
 }
 
-IMAGEFILESPATH = ""
-FILESROOT = ".vsutillib"
-LOGFILE = "vsutillib.log"
 CONFIGFILE = "config.xml"
+FILESROOT = "." + APPNAME
+LOGFILE = APPNAME + ".log"
+IMAGEFILESPATH = ""
 
 __version__ = VERSION
 
+data = ConfigurationSettings()  # pylint: disable=invalid-name
 
 def init(filesRoot=None,
          configFile=None,

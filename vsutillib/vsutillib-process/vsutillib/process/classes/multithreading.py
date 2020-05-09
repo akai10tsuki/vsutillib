@@ -92,6 +92,7 @@ class ThreadWorker(threading.Thread):
         funcFinished (function): Call back function when thread finishes.
         funcError (function): Call back function when an error occurs.
         funcResult (function): Call back function with the result of the execution.
+        funcStart (function): Call back function when an Thread is about to start.
         *args: Variable length argument list.
         **kwargs: Arbitrary keyword arguments.
     """
@@ -101,25 +102,29 @@ class ThreadWorker(threading.Thread):
     def __init__(self,
                  function,
                  *args,
-                 funcFinished=None,
-                 funcError=None,
-                 funcResult=None,
                  **kwargs):
         super(ThreadWorker, self).__init__()
 
         # Store constructor arguments (re-used for processing)
         self.function = function
         self.args = args
-        self.kwargs = kwargs
-        self.finished = funcFinished
-        self.error = funcError
-        self.result = funcResult
+
+        # remove optional known named parameters
+        self.funcStart = kwargs.pop('funcStart', None)
+        self.funcFinished = kwargs.pop('funcFinished', None)
+        self.funcError = kwargs.pop('funcError', None)
+        self.funcResult = kwargs.pop('funcResult', None)
+
+        self.kwargs = kwargs # pass rest of named parameters to self.function
 
     def run(self):
         """
         Override run initialise and starts the worker function
         with passed args, kwargs.
         """
+
+        if callable(self.funcStart):
+            self.funcStart()  # Done
 
         # Retrieve args/kwargs here; and fire processing using them
         # pylint: disable-msg=W0702
@@ -130,11 +135,11 @@ class ThreadWorker(threading.Thread):
         except:
             traceback.print_exc()
             excepttype, value = sys.exc_info()[:2]
-            if callable(self.error):
-                self.error((excepttype, value, traceback.format_exc()))
+            if callable(self.funcError):
+                self.funcError((excepttype, value, traceback.format_exc()))
         else:
-            if callable(self.result):
-                self.result(result)  # Return the result of the processing
+            if callable(self.funcResult):
+                self.funcResult(result)  # Return the result of the processing
         finally:
-            if callable(self.finished):
-                self.finished()  # Done
+            if callable(self.funcFinished):
+                self.funcFinished()  # Done

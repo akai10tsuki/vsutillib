@@ -2,6 +2,9 @@
 Get file structure information from media file
 """
 
+# MFI0001
+
+import base64
 import logging
 
 from pymediainfo import MediaInfo
@@ -57,20 +60,24 @@ class MediaFileInfo(object):
 
         return cls.__log
 
-    def __init__(self, strMediaFile):
+    def __init__(self, strMediaFile, log=None):
 
         self.fileName = strMediaFile
+        self.mediaInfo = None
         self.codec = ""
         self.format = ""
+        self.title = ""
         self.lstMediaTracks = []
         self.__log = None
-
+        self.log = log
+        self.totalTracks = {"Video": 0, "Audio": 0, "Text": 0}
         self._initHelper()
 
     def _initHelper(self):
 
         try:
             fileMediaInfo = MediaInfo.parse(self.fileName)
+            self.mediaInfo = fileMediaInfo
         except OSError:
             raise OSError("MediaInfo not found.")
 
@@ -78,12 +85,19 @@ class MediaFileInfo(object):
             if track.track_type == "General":
                 self.codec = track.codec
                 self.format = track.format
+                if track.title is not None:
+                    self.title = track.title
+                    try:
+                        self.title = base64.b64decode(track.title).decode("UTF-8")
+                    except: # pylint: disable=bare-except
+                        pass
+                    self.title = self.title.strip()
             if track.track_type in ("Video", "Audio", "Text"):
+                self.totalTracks[track.track_type] += 1
                 self.lstMediaTracks.append(
                     MediaTrackInfo(track.streamorder, track.track_type,
                                    track.language, track.default, track.forced,
                                    track.title, track.codec, track.format))
-
     def __len__(self):
         return len(self.lstMediaTracks) if self.lstMediaTracks else 0
 
@@ -93,18 +107,18 @@ class MediaFileInfo(object):
 
         if self.log:
             MODULELOG.debug(
-                "MC006: Structure equality test between [%s] and [%s]",
+                "MFI0001: Structure equality test between [%s] and [%s]",
                 self.fileName, objOther.fileName)
-            MODULELOG.debug("MC007: FORMAT: %s", self.format)
+            MODULELOG.debug("MFI0002: FORMAT: %s", self.format)
 
         if self.codec != objOther.codec:
             if self.log:
-                MODULELOG.debug("MC008: Codec mismatched %s - %s", self.codec,
+                MODULELOG.debug("MFI0003: Codec mismatched %s - %s", self.codec,
                                 objOther.codec)
             bReturn = False
         elif len(self) != len(objOther):
             if self.log:
-                MODULELOG.debug("MC009: Number of tracks mismatched %s - %s",
+                MODULELOG.debug("MFI0004: Number of tracks mismatched %s - %s",
                                 len(self), len(objOther))
             bReturn = False
         elif len(self) == len(objOther):
@@ -112,55 +126,58 @@ class MediaFileInfo(object):
                 if a.streamorder != b.streamorder:
                     if self.log:
                         MODULELOG.debug(
-                            "MC010:  Stream order mismatched %s - %s",
+                            "MFI0005:  Stream order mismatched %s - %s",
                             a.streamorder, b.streamorder)
                     bReturn = False
                 elif a.track_type != b.track_type:
                     if self.log:
                         MODULELOG.debug(
-                            "MC011: Stream type mismatched %s - %s",
+                            "MFI006: Stream type mismatched %s - %s",
                             a.track_type, b.track_type)
                     bReturn = False
-                elif a.language != b.language:
+                elif (a.language != b.language) and (a.track_type != "Video"):
                     if self.log:
                         MODULELOG.debug(
-                            "MC012: Stream language mismatched %s - %s",
+                            "MFI0007: Stream language mismatched %s - %s",
                             a.language, b.language)
-                    if self.format != 'AVI':
+                    if self.format == 'AVI':
                         # Ignore language for AVI container
                         if self.log:
                             MODULELOG.debug(
-                                "MC013: AVI container ignore language mismatched %s - %s",
+                                "MFI0008: AVI container ignore language mismatched %s - %s",
                                 a.track_type, b.track_type)
                     else:
                         bReturn = False
                 elif (a.codec != b.codec) and (a.track_type != "Audio"):
                     if self.log:
-                        MODULELOG.debug("MC014: Codec mismatched %s - %s",
+                        MODULELOG.debug("MFI0009: Codec mismatched %s - %s",
                                         a.codec, b.codec)
                     if self.format == 'AVI':
                         # Ignore language for AVI container
                         if self.log:
                             MODULELOG.debug(
-                                "MC015: AVI container ignore codec mismatched %s - %s",
+                                "MFI0010: AVI container ignore codec mismatched %s - %s",
                                 a.codec, b.codec)
                     else:
                         bReturn = False
                 elif a.format != b.format:
                     if self.log:
                         MODULELOG.debug(
-                            "MC016: Stream format mismatched %s - %s",
+                            "MFI0011: Stream format mismatched %s - %s",
                             a.format, b.format)
                     bReturn = False
 
-        if self.log and bReturn:
-            MODULELOG.debug("MC017: Structure found ok.", )
+        if self.log:
+            if bReturn:
+                MODULELOG.debug("MFI0012: Structure found ok.", )
+            else:
+                MODULELOG.debug("MFI0013: Structure not ok.", )
 
         return bReturn
 
     def __str__(self):
 
-        tmpStr = "File Nme: {}\nFile Format: -{}-\n\n".format(
+        tmpStr = "File Name: {}\nFile Format: -{}-\n\n".format(
             self.fileName, self.format)
         tmpNum = 1
 
@@ -170,7 +187,7 @@ class MediaFileInfo(object):
                                                 track.track_type)
             tmpStr += "Codec: {}\n".format(track.codec)
             tmpStr += "Language: {}\n".format(track.language)
-            tmpStr += "Format: {}\n".format(track.format)
+            tmpStr += "Format: {}".format(track.format)
             tmpNum += 1
 
         return tmpStr
@@ -198,7 +215,7 @@ class MediaFileInfo(object):
             self.__log = value
 
 
-class MediaTrackInfo(object):
+class MediaTrackInfo:
     r"""
     Convenience class used by MediaFileInfo_
     contains the media track properties
