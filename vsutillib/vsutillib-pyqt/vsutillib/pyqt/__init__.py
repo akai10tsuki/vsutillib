@@ -11,6 +11,7 @@ from .classes import (
     FileListWidget,
     FormatLabel,
     GroupSignal,
+    HorizontalLine,
     LineOutput,
     OutputTextWidget,
     QActionWidget,
@@ -22,6 +23,7 @@ from .classes import (
     RunInThread,
     SvgColor,
     TabWidget,
+    VerticalLine,
     WorkerSignals,
     Worker,
 )

@@ -9,6 +9,7 @@ from .FormatLabel import FormatLabel
 from .GenericThreads import QthThread, QthThreadWorker
 from .GroupSignal import GroupSignal
 from .insertTextHelpers import LineOutput, checkColor
+from .LineFrame import HorizontalLine, VerticalLine
 from .OutputTextWidget import OutputTextWidget
 from .QActionWidget import QActionWidget
 from .QMenuWidget import QMenuWidget
