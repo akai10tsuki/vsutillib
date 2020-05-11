@@ -98,15 +98,20 @@ class SourceFile:
                 f = unQuote(match.group(1))
                 p = Path(f)
 
-                if p.is_file():
-                    self.fileName = p
-                    self.matchString = match.group(0)
-                    d = p.parent
-                    fid = [x for x in d.glob("*" + p.suffix) if x.is_file()]
-                    fid.sort(key=strPath)
-                    self.filesInDir.extend(fid)
-                else:
+                try:
+                    test = p.is_file()
+                except OSError:
                     self.__errorFound = True
+                else:
+                    if test:
+                        self.fileName = p
+                        self.matchString = match.group(0)
+                        d = p.parent
+                        fid = [x for x in d.glob("*" + p.suffix) if x.is_file()]
+                        fid.sort(key=strPath)
+                        self.filesInDir.extend(fid)
+                    else:
+                        self.__errorFound = True
             else:
                 self.__errorFound = True
 

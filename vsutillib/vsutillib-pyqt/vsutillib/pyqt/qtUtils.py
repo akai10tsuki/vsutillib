@@ -57,25 +57,29 @@ def pushButton(label, function, tooltip):
     return button
 
 
-def darkPalette():
+def darkPaletteOriginal():
     """
     darkPalette palette to change to a dark theme
     """
 
     palette = QPalette()
-    palette.setColor(QPalette.Window, QColor(53, 53, 53))
-    palette.setColor(QPalette.WindowText, Qt.white)
-    palette.setColor(QPalette.Base, QColor(25, 25, 25))
+
     palette.setColor(QPalette.AlternateBase, QColor(53, 53, 53))
-    palette.setColor(QPalette.Text, Qt.white)
+    palette.setColor(QPalette.Base, QColor(25, 25, 25))
+    palette.setColor(QPalette.BrightText, SvgColor.cyan)  # Qt.cyan
     palette.setColor(QPalette.Button, QColor(53, 53, 53))
     palette.setColor(QPalette.ButtonText, Qt.white)
-    palette.setColor(QPalette.BrightText, SvgColor.cyan) # Qt.cyan
-    palette.setColor(QPalette.Link, QColor(42, 130, 218))
+    palette.setColor(QPalette.Disabled, QPalette.ButtonText, Qt.darkGray)
+
+    palette.setColor(QPalette.Disabled, QPalette.Text, Qt.darkGray)
+
     palette.setColor(QPalette.Highlight, Qt.darkCyan)  # QColor(42, 130, 218)
     palette.setColor(QPalette.HighlightedText, Qt.white)
-    palette.setColor(QPalette.Disabled, QPalette.Text, Qt.darkGray)
-    palette.setColor(QPalette.Disabled, QPalette.ButtonText, Qt.darkGray)
+    palette.setColor(QPalette.Link, QColor(42, 130, 218))
+    palette.setColor(QPalette.Text, Qt.white)
+
+    palette.setColor(QPalette.Window, QColor(53, 53, 53))
+    palette.setColor(QPalette.WindowText, Qt.white)
 
     toolTipPalette = QPalette()
     toolTipPalette.setColor(
@@ -86,6 +90,40 @@ def darkPalette():
     QToolTip.setPalette(toolTipPalette)
 
     return palette
+
+
+def darkPalette(app):
+
+    palette = QPalette()
+
+    darkColor = QColor(45, 45, 45)
+    disabledColor = QColor(127, 127, 127)
+
+    palette.setColor(QPalette.AlternateBase, darkColor)
+    palette.setColor(QPalette.Base, QColor(18, 18, 18))
+    palette.setColor(QPalette.BrightText, SvgColor.red)
+    palette.setColor(QPalette.Button, darkColor)
+    palette.setColor(QPalette.ButtonText, SvgColor.white)
+    palette.setColor(QPalette.Disabled, QPalette.ButtonText, disabledColor)
+    palette.setColor(QPalette.Disabled, QPalette.HighlightedText, disabledColor)
+    palette.setColor(QPalette.Disabled, QPalette.Text, disabledColor)
+    palette.setColor(QPalette.Disabled, QPalette.WindowText, disabledColor)
+    palette.setColor(QPalette.Highlight, QColor(42, 130, 218))
+    palette.setColor(QPalette.HighlightedText, SvgColor.black)
+    palette.setColor(QPalette.Link, QColor(42, 130, 218))
+    palette.setColor(QPalette.Text, SvgColor.white)
+    palette.setColor(QPalette.ToolTipBase, SvgColor.white)
+    palette.setColor(QPalette.ToolTipText, SvgColor.white)
+    palette.setColor(QPalette.Window, darkColor)
+    palette.setColor(QPalette.WindowText, SvgColor.white)
+    app.setStyle("Fusion")
+    app.setPalette(palette)
+    toolTipPalette = QPalette()
+    toolTipPalette.setColor(QPalette.Inactive, QPalette.ToolTipText, SvgColor.white)
+    toolTipPalette.setColor(
+        QPalette.Inactive, QPalette.ToolTipBase, QColor(42, 130, 218)
+    )
+    QToolTip.setPalette(toolTipPalette)
 
 
 def runFunctionInThread(function, *args, **kwargs):

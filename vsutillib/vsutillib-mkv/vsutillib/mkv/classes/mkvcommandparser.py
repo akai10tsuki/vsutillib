@@ -304,34 +304,51 @@ class MKVCommandParser:
         if matchExecutable := reExecutableEx.match(strCommand):
             f = stripEncaseQuotes(matchExecutable.group(1))
             p = Path(f)
-            if p.is_file():
-                self.mkvmerge = p
-                self.__lstAnalysis.append("chk: mkvmerge ok - {}.".format(str(p)))
-            else:
+            try:
+                test = p.is_file()
+            except OSError:
                 self.__lstAnalysis.append(
-                    "err: mkvmerge not found - {}.".format(str(p))
+                    "err: mkvmerge incorrect syntax - {}.".format(str(p))
                 )
                 self.__errorFound = True
+            else:
+                if test:
+                    self.mkvmerge = p
+                    self.__lstAnalysis.append("chk: mkvmerge ok - {}.".format(str(p)))
+                else:
+                    self.__lstAnalysis.append(
+                        "err: mkvmerge not found - {}.".format(str(p))
+                    )
+                    self.__errorFound = True
         else:
             self.__lstAnalysis.append("err: mkvmerge not found.")
             self.__errorFound = True
 
         if matchOutputFile := reOutputFileEx.match(strCommand):
+            self.cliOutputFile = None
+            self.cliOutputFileMatchString = None
             f = stripEncaseQuotes(matchOutputFile.group(1))
             f = f.replace(r"'\''", "'")
             p = Path(f)
-            if Path(p.parent).is_dir():
-                self.cliOutputFile = p
-                self.cliOutputFileMatchString = matchOutputFile.group(1)
-                self.__lstAnalysis.append(
-                    "chk: Destination directory ok = {}.".format(str(p.parent))
-                )
-            else:
-                self.cliOutputFile = None
+            try:
+                test = Path(p.parent).is_dir()
+            except OSError:
                 self.__errorFound = True
                 self.__lstAnalysis.append(
-                    "err: Destination directory not found - {}.".format(str(p.parent))
+                    "err: Destination directory incorrect syntax - {}.".format(str(p.parent))
                 )
+            else:
+                if test:
+                    self.cliOutputFile = p
+                    self.cliOutputFileMatchString = matchOutputFile.group(1)
+                    self.__lstAnalysis.append(
+                        "chk: Destination directory ok = {}.".format(str(p.parent))
+                    )
+                else:
+                    self.__errorFound = True
+                    self.__lstAnalysis.append(
+                        "err: Destination directory not found - {}.".format(str(p.parent))
+                    )
         else:
             self.__errorFound = True
             self.__lstAnalysis.append("err: No output file found in command.")
@@ -375,14 +392,29 @@ class MKVCommandParser:
         #
         if matchChaptersFile := reChaptersFileEx.search(strCommand):
             self.chaptersLanguage = matchChaptersFile.group(1)
+            self.cliChaptersFile = None
+            self.cliChaptersFileMatchString = None
             f = unQuote(matchChaptersFile.group(2))
             p = Path(f)
-            if p.is_file():
-                self.cliChaptersFile = p
-                self.cliChaptersFileMatchString = matchChaptersFile.group(2)
+            try:
+                test = p.is_file()
+            except OSError:
                 self.__lstAnalysis.append(
-                    "chk: Chapters files directory ok = {}.".format(str(p.parent))
+                    "err: Chapters file incorrect syntax - {}.".format(str(p))
                 )
+                self.__errorFound = True
+            else:
+                if test:
+                    self.cliChaptersFile = p
+                    self.cliChaptersFileMatchString = matchChaptersFile.group(2)
+                    self.__lstAnalysis.append(
+                        "chk: Chapters file ok - {}.".format(str(p.parent))
+                    )
+                else:
+                    self.__lstAnalysis.append(
+                        "chk: Chapters file not found - {}.".format(str(p.parent))
+                    )
+                    self.__errorFound = True
 
     def _readDirs(self):
         """

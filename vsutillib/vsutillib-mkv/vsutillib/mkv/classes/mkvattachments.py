@@ -22,6 +22,7 @@ from pathlib import Path
 
 from ..mkvutils import unQuote
 
+
 class MKVAttachment:  # pylint: disable=too-few-public-methods
     """
     Class to save attachment information
@@ -41,8 +42,13 @@ class MKVAttachment:  # pylint: disable=too-few-public-methods
             f = unQuote(attachment[2])
             p = Path(f)
 
-            if p.is_file():
-                self.fileName = p
+            try:
+                test = p.is_file()
+            except OSError:
+                self.fileName = None
+            else:
+                if test:
+                    self.fileName = p
 
         self.span = span
         self.matchString = matchString
@@ -196,9 +202,16 @@ class MKVAttachments:
             f = unQuote(match.group(1))
             p = Path(f)
 
-            if p.is_file():
-                fid = fid = [x for x in p.parent.glob("*" + p.suffix) if x.is_file()]
-                self.__totalSourceFiles = len(fid)
+            try:
+                test = p.is_file()
+            except OSError:
+                pass
+            else:
+                if test:
+                    fid = fid = [
+                        x for x in p.parent.glob("*" + p.suffix) if x.is_file()
+                    ]
+                    self.__totalSourceFiles = len(fid)
 
         if matchAttachments := reAttachmentsEx.finditer(self.__strCommand):
             dirs = set()
@@ -206,9 +219,14 @@ class MKVAttachments:
                 attachment = MKVAttachment(match.groups(), match.span(), match.group())
                 self.__cmdLineAttachments.append(attachment)
                 p = Path(unQuote(match.group(3)))
-                if p.is_file():
-                    self.__cmdLineAttachmentsFiles.append(p)
-                    dirs.add(p.parent)
+                try:
+                    test = p.is_file()
+                except OSError:
+                    pass
+                else:
+                    if test:
+                        self.__cmdLineAttachmentsFiles.append(p)
+                        dirs.add(p.parent)
             self.__cmdLineAttachmentsDirs.extend(list(dirs))
 
     def _readDirs(self):
@@ -230,7 +248,9 @@ class MKVAttachments:
                     self.__attachmentsFiles.append(lstTmp)
                     self.__attachmentsStr.append(attachmentsToStr(lstTmp))
             else:
-                self.__attachmentsDirs.extend(self.__cmdLineAttachmentsDirs * self.__totalSourceFiles)
+                self.__attachmentsDirs.extend(
+                    self.__cmdLineAttachmentsDirs * self.__totalSourceFiles
+                )
                 self.__attachmentsStr.extend(
                     [self.attachmentsMatchString] * self.__totalSourceFiles
                 )

@@ -168,13 +168,21 @@ class VerifyMKVCommand:
         if matchExecutable:
             f = stripEncaseQuotes(matchExecutable.group(1))
             p = Path(f)
-            if not p.is_file():
+            try:
+                test = p.is_file()
+            except OSError:
                 self.__lstAnalysis.append(
-                    "err: mkvmerge not found - {}.".format(str(p))
+                    "err: mkvmerge incorrect syntax: - {}.".format(str(p))
                 )
                 bOk = False
             else:
-                self.__lstAnalysis.append("chk: mkvmerge ok - {}".format(str(p)))
+                if test:
+                    self.__lstAnalysis.append("chk: mkvmerge ok - {}".format(str(p)))
+                else:
+                    self.__lstAnalysis.append(
+                        "err: mkvmerge not found - {}.".format(str(p))
+                    )
+                    bOk = False
         else:
             self.__lstAnalysis.append("err: mkvmerge not found.")
             bOk = False
@@ -185,16 +193,24 @@ class VerifyMKVCommand:
             p = Path(f)
             self.__outputFile = None
 
-            if not Path(p.parent).is_dir():
+            try:
+                test = Path(p.parent).is_dir()
+            except OSError:
                 self.__lstAnalysis.append(
-                    "err: Destination directory not found - {}.".format(str(p.parent))
+                    "err: Destination directory incorrect syntax - {}.".format(str(p.parent))
                 )
                 bOk = False
             else:
-                self.__lstAnalysis.append(
-                    "chk: Destination directory ok = {}".format(str(p.parent))
-                )
-                self.__outputFile = p
+                if test:
+                    self.__lstAnalysis.append(
+                        "chk: Destination directory ok = {}".format(str(p.parent))
+                    )
+                    self.__outputFile = p
+                else:
+                    self.__lstAnalysis.append(
+                        "err: Destination directory not found - {}.".format(str(p.parent))
+                    )
+                    bOk = False
         else:
             self.__lstAnalysis.append("err: Destination directory not found.")
             bOk = False
@@ -206,25 +222,40 @@ class VerifyMKVCommand:
                 f = _unQuote(match.group(1))
                 p = Path(f)
 
-                if not Path(p.parent).is_dir():
+                try:
+                    test = Path(p.parent).is_dir()
+                except OSError:
                     self.__lstAnalysis.append(
-                        "err: Source directory {} not found {}".format(n, str(p.parent))
+                        "err: Source directory {} bad syntax {}".format(n, str(p.parent))
                     )
                     bOk = False
                 else:
+                    if not test:
+                        self.__lstAnalysis.append(
+                            "err: Source directory {} not found {}".format(n, str(p.parent))
+                        )
+                        bOk = False
+                    else:
+                        self.__lstAnalysis.append(
+                            "chk: Source directory {} ok = {}".format(n, str(p.parent))
+                        )
+                try:
+                    test = Path(p).is_file()
+                except OSError:
                     self.__lstAnalysis.append(
-                        "chk: Source directory {} ok = {}".format(n, str(p.parent))
-                    )
-
-                if not Path(p).is_file():
-                    self.__lstAnalysis.append(
-                        "err: Source file {} not found {}".format(n, str(p))
+                        "err: Source file {} bad syntax {}".format(n, str(p))
                     )
                     bOk = False
                 else:
-                    self.__lstAnalysis.append(
-                        "chk: Source file {} ok = {}".format(n, str(p))
-                    )
+                    if not test:
+                        self.__lstAnalysis.append(
+                            "err: Source file {} not found {}".format(n, str(p))
+                        )
+                        bOk = False
+                    else:
+                        self.__lstAnalysis.append(
+                            "chk: Source file {} ok = {}".format(n, str(p))
+                        )
 
                 n += 1
 
@@ -242,29 +273,45 @@ class VerifyMKVCommand:
             p = Path(f)
             self.__chaptersFile = None
 
-            if not p.is_file():
+            try:
+                test = p.is_file()
+            except OSError:
                 self.__lstAnalysis.append(
-                    "err: Chapters file not found - {}.".format(str(p))
+                    "err: Chapters file incorrect syntax - {}.".format(str(p))
                 )
                 bOk = False
             else:
-                self.__lstAnalysis.append("chk: Chapters file ok - {}".format(str(p)))
-                self.__chaptersFile = p
+                if not test:
+                    self.__lstAnalysis.append(
+                        "err: Chapters file not found - {}.".format(str(p))
+                    )
+                    bOk = False
+                else:
+                    self.__lstAnalysis.append("chk: Chapters file ok - {}".format(str(p)))
+                    self.__chaptersFile = p
 
         # This check if for optional attachments files
         n = 1
         for match in matchAttachments:
             f = _unQuote(match.group(1))
             p = Path(p)
-            if not p.is_file():
+            try:
+                test = p.is_file()
+            except OSError:
                 self.__lstAnalysis.append(
-                    "err: Attachment {} not found - {}".format(n, str(p))
+                    "err: Attachment file {} incorrect syntax - {}".format(n, str(p))
                 )
                 bOk = False
             else:
-                self.__lstAnalysis.append(
-                    "chk: Attachment {} ok = {}".format(n, str(p))
-                )
+                if not test:
+                    self.__lstAnalysis.append(
+                        "err: Attachment {} not found - {}".format(n, str(p))
+                    )
+                    bOk = False
+                else:
+                    self.__lstAnalysis.append(
+                        "chk: Attachment {} ok = {}".format(n, str(p))
+                    )
             n += 1
 
         self.__errorFound = not bOk
