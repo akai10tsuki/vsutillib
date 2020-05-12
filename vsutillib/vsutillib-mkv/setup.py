@@ -44,14 +44,14 @@ def readme():
 
 setup(
     name=config.NAME + "-" + PACKAGE,
-    version="1.5.0",
+    version="1.5.1",
     description="vsutillib." + PACKAGE + " sub package part of vsutillib",
     long_description=readme(),
     author=config.AUTHOR,
     author_email=config.EMAIL,
     license="MIT",
     packages=["vsutillib." + PACKAGE, "vsutillib." + PACKAGE + ".classes"],
-    install_requires=["vsutillib.files", "vsutillib.media", "vsutillib.process"],
+    install_requires=["vsutillib.files", "vsutillib.misc", "vsutillib.media", "vsutillib.process"],
     zip_safe=False,
     python_requires=">=3.8, <3.9",
 )
