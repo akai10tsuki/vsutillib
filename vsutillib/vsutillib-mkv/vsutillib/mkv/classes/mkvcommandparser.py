@@ -213,7 +213,11 @@ class MKVCommandParser:
 
             list with destination files
         """
-        return self.filesInDirByKey[_Key.outputFile]
+
+        if _Key.outputFile in self.filesInDirByKey:
+            return self.filesInDirByKey[_Key.outputFile]
+
+        return []
 
     @property
     def strCommands(self):
