@@ -7,6 +7,9 @@ Dual progress bar intended use is horizontal position vertical layout possible
 align:
     Qt.Horizontal - Horizontal layout the default
     Qt.Vertical - Vertical layout
+
+TaskBarButtonProgress show progress bar on taskbar icon
+
 """
 
 import platform
@@ -21,7 +24,8 @@ from PySide2.QtWidgets import (
     QSizePolicy,
 )
 
-from .TaskbarButtonProgress import TaskbarButtonProgress
+if platform.system() == "Windows":
+    from PySide2.QtWinExtras import QWinTaskbarButton
 
 
 class DualProgressBar(QWidget):
@@ -63,7 +67,6 @@ class DualProgressBar(QWidget):
         self.hboxLayout = QHBoxLayout()
         # Horizontal with vertical elements
         self.vboxLayout = QHBoxLayout()
-
 
     def _hLayout(self):
         """Set horizontal layout"""
@@ -197,6 +200,12 @@ class DualProgressBar(QWidget):
 
         self.valuesChangedSignal.emit(unit, total)
 
+    @Slot()
+    def reset(self):
+        if self.taskbarButton:
+            self.taskbarButton.progress.reset()
+
+    @Slot()
     def initTaskbarButton(self):
 
         if platform.system() == "Windows":
@@ -256,6 +265,44 @@ class DualProgressBar(QWidget):
         """
 
         QWidget.setSizePolicy(self, horizontal, vertical)
+
+
+class TaskbarButtonProgress(QWinTaskbarButton):
+    """
+    TaskbarProgress taskbar icon progress indicator
+    """
+
+    def __init__(self, parent):
+        super().__init__(parent)
+
+        self.platform = platform.system()
+        self.parent = parent
+        self.button = None
+        self.progress = None
+
+        if self.platform == "Windows":
+            self.button = QWinTaskbarButton(parent)
+
+    def __bool__(self):
+        if (self.button is None) or (self.progress is None):
+            return False
+        return True
+
+    def initTaskbarButton(self):
+        """
+        initTaskbarButton for late init QWinTaskbarButton
+        """
+
+        if self.platform == "Windows":
+            self.button.setWindow(self.parent.windowHandle())
+            self.progress = self.button.progress()
+            self.progress.setRange(0, 100)
+            self.progress.setVisible(True)
+
+    @Slot(int, int)
+    def setValue(self, init, total):
+
+        self.progress.setValue(total)
 
 
 def _VerticalBarSetup(pbBar, label):
