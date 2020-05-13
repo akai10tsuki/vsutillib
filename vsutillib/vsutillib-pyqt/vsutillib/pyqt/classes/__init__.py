@@ -19,3 +19,4 @@ from .QthThreads import Worker, WorkerSignals
 from .RunInThread import RunInThread
 from .SvgColor import SvgColor
 from .TabWidget import TabWidget
+from .TaskbarButtonProgress import TaskbarButtonProgress
