@@ -20,7 +20,7 @@ MODULELOG = logging.getLogger(__name__)
 MODULELOG.addHandler(logging.NullHandler())
 
 
-def centerWidgets(widget, parent=None):
+def centerWidget(widget, parent=None):
     """center widget based on parent or screen geometry"""
 
     if parent is None:

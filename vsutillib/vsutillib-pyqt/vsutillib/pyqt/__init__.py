@@ -32,7 +32,7 @@ from .classes import (
 from .messagebox import messageBox, messageBoxYesNo
 
 from .qtUtils import (
-    centerWidgets,
+    centerWidget,
     pushButton,
     darkPalette,
     runFunctionInThread,
