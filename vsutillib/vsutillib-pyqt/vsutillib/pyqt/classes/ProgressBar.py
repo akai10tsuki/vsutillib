@@ -267,42 +267,50 @@ class DualProgressBar(QWidget):
         QWidget.setSizePolicy(self, horizontal, vertical)
 
 
-class TaskbarButtonProgress(QWinTaskbarButton):
-    """
-    TaskbarProgress taskbar icon progress indicator
-    """
+if platform.system() == "Windows":
 
-    def __init__(self, parent):
-        super().__init__(parent)
-
-        self.platform = platform.system()
-        self.parent = parent
-        self.button = None
-        self.progress = None
-
-        if self.platform == "Windows":
-            self.button = QWinTaskbarButton(parent)
-
-    def __bool__(self):
-        if (self.button is None) or (self.progress is None):
-            return False
-        return True
-
-    def initTaskbarButton(self):
+    class TaskbarButtonProgress(QWinTaskbarButton):
         """
-        initTaskbarButton for late init QWinTaskbarButton
+        TaskbarProgress taskbar icon progress indicator
         """
 
-        if self.platform == "Windows":
-            self.button.setWindow(self.parent.windowHandle())
-            self.progress = self.button.progress()
-            self.progress.setRange(0, 100)
-            self.progress.setVisible(True)
+        def __init__(self, parent):
+            super().__init__(parent)
 
-    @Slot(int, int)
-    def setValue(self, init, total):
+            self.platform = platform.system()
+            self.parent = parent
+            self.button = None
+            self.progress = None
 
-        self.progress.setValue(total)
+            if self.platform == "Windows":
+                self.button = QWinTaskbarButton(parent)
+
+        def __bool__(self):
+            if (self.button is None) or (self.progress is None):
+                return False
+            return True
+
+        def initTaskbarButton(self):
+            """
+            initTaskbarButton for late init QWinTaskbarButton
+            """
+
+            if self.platform == "Windows":
+                self.button.setWindow(self.parent.windowHandle())
+                self.progress = self.button.progress()
+                self.progress.setRange(0, 100)
+                self.progress.setVisible(True)
+
+        @Slot(int, int)
+        def setValue(self, init, total):
+
+            self.progress.setValue(total)
+
+
+else:
+
+    def TaskbarButtonProgress(parent):
+        return False
 
 
 def _VerticalBarSetup(pbBar, label):
