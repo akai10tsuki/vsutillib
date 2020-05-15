@@ -27,7 +27,24 @@ from pathlib import Path
 from vsutillib.files import ConfigurationSettings
 from vsutillib.log import LogRotateFileHandler
 
-__VERSION = (1, 5, '0')
+__VERSION = (1, 5, '1')
+
+
+FILES_VERSION = "1.5.1"
+LOG_VERSION = "1.5.0"
+MACOS_VERSION = "1.5.0"
+MEDIA_VERSION = "1.5.0"
+MISC_VERSION = "1.5.0"
+MKV_VERSION = "1.5.1"
+NETWORK_VERSION = "1.5.0"
+PROCESS_VERSION = "1.5.0"
+PYQT_VERSION = "1.5.1"
+SCRIPTS_VERSION = "1.5.0"
+VSXML_VERSION = "1.5.0"
+
+PYMEDIAINFO_VERSION = "4.2.1"
+PYSIDE2_VERSION = "5.14"
+PYTHON_VERSION = ">=3.8, <3.9"
 
 APPNAME = "vsutillib"
 VERSION = ".".join(map(str, __VERSION))
@@ -40,7 +57,7 @@ DESCRIPTION = 'Library module with miscellaneous convenience functions and class
 NAME = "vsutillib"
 KEYWORDS = 'mkv multimedia video audio configuration'
 REQUIRED = [
-    'vsutillib-files>=1.5.0',
+    'vsutillib-files>=1.5.1',
     'vsutillib-log>=1.5.0',
     'vsutillib-macos>=1.5.0',
     'vsutillib-media>=1.5.0',

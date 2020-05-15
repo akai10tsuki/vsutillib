@@ -44,16 +44,16 @@ def readme():
 
 setup(
     name=config.NAME + "-" + PACKAGE,
-    version="1.5.0",
+    version=config.MEDIA_VERSION,
     description="vsutillib." + PACKAGE + " sub package part of vsutillib",
     long_description=readme(),
     author=config.AUTHOR,
     author_email=config.EMAIL,
     license="MIT",
     packages=["vsutillib." + PACKAGE, "vsutillib." + PACKAGE + ".classes"],
-    install_requires=["pymediainfo>=4.1"],
+    install_requires=["pymediainfo>" + config.PYMEDIAINFO_VERSION],
     zip_safe=False,
-    python_requires=">=3.8, <3.9",
+    python_requires=config.PYTHON_VERSION,
 )
 
 removeTmpDirs()

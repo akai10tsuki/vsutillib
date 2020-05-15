@@ -44,7 +44,7 @@ def readme():
 
 setup(
     name=config.NAME + "-" + PACKAGE,
-    version="1.5.0",
+    version=config.SCRIPTS_VERSION,
     description="vsutillib." + PACKAGE + " sub package part of vsutillib",
     long_description=readme(),
     author=config.AUTHOR,
@@ -52,13 +52,13 @@ setup(
     license="MIT",
     packages=["vsutillib." + PACKAGE],
     install_requires=[
-        "vsutillib.files>=1.5.0",
-        "vsutillib.media>=1.5.0",
-        "vsutillib.mkv>=1.5.0",
-        "vsutillib.process>=1.5.0",
+        "vsutillib.files>=" + config.FILES_VERSION,
+        "vsutillib.media>=" + config.MEDIA_VERSION,
+        "vsutillib.mkv>=" + config.MKV_VERSION,
+        "vsutillib.process>=" + config.PROCESS_VERSION,
     ],
     zip_safe=False,
-    python_requires=">=3.8, <3.9",
+    python_requires=config.PYTHON_VERSION,
 )
 
 removeTmpDirs()

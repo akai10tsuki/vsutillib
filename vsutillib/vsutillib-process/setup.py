@@ -44,7 +44,7 @@ def readme():
 
 setup(
     name=config.NAME + "-" + PACKAGE,
-    version="1.5.0",
+    version=config.PROCESS_VERSION,
     description="vsutillib." + PACKAGE + " sub package part of vsutillib",
     long_description=readme(),
     author=config.AUTHOR,
@@ -52,7 +52,7 @@ setup(
     license="MIT",
     packages=["vsutillib." + PACKAGE, "vsutillib." + PACKAGE + ".classes"],
     zip_safe=False,
-    python_requires=">=3.8, <3.9",
+    python_requires=config.PYTHON_VERSION,
 )
 
 removeTmpDirs()
