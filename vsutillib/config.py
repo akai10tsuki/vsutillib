@@ -40,6 +40,7 @@ NETWORK_VERSION = "1.5.0"
 PROCESS_VERSION = "1.5.0"
 PYQT_VERSION = "1.5.1"
 SCRIPTS_VERSION = "1.5.0"
+SQL_VERSION = "1.5.1"
 VSXML_VERSION = "1.5.0"
 
 PYMEDIAINFO_VERSION = "4.2.1"
@@ -60,12 +61,13 @@ REQUIRED = [
     'vsutillib-files>=1.5.1',
     'vsutillib-log>=1.5.0',
     'vsutillib-macos>=1.5.0',
-    'vsutillib-media>=1.5.0',
+    'vsutillib-media>=1.5.1',
     'vsutillib-mkv>=1.5.0'
     'vsutillib-network>=1.5.0',
     'vsutillib-process>=1.5.0',
     'vsutillib-pyqt>=1.5.0',
     'vsutillib-scripts>=1.5.0'
+    'vsutillib-sql>=1.5.1'
     'vsutillib-vsxml>=1.5.0',
 ]
 URL = 'https://github.com/akai10tsuki/vsutillib'
