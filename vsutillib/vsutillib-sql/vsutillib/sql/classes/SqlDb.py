@@ -40,7 +40,7 @@ class SqlDb:
     def close(self):
         self.connection.close()
 
-    def connect(self, database=None, autoCommit=False):
+    def connect(self, database, autoCommit=False):
         """
         connect connects to sqlite database
 
