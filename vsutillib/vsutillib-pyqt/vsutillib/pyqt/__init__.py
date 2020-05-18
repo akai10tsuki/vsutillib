@@ -23,6 +23,7 @@ from .classes import (
     RunInThread,
     SvgColor,
     TabWidget,
+    TabWidgetExtension,
     TaskbarButtonProgress,
     VerticalLine,
     WorkerSignals,
