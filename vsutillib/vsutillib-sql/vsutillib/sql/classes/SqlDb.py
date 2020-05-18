@@ -128,3 +128,24 @@ class SqlDb:
             self.__lastError = "SQLiteError: {}".format(e)
 
         return cursor
+
+    def tableExists(self, dbTable):
+        """
+        verify if table exists in the database
+        """
+
+        sqlTableCheck = """
+            SELECT count(name)
+              FROM sqlite_master
+              WHERE type='table' AND name=?
+            """
+
+        cursor = self.connection.cursor()
+        cursor.execute(sqlTableCheck, (dbTable, ))
+
+        if cursor:
+            row = cursor.fetchone()
+            if row:
+                return bool(row[0])
+
+        return False
