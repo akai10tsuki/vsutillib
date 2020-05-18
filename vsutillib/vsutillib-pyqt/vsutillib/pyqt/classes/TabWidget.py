@@ -7,6 +7,8 @@ Central widget holds:
     - TableViewWidget
     - TreeViewWidget
 
+Todo: Hide and un hide at current position.  Possibly the widget itself do
+      the hiding
 """
 # TWG0001
 
@@ -107,6 +109,42 @@ class TabWidget(QTabWidget):
         """set instance log variable"""
         if isinstance(value, bool) or value is None:
             self.__log = value
+
+    def addTabFromList(self, tabList):
+        self.unHideTab(tabList)
+
+    def hideTab(self, index):
+
+        currentWidget = self.widget(index)
+
+        if currentWidget is not None:
+            print("currentWidget")
+            try:
+                currentWidget.tab = (-1)
+            except:  # pylint: disable=bare-except
+                pass
+
+            self.removeTab(index)
+
+        return currentWidget
+
+    def unHideTab(self, tabList):
+
+        tabIndex = self.addTab(tabList[0], tabList[1])
+        self.setTabToolTip(tabIndex, tabList[2])
+
+        try:
+            tabList[0].tab = tabIndex
+        except:  # pylint: disable=bare-except
+            pass
+
+        try:
+            tabList[0].tabWidget = self
+        except:  # pylint: disable=bare-except
+            pass
+
+
+
 
     def setLanguage(self):
         """
