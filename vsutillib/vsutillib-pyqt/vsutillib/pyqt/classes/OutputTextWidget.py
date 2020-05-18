@@ -16,6 +16,8 @@ from PySide2.QtWidgets import QTextEdit
 
 from .insertTextHelpers import checkColor, LineOutput
 from .SvgColor import SvgColor
+from .TabWidgetExtension import TabWidgetExtension
+
 
 MODULELOG = logging.getLogger(__name__)
 MODULELOG.addHandler(logging.NullHandler())
@@ -55,8 +57,8 @@ class OutputTextWidget(QTextEdit):
 
         return cls.__log
 
-    def __init__(self, parent=None, log=None):
-        super(OutputTextWidget, self).__init__(parent)
+    def __init__(self, parent=None, log=None, **kwargs):
+        super().__init__(parent=parent, **kwargs)
 
         self.parent = parent
         self.__log = None
@@ -65,7 +67,8 @@ class OutputTextWidget(QTextEdit):
         self.log = log
 
         self.insertTextSignal.connect(self.insertText)
-        self.setCurrentIndexSignal.connect(self._setCurrentIndex)
+        #self.setCurrentIndexSignal.connect(self._setCurrentIndex)
+        #self.setCurrentIndexSignal.connect(self.setAsCurrentIndex)
 
     @property
     def log(self):
@@ -89,27 +92,27 @@ class OutputTextWidget(QTextEdit):
         if isinstance(value, bool) or value is None:
             self.__log = value
 
-    @property
-    def tab(self):
-        return self.__tab
+    #@property
+    #def tab(self):
+    #    return self.__tab
 
-    @tab.setter
-    def tab(self, value):
-        self.__tab = value
+    #@tab.setter
+    #def tab(self, value):
+    #    self.__tab = value
 
-    @property
-    def tabWidget(self):
-        return self.__tabWidget
+    #@property
+    #def tabWidget(self):
+    #    return self.__tabWidget
 
-    @tabWidget.setter
-    def tabWidget(self, value):
-        self.__tabWidget = value
+    #@tabWidget.setter
+    #def tabWidget(self, value):
+    #    self.__tabWidget = value
 
-    @Slot()
-    def _setCurrentIndex(self):
+    #@Slot()
+    #def _setCurrentIndex(self):
 
-        if self.tabWidget:
-            self.tabWidget.setCurrentIndex(self.tab)
+    #    if self.tabWidget:
+    #        self.tabWidget.setCurrentIndex(self.tab)
 
     def connectToInsertText(self, objSignal):
         """Connect to signal"""
