@@ -128,7 +128,7 @@ class MKVCommandParser:
             self.__shellCommands[index],
             self.baseFiles,
             self.oSourceFiles[index],
-            self.filesInDirByKey[_Key.outputFile][index],
+            self.filesInDirByKey[MKVParseKey.outputFile][index],
             None if not self.oAttachments else self.oAttachments.attachmentsStr[index],
             None if not self.titles else self.titles[index],
             None if not self.cliChaptersFile else self.chaptersFiles[index],
@@ -214,8 +214,8 @@ class MKVCommandParser:
             list with destination files
         """
 
-        if _Key.outputFile in self.filesInDirByKey:
-            return self.filesInDirByKey[_Key.outputFile]
+        if MKVParseKey.outputFile in self.filesInDirByKey:
+            return self.filesInDirByKey[MKVParseKey.outputFile]
 
         return []
 
@@ -339,7 +339,9 @@ class MKVCommandParser:
             except OSError:
                 self.__errorFound = True
                 self.__lstAnalysis.append(
-                    "err: Destination directory incorrect syntax - {}.".format(str(p.parent))
+                    "err: Destination directory incorrect syntax - {}.".format(
+                        str(p.parent)
+                    )
                 )
             else:
                 if test:
@@ -351,7 +353,9 @@ class MKVCommandParser:
                 else:
                     self.__errorFound = True
                     self.__lstAnalysis.append(
-                        "err: Destination directory not found - {}.".format(str(p.parent))
+                        "err: Destination directory not found - {}.".format(
+                            str(p.parent)
+                        )
                     )
         else:
             self.__errorFound = True
@@ -370,11 +374,11 @@ class MKVCommandParser:
                         )
                     )
                     if index == 0:
-                        self.filesInDirByKey[_Key.outputFile] = []
+                        self.filesInDirByKey[MKVParseKey.outputFile] = []
                         for f in oFile.filesInDir:
                             of = self.cliOutputFile.parent.joinpath(f.stem + ".mkv")
                             of = resolveOverwrite(of)
-                            self.filesInDirByKey[_Key.outputFile].append(of)
+                            self.filesInDirByKey[MKVParseKey.outputFile].append(of)
                     key = "<SOURCE{}>".format(str(index))
                     self.filesInDirByKey[key] = oFile.filesInDir
                     if len(oFile.filesInDir) != self.__totalSourceFiles:
@@ -468,32 +472,32 @@ class MKVCommandParser:
 
         if self.oAttachments.cmdLineAttachments:
             self.filesInDirByKey[
-                _Key.attachmentFiles
+                MKVParseKey.attachmentFiles
             ] = self.oAttachments.attachmentsStr
-        self.filesInDirByKey[_Key.title] = self.titles
+        self.filesInDirByKey[MKVParseKey.title] = self.titles
         if self.chaptersFiles:
-            self.filesInDirByKey[_Key.chaptersFile] = self.chaptersFiles
+            self.filesInDirByKey[MKVParseKey.chaptersFile] = self.chaptersFiles
 
     def _template(self):
 
         cmdTemplate = self.__bashCommand
         cmdTemplate = cmdTemplate.replace(
-            self.cliOutputFileMatchString, _Key.outputFile, 1
+            self.cliOutputFileMatchString, MKVParseKey.outputFile, 1
         )
         for index, sf in enumerate(self.oSourceFiles.sourceFiles):
             key = "<SOURCE{}>".format(str(index))
             cmdTemplate = cmdTemplate.replace(sf.matchString, key, 1)
         if self.oAttachments.cmdLineAttachments:
             cmdTemplate = cmdTemplate.replace(
-                self.oAttachments.attachmentsMatchString, _Key.attachmentFiles, 1
+                self.oAttachments.attachmentsMatchString, MKVParseKey.attachmentFiles, 1
             )
         if self.cliTitle:
             cmdTemplate = cmdTemplate.replace(
-                self.cliTitleMatchString, "--title " + _Key.title, 1
+                self.cliTitleMatchString, "--title " + MKVParseKey.title, 1
             )
         if self.cliChaptersFile:
             cmdTemplate = cmdTemplate.replace(
-                self.cliChaptersFileMatchString, _Key.chaptersFile, 1
+                self.cliChaptersFileMatchString, MKVParseKey.chaptersFile, 1
             )
         self.commandTemplate = cmdTemplate
 
@@ -509,11 +513,11 @@ class MKVCommandParser:
                 self._filesInDirByKey()
                 self.__readFiles = False
             cmdTemplate = self.commandTemplate
-            totalCommands = len(self.filesInDirByKey[_Key.outputFile])
+            totalCommands = len(self.filesInDirByKey[MKVParseKey.outputFile])
             for i in range(totalCommands):
                 keyDictionary = {}
                 for key, sourceFiles in self.filesInDirByKey.items():
-                    if key != _Key.attachmentFiles:
+                    if key != MKVParseKey.attachmentFiles:
                         keyDictionary[key] = shlex.quote(str(sourceFiles[i]))
                     else:
                         keyDictionary[key] = sourceFiles[i]
@@ -528,11 +532,12 @@ class MKVCommandParser:
     def renameOutputFiles(self, newNames):
 
         if len(newNames) == self.__totalSourceFiles:
-            self.filesInDirByKey[_Key.outputFile] = list(newNames)
+            self.filesInDirByKey[MKVParseKey.outputFile] = list(newNames)
             if not self.__readFiles:
                 self.generateCommands()
 
-class _Key:
+
+class MKVParseKey:
 
     attachmentFiles = "<ATTACHMENTS>"
     chaptersFile = "<CHAPTERS>"
