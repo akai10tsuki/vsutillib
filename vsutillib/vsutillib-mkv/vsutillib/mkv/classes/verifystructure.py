@@ -64,7 +64,7 @@ class VerifyStructure:
             if isinstance(setLogging, bool):
                 cls.__log = setLogging
 
-    def __init__(self, lstBaseFiles=None, lstFiles=None, log=None):
+    def __init__(self, lstBaseFiles=None, lstFiles=None, destinationFile=None, log=None):
 
         self.__analysis = None
         self.__log = None
@@ -73,7 +73,7 @@ class VerifyStructure:
         self.log = log
 
         if (lstBaseFiles is not None) and (lstFiles is not None):
-            self.verifyStructure(lstBaseFiles, lstFiles)
+            self.verifyStructure(lstBaseFiles, lstFiles, destinationFile)
 
     def __bool__(self):
         return self.__status
@@ -128,7 +128,7 @@ class VerifyStructure:
         """
         return self.__analysis
 
-    def verifyStructure(self, lstBaseFiles, lstFiles):
+    def verifyStructure(self, lstBaseFiles, lstFiles, destinationFile=None):
         """
         Verify if structure of files if logically equal.
 
@@ -139,7 +139,7 @@ class VerifyStructure:
             lstFiles (list): list of files to generate new command
         """
 
-        msg = "Error: In structure \n\nSource:\n{}\nBase Source:\n{}\n"
+        #msg = "Error: In structure \n\nSource:\n{}\nBase Source:\n{}\n"
         self.__analysis = []
         self.__status = True
 
@@ -152,7 +152,12 @@ class VerifyStructure:
 
                 if objSource != objFile:
 
-                    msg = "Error: In structure \n\nSource:\n{}\n\nBase Source:\n{}\n"
+                    if destinationFile is not None:
+                        msg = "Error: In structure\nDestination File: {}\n\n"
+                        msg = msg.format(destinationFile)
+                    else:
+                        msg = "Error: In structure\n\n"
+                    msg = msg + "Source:\n{}\n\nBase Source:\n{}\n"
                     msg = msg.format(str(objFile), str(objSource))
                     self.__analysis.append(msg)
                     self.__status = False
