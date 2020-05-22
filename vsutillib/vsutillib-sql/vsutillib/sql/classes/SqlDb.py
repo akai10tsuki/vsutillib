@@ -196,21 +196,21 @@ class SqlDb:
 
     def transaction(self):
         sqlBeginTransaction = "BEGIN TRANSACTION;"
-        cursor = self.sqlExecute(sqlBeginTransaction)
+        cursor = self.connection.execute(sqlBeginTransaction)
         if cursor:
             return True
         return False
 
     def rollback(self):
         sqlRollback = "ROLLBACK;"
-        cursor = self.sqlExecute(sqlRollback)
+        cursor = self.connection.execute(sqlRollback)
         if cursor:
             return True
         return False
 
     def commit(self):
         sqlCommit = "COMMIT;"
-        cursor = self.sqlExecute(sqlCommit)
+        cursor = self.connection.execute(sqlCommit)
         if cursor:
             return True
         return False
