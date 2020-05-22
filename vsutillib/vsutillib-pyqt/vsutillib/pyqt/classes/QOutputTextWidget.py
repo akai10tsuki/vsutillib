@@ -23,7 +23,7 @@ MODULELOG = logging.getLogger(__name__)
 MODULELOG.addHandler(logging.NullHandler())
 
 
-class OutputTextWidget(QTextEdit):
+class QOutputTextWidget(QTextEdit):
     """Output for running queue"""
 
     # log state

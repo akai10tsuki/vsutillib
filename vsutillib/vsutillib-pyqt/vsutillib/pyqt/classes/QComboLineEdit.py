@@ -8,7 +8,7 @@ from PySide2.QtCore import Qt, Signal, Slot, QObject, QEvent
 from PySide2.QtWidgets import QApplication, QComboBox
 
 
-class ComboLineEdit(QComboBox):
+class QComboLineEdit(QComboBox):
     """
     ComboBox removes highlighted item in popup with Del key
 

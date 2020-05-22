@@ -19,7 +19,7 @@ from PySide2.QtCore import QObject, Signal
 from vsutillib.process import ThreadWorker, isThreadRunning
 
 
-class RunInThread(QObject):
+class QRunInThread(QObject):
     """
     RunInThread - Runs a function in a Thread
 
@@ -52,7 +52,7 @@ class RunInThread(QObject):
     __log = False
 
     def __init__(self, function, *args, **kwargs):
-        super(RunInThread, self).__init__()
+        super().__init__()
 
         self.function = function
         self.args = args

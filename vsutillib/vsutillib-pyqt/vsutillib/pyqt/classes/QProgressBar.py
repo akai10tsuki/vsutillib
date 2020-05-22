@@ -39,7 +39,7 @@ class DualProgressBar(QWidget):
     valuesChangedSignal = Signal(int, int)
 
     def __init__(self, parent, align=Qt.Horizontal):
-        super(DualProgressBar, self).__init__(parent)
+        super().__init__(parent)
 
         self.parent = parent
         self.taskbarButton = TaskbarButtonProgress(parent)
@@ -336,7 +336,7 @@ class SpacerWidget(QWidget):
     """
 
     def __init__(self, parent=None):
-        super(SpacerWidget, self).__init__(parent)
+        super().__init__(parent)
 
         self.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Expanding)
 
@@ -350,7 +350,7 @@ if __name__ == "__main__":
         """Test the progress bars"""
 
         def __init__(self, *args, **kwargs):
-            super(MainWindow, self).__init__(*args, **kwargs)
+            super().__init__(*args, **kwargs)
 
             l = QGridLayout()
 
