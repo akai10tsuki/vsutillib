@@ -2,21 +2,21 @@
 PySide2 related classes
 """
 
-from .ComboLineEdit import ComboLineEdit
-from .FileListWidget import FileListWidget
-from .FormatLabel import FormatLabel
-from .GenericThreads import QthThread, QthThreadWorker
-from .GroupSignal import GroupSignal
 from .insertTextHelpers import LineOutput, checkColor
-from .LineFrame import HorizontalLine, VerticalLine
-from .OutputTextWidget import OutputTextWidget
-from .ProgressBar import DualProgressBar, TaskbarButtonProgress
 from .QActionWidget import QActionWidget
+from .QComboLineEdit import QComboLineEdit
+from .QFormatLabel import QFormatLabel
+from .QFileListWidget import QFileListWidget
+from .QGenericThreads import QthThread, QthThreadWorker
+from .QGroupSignal import QGroupSignal
+from .QLineFrame import HorizontalLine, VerticalLine
 from .QMenuWidget import QMenuWidget
+from .QOutputTextWidget import QOutputTextWidget
+from .QProgressBar import DualProgressBar, TaskbarButtonProgress
 from .QProgressIndicator import QProgressIndicator
 from .QPushButtonWidget import QPushButtonWidget
-from .QthThreads import Worker, WorkerSignals
-from .RunInThread import RunInThread
+from .QRunInThread import QRunInThread
+from .QWorker import Worker, WorkerSignals
 from .SvgColor import SvgColor
 from .TabWidget import TabWidget
 from .TabWidgetExtension import TabWidgetExtension
