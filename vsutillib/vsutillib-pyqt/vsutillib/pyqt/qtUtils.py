@@ -14,7 +14,7 @@ from PySide2.QtWidgets import QDesktopWidget, QPushButton, QToolTip
 
 from vsutillib.macos import isMacDarkMode
 
-from .classes import RunInThread, SvgColor
+from .classes import QRunInThread, SvgColor
 
 MODULELOG = logging.getLogger(__name__)
 MODULELOG.addHandler(logging.NullHandler())
@@ -132,7 +132,7 @@ def runFunctionInThread(function, *args, **kwargs):
     kwargs are passed to the run function
     """
 
-    worker = RunInThread(function, *args, **kwargs)
+    worker = QRunInThread(function, *args, **kwargs)
 
     # Execute
     worker.run()
