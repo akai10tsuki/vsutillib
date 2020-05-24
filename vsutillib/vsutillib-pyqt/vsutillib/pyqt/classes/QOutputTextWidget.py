@@ -82,7 +82,7 @@ class QOutputTextWidget(QTextEdit):
         if self.__log is not None:
             return self.__log
 
-        return OutputTextWidget.classLog()
+        return QOutputTextWidget.classLog()
 
     @log.setter
     def log(self, value):
@@ -118,7 +118,7 @@ class QOutputTextWidget(QTextEdit):
         # still no restore to default the ideal configuration
         # search will continue considering abandoning color
 
-        color = checkColor(color, OutputTextWidget.isDarkMode)
+        color = checkColor(color, QOutputTextWidget.isDarkMode)
 
         if replaceLine:
             self.moveCursor(QTextCursor.StartOfLine, QTextCursor.KeepAnchor)
