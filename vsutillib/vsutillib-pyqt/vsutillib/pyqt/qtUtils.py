@@ -132,7 +132,18 @@ def runFunctionInThread(function, *args, **kwargs):
     kwargs are passed to the run function
     """
 
+    funcStart = kwargs.pop("funcStart", None)
+    funcFinished = kwargs.pop("funcFinished", None)
+    funcResult = kwargs.pop("funcResult", None)
+
     worker = QRunInThread(function, *args, **kwargs)
+
+    if funcStart is not None:
+        worker.startSignal.connect(funcStart)
+    if funcFinished is not None:
+        worker.finishedSignal.connect(funcFinished)
+    if funcResult is not None:
+        worker.resultSignal.connect(funcResult)
 
     # Execute
     worker.run()
