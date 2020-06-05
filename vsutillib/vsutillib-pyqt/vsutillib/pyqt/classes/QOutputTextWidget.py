@@ -28,6 +28,7 @@ class QOutputTextWidget(QTextEdit):
 
     # log state
     __log = False
+    clearSignal = Signal()
     insertTextSignal = Signal(str, dict)
     setCurrentIndexSignal = Signal()
     isDarkMode = True
@@ -67,6 +68,7 @@ class QOutputTextWidget(QTextEdit):
         self.log = log
 
         self.insertTextSignal.connect(self.insertText)
+        self.clearSignal.connect(super().clear)
 
     @property
     def log(self):
@@ -114,6 +116,7 @@ class QOutputTextWidget(QTextEdit):
         replaceLine = kwargs.pop(LineOutput.ReplaceLine, False)
         appendLine = kwargs.pop(LineOutput.AppendLine, False)
         appendEnd = kwargs.pop(LineOutput.AppendEnd, False)
+        overrideLog = kwargs.pop("log", None)
 
         # still no restore to default the ideal configuration
         # search will continue considering abandoning color
@@ -139,7 +142,12 @@ class QOutputTextWidget(QTextEdit):
 
         self.ensureCursorVisible()
 
-        if self.log:
+        log = self.log
+
+        if overrideLog is not None:
+            log = overrideLog
+
+        if log:
             strTmp = strTmp + strText
             strTmp = strTmp.replace("\n", " ")
 
