@@ -15,8 +15,6 @@ from PySide2.QtWidgets import QTextEdit
 
 
 from .insertTextHelpers import checkColor, LineOutput
-from .SvgColor import SvgColor
-from .TabWidgetExtension import TabWidgetExtension
 
 
 MODULELOG = logging.getLogger(__name__)
