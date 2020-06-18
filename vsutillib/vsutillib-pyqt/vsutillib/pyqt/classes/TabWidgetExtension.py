@@ -56,14 +56,17 @@ class TabWidgetExtension:
 
     def hideTab(self):
 
-        self.title = self.tabWidget.tabText(self.tab)
-        self.toolTip = self.tabWidget.tabToolTip(self.tab)
-        self.tabWidget.removeTab(self.tab)
+        tabIndex = self.tabWidget.indexOf(self.__tabWidgetChild)
+        self.__oldTab = tabIndex
+        self.tabWidget.removeTab(tabIndex)
         self.tab = (-1)
 
     def unHideTab(self):
 
         if self.tabWidget is not None:
-            tabIndex = self.tabWidget.addTab(self.__tabWidgetChild, self.title)
+            if self.__oldTab >= 0:
+                tabIndex = self.tabWidget.insertTab(self.__oldTab, self.__tabWidgetChild, self.title)
+            else:
+                tabIndex = self.tabWidget.addTab(self.__tabWidgetChild, self.title)
             self.tabWidget.setTabToolTip(tabIndex, self.toolTip)
             self.tab = tabIndex
