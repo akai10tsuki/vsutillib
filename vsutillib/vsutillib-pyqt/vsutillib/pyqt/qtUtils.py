@@ -10,7 +10,7 @@ import platform
 
 from PySide2.QtCore import Qt
 from PySide2.QtGui import QPalette, QColor
-from PySide2.QtWidgets import QDesktopWidget, QPushButton, QToolTip
+from PySide2.QtWidgets import QCheckBox, QDesktopWidget, QPushButton, QToolTip
 
 from vsutillib.macos import isMacDarkMode
 
@@ -57,42 +57,7 @@ def pushButton(label, function, tooltip):
     return button
 
 
-def darkPaletteOriginal():
-    """
-    darkPalette palette to change to a dark theme
-    """
-
-    palette = QPalette()
-
-    palette.setColor(QPalette.AlternateBase, QColor(53, 53, 53))
-    palette.setColor(QPalette.Base, QColor(25, 25, 25))
-    palette.setColor(QPalette.BrightText, SvgColor.cyan)  # Qt.cyan
-    palette.setColor(QPalette.Button, QColor(53, 53, 53))
-    palette.setColor(QPalette.ButtonText, Qt.white)
-    palette.setColor(QPalette.Disabled, QPalette.ButtonText, Qt.darkGray)
-
-    palette.setColor(QPalette.Disabled, QPalette.Text, Qt.darkGray)
-
-    palette.setColor(QPalette.Highlight, Qt.darkCyan)  # QColor(42, 130, 218)
-    palette.setColor(QPalette.HighlightedText, Qt.white)
-    palette.setColor(QPalette.Link, QColor(42, 130, 218))
-    palette.setColor(QPalette.Text, Qt.white)
-
-    palette.setColor(QPalette.Window, QColor(53, 53, 53))
-    palette.setColor(QPalette.WindowText, Qt.white)
-
-    toolTipPalette = QPalette()
-    toolTipPalette.setColor(
-        QPalette.Inactive, QPalette.ToolTipBase, Qt.lightGray
-    )  # QColor(53, 53, 53)
-    toolTipPalette.setColor(QPalette.Inactive, QPalette.ToolTipText, Qt.black)
-
-    QToolTip.setPalette(toolTipPalette)
-
-    return palette
-
-
-def darkPalette(app):
+def darkPalette(app=None):
 
     palette = QPalette()
 
@@ -116,17 +81,22 @@ def darkPalette(app):
     palette.setColor(QPalette.ToolTipText, SvgColor.white)
     palette.setColor(QPalette.Window, darkColor)
     palette.setColor(QPalette.WindowText, SvgColor.white)
-    app.setStyle("Fusion")
-    app.setPalette(palette)
-    toolTipPalette = QPalette()
-    toolTipPalette.setColor(QPalette.Inactive, QPalette.ToolTipText, SvgColor.white)
-    toolTipPalette.setColor(
-        QPalette.Inactive, QPalette.ToolTipBase, QColor(42, 130, 218)
-    )
-    QToolTip.setPalette(toolTipPalette)
 
+    if app is not None:
+        app.setStyle("Fusion")
+        #app.setStyle("windowsvista")
+        app.setPalette(palette)
 
-def runFunctionInThread(function, *args, **kwargs):
+        toolTipPalette = QPalette()
+        toolTipPalette.setColor(QPalette.Inactive, QPalette.ToolTipText, SvgColor.white)
+        toolTipPalette.setColor(
+            QPalette.Inactive, QPalette.ToolTipBase, QColor(42, 130, 218)
+        )
+        QToolTip.setPalette(toolTipPalette)
+
+    return palette
+
+def qtRunFunctionInThread(function, *args, **kwargs):
     """
     Pass the function to execute Other args,
     kwargs are passed to the run function
