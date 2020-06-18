@@ -16,6 +16,7 @@ from .QProgressBar import DualProgressBar, TaskbarButtonProgress
 from .QProgressIndicator import QProgressIndicator
 from .QPushButtonWidget import QPushButtonWidget
 from .QRunInThread import QRunInThread
+from .QSignalLogHandler import QSignalLogHandler
 from .QWorker import Worker, WorkerSignals
 from .SvgColor import SvgColor
 from .TabWidget import TabWidget
