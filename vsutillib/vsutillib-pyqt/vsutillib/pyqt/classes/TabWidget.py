@@ -37,7 +37,6 @@ class TabWidget(QTabWidget):
 
         self.parent = parent
         self.__tabWidgets = []
-        self.__tabWidgets.extend(tabWidgets)
 
         self.__log = False
 
@@ -50,12 +49,19 @@ class TabWidget(QTabWidget):
         """Setup Widget Layout"""
 
         if tabWidgets is not None:
+            self.__tabWidgets.extend(tabWidgets)
+
             for tw in tabWidgets:
                 tabIndex = self.addTab(tw[0], tw[1])
                 self.setTabToolTip(tabIndex, tw[2])
 
                 try:
                     tw[0].tab = tabIndex
+                except:  # pylint: disable=bare-except
+                    pass
+
+                try:
+                    tw[0].title = tw[1]
                 except:  # pylint: disable=bare-except
                     pass
 
@@ -110,8 +116,20 @@ class TabWidget(QTabWidget):
         if isinstance(value, bool) or value is None:
             self.__log = value
 
-    def addTabFromList(self, tabList):
-        self.unHideTab(tabList)
+    def tabInserted(self, index):
+
+        for tabIndex in range(self.count()):
+            widget = self.widget(tabIndex)
+            widget.tab = tabIndex
+
+    def tabRemoved(self, index):
+
+        for tabIndex in range(self.count()):
+            widget = self.widget(tabIndex)
+            widget.tab = tabIndex
+
+    def addTabs(self, tabWidgets):
+        self._initUI(tabWidgets)
 
     def setLanguage(self):
         """
