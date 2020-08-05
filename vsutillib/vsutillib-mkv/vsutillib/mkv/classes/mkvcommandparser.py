@@ -112,6 +112,7 @@ class MKVCommandParser:
 
         self.chaptersFiles = []
         self.filesInDirByKey = {}
+        self.dirsByKey = {}
         self.titles = []
 
         self.oAttachments = MKVAttachments()
@@ -375,12 +376,17 @@ class MKVCommandParser:
                     )
                     if index == 0:
                         self.filesInDirByKey[MKVParseKey.outputFile] = []
+                        self.dirsByKey[MKVParseKey.outputFile] = ""
                         for f in oFile.filesInDir:
+                            if self.dirsByKey[MKVParseKey.outputFile] == "":
+                                self.dirsByKey[MKVParseKey.outputFile] =  oFile.fileName.parent
+
                             of = self.cliOutputFile.parent.joinpath(f.stem + ".mkv")
                             of = resolveOverwrite(of)
                             self.filesInDirByKey[MKVParseKey.outputFile].append(of)
                     key = "<SOURCE{}>".format(str(index))
                     self.filesInDirByKey[key] = oFile.filesInDir
+                    self.dirsByKey[key] =  oFile.fileName.parent
                     if len(oFile.filesInDir) != self.__totalSourceFiles:
                         self.__errorFound = True
                         self.__lstAnalysis.append(
