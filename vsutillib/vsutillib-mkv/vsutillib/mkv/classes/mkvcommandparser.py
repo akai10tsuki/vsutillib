@@ -393,7 +393,7 @@ class MKVCommandParser:
                     if len(oFile.filesInDir) != self.__totalSourceFiles:
                         self.__errorFound = True
                         self.__lstAnalysis.append(
-                            "err: Error source files total mismatched." + match.group(0)
+                            "err: Error source files TOTAL mismatched." + match.group(0)
                         )
                 else:
                     self.__errorFound = True
@@ -432,6 +432,9 @@ class MKVCommandParser:
                         "chk: Chapters file not found - {}.".format(str(p.parent))
                     )
                     self.__errorFound = True
+
+        if self.__errorFound:
+            self.__readFiles = True
 
     def _readDirs(self):
         """
