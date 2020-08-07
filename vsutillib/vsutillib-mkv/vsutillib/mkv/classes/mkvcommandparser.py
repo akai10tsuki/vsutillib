@@ -24,6 +24,7 @@ r"|--compression "
 
 import ast
 import logging
+import platform
 import re
 import shlex
 
@@ -379,14 +380,16 @@ class MKVCommandParser:
                         self.dirsByKey[MKVParseKey.outputFile] = ""
                         for f in oFile.filesInDir:
                             if self.dirsByKey[MKVParseKey.outputFile] == "":
-                                self.dirsByKey[MKVParseKey.outputFile] =  oFile.fileName.parent
+                                self.dirsByKey[
+                                    MKVParseKey.outputFile
+                                ] = oFile.fileName.parent
 
                             of = self.cliOutputFile.parent.joinpath(f.stem + ".mkv")
                             of = resolveOverwrite(of)
                             self.filesInDirByKey[MKVParseKey.outputFile].append(of)
                     key = "<SOURCE{}>".format(str(index))
                     self.filesInDirByKey[key] = oFile.filesInDir
-                    self.dirsByKey[key] =  oFile.fileName.parent
+                    self.dirsByKey[key] = oFile.fileName.parent
                     if len(oFile.filesInDir) != self.__totalSourceFiles:
                         self.__errorFound = True
                         self.__lstAnalysis.append(
@@ -487,6 +490,33 @@ class MKVCommandParser:
     def _template(self):
 
         cmdTemplate = self.__bashCommand
+
+        reExecutableEx = re.compile(r"^(.*?)\s--")
+        matchExecutable = reExecutableEx.match(cmdTemplate)
+        m = matchExecutable.group(1)
+        f = stripEncaseQuotes(m)
+        e = shlex.quote(f)
+
+        ##
+        # BUG 1
+        # Reported by zFerry98
+        #
+        # When running in Windows there is no space in the mkvmerge executable path
+        # \ is use as escape
+        # Command: ['C:binmkvtoolnixmkvmerge.exe', ...
+        #
+        # Solution:
+        #   Force quotes for mkvmerge executable
+        #
+        #   Command: ['C:\\bin\\mkvtoolnix\\mkvmerge.exe'
+        ##
+        if platform.system() == "Windows":
+            if e[0:1] != "'":
+                e = "'" + f + "'"
+        ##
+
+        cmdTemplate = self.__bashCommand
+        cmdTemplate = cmdTemplate.replace(m, e, 1)
         cmdTemplate = cmdTemplate.replace(
             self.cliOutputFileMatchString, MKVParseKey.outputFile, 1
         )
