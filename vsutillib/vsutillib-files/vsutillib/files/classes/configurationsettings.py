@@ -204,6 +204,10 @@ class ConfigurationSettings:
 
         return ConfigurationSettings.classLog()
 
+    @property
+    def configDictionary(self):
+        return self._config
+
     @log.setter
     def log(self, value):
         """set instance log variable"""
