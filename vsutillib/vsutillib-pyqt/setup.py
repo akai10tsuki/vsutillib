@@ -56,6 +56,7 @@ setup(
         "vsutillib.macos>=" + config.MACOS_VERSION,
     ],
     zip_safe=False,
+    url="https://pypi.org/project/vsutillib-" + PACKAGE + "/",
     python_requires=">=3.8.1, <3.9",
 )
 

@@ -44,7 +44,7 @@ def readme():
 
 setup(
     name=config.NAME + "-" + PACKAGE,
-    version=config.MACOS_VERSION",
+    version=config.MACOS_VERSION,
     description="vsutillib." + PACKAGE + " sub package part of vsutillib",
     long_description=readme(),
     author=config.AUTHOR,
@@ -53,6 +53,7 @@ setup(
     packages=["vsutillib." + PACKAGE],
     install_requires=["vsutillib.process>=" + config.PROCESS_VERSION],
     zip_safe=False,
+    url="https://pypi.org/project/vsutillib-" + PACKAGE + "/",
     python_requires=config.PYTHON_VERSION,
 )
 

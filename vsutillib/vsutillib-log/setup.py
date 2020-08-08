@@ -52,6 +52,7 @@ setup(
     license="MIT",
     packages=["vsutillib." + PACKAGE, "vsutillib." + PACKAGE + ".classes"],
     zip_safe=False,
+    url="https://pypi.org/project/vsutillib-" + PACKAGE + "/",
     python_requires=config.PYTHON_VERSION,
 )
 

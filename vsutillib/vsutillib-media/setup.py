@@ -53,6 +53,7 @@ setup(
     packages=["vsutillib." + PACKAGE, "vsutillib." + PACKAGE + ".classes"],
     install_requires=["pymediainfo>" + config.PYMEDIAINFO_VERSION],
     zip_safe=False,
+    url="https://pypi.org/project/vsutillib-" + PACKAGE + "/",
     python_requires=config.PYTHON_VERSION,
 )
 
