@@ -107,7 +107,7 @@ class MKVCommandParser:
         self.mkvmerge = None
         self.cliOutputFile = None
         self.cliOutputFileMatchString = None
-        self.cliTitle = None
+        self._hasTitle = None
         self.cliTitleMatchString = None
         self.cliTrackOrder = None
 
@@ -196,7 +196,11 @@ class MKVCommandParser:
         if isinstance(value, str):
             self._initVars()
             self.__strCommand = value
+
+            self._removeTitle()
+
             strCommand = convertToBashStyle(self.__strCommand)
+
             self.__bashCommand = strCommand
             self._parse()
             self.__readFiles = True
@@ -243,6 +247,7 @@ class MKVCommandParser:
         reExecutableEx = re.compile(r"^(.*?)\s--")
         reLanguageEx = re.compile(r"--ui-language (.*?) --")
         reOutputFileEx = re.compile(r".*?--output\s(.*?)\s--")
+
         reFilesEx = re.compile(
             (
                 r"(?=--audio-tracks "
@@ -530,15 +535,50 @@ class MKVCommandParser:
             cmdTemplate = cmdTemplate.replace(
                 self.oAttachments.attachmentsMatchString, MKVParseKey.attachmentFiles, 1
             )
-        if self.cliTitle:
-            cmdTemplate = cmdTemplate.replace(
-                self.cliTitleMatchString, "--title " + MKVParseKey.title, 1
-            )
+        ##
+        # Bug #3
+        #
+        # It was not preserving the episode title
+        #
+        # Remove title before parsing and added the <TITLE> key to the template
+        # If there is no title read --title '' will be used.
+        # working with \ ' " backslash, single and double quotes in same title
+        ##
+
+        # Add title to template
+        cmdTemplate = cmdTemplate.replace(
+            "--track-order", "--title " + MKVParseKey.title + " --track-order", 1
+        )
+
         if self.cliChaptersFile:
             cmdTemplate = cmdTemplate.replace(
                 self.cliChaptersFileMatchString, MKVParseKey.chaptersFile, 1
             )
         self.commandTemplate = cmdTemplate
+
+    def _removeTitle(self):
+        """
+        _removeTitle remove --title option from command
+        """
+
+        ##
+        # Bug #3
+        #
+        # It was not preserving the episode title
+        #
+        # Remove title before parsing and added the <TITLE> key to the template
+        # If there is no title read --title '' will be used.
+        # working with \ ' " backslash, single and double quotes in same title
+        ##
+
+        reTitleEx = re.compile(r".*?--title\s(.*?)\s--")
+
+        if matchTitle := reTitleEx.match(self.__strCommand):
+            self.cliTitleMatchString = matchTitle.group(1)
+
+            self.__strCommand = self.__strCommand.replace(
+                "--title " + self.cliTitleMatchString + " ", "", 1
+            )
 
     def generateCommands(self):
         """
