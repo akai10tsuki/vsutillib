@@ -19,6 +19,11 @@ r"|--fix-bitstream-timing-information "
 r"|--nalu-size-length "
 r"|--compression "
 
+
+Properties update
+
+<MKVPROPEDIT.EXE> <SOURCE> --edit info --set title=<TITLE>
+
 """
 # MCP0003
 
@@ -105,9 +110,9 @@ class MKVCommandParser:
         self.commandTemplate = None
         self.language = None
         self.mkvmerge = None
+        self.mkvpropedit = None
         self.cliOutputFile = None
         self.cliOutputFileMatchString = None
-        self._hasTitle = None
         self.cliTitleMatchString = None
         self.cliTrackOrder = None
 
@@ -325,6 +330,7 @@ class MKVCommandParser:
             else:
                 if test:
                     self.mkvmerge = p
+                    self.mkvpropedit = str(p.parent) + "mkvpropedit.exe"
                     self.__lstAnalysis.append("chk: mkvmerge ok - {}.".format(str(p)))
                 else:
                     self.__lstAnalysis.append(
