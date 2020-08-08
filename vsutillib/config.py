@@ -27,25 +27,25 @@ from pathlib import Path
 from vsutillib.files import ConfigurationSettings
 from vsutillib.log import LogRotateFileHandler
 
-__VERSION = (1, 5, '1')
+__VERSION = (1, 6, '0')
 
 
-FILES_VERSION = "1.5.1"
-LOG_VERSION = "1.5.0"
-MACOS_VERSION = "1.5.0"
-MEDIA_VERSION = "1.5.0"
-MISC_VERSION = "1.5.0"
-MKV_VERSION = "1.5.1"
-NETWORK_VERSION = "1.5.0"
-PROCESS_VERSION = "1.5.0"
-PYQT_VERSION = "1.5.1"
-SCRIPTS_VERSION = "1.5.0"
-SQL_VERSION = "1.5.1"
-VSXML_VERSION = "1.5.0"
+FILES_VERSION = "1.6.0"
+LOG_VERSION = "1.6.0"
+MACOS_VERSION = "1.6.0"
+MEDIA_VERSION = "1.6.0"
+MISC_VERSION = "1.6.0"
+MKV_VERSION = "1.6.0"
+NETWORK_VERSION = "1.6.0"
+PROCESS_VERSION = "1.6.0"
+PYQT_VERSION = "1.6.0"
+SCRIPTS_VERSION = "1.6.0"
+SQL_VERSION = "1.6.0"
+VSXML_VERSION = "1.6.0"
 
 PYMEDIAINFO_VERSION = "4.2.1"
-PYSIDE2_VERSION = "5.14"
-PYTHON_VERSION = ">=3.8, <3.9"
+PYSIDE2_VERSION = ">=5.14"
+PYTHON_VERSION = ">=3.8.1, <3.9"
 
 APPNAME = "vsutillib"
 VERSION = ".".join(map(str, __VERSION))
