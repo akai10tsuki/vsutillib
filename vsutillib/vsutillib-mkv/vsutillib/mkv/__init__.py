@@ -16,6 +16,7 @@ from .classes import (
     VerifyStructure,
 )
 from .mkvutils import (
+    convertToBashStyle,
     getMKVMerge,
     getMKVMergeVersion,
     numberOfTracksInCommand,
