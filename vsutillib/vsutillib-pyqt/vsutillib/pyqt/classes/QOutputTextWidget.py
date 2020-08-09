@@ -29,7 +29,7 @@ class QOutputTextWidget(QTextEdit):
     clearSignal = Signal()
     insertTextSignal = Signal(str, dict)
     setCurrentIndexSignal = Signal()
-    isDarkMode = True
+    isDarkMode = False
 
     @classmethod
     def classLog(cls, setLogging=None):
