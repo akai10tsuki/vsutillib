@@ -8,6 +8,7 @@ from .classes import (
     MKVCommand,
     MKVCommandParser,
     MKVCommandNew,
+    MKVParseKey,
     SourceFile,
     SourceFiles,
     VerifyMKVCommand,

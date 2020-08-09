@@ -1,5 +1,5 @@
 """
-setup for vsutillib-scripts
+setup for vsutillib-pyqt
 """
 
 import io
@@ -15,7 +15,7 @@ from vsutillib import config
 sys.path.insert(0, os.path.abspath("../.."))
 
 ROOT = os.path.abspath(os.path.dirname(__file__))
-PACKAGE = "scripts"
+PACKAGE = "sql"
 
 
 def removeTmpDirs():
@@ -44,18 +44,16 @@ def readme():
 
 setup(
     name=config.NAME + "-" + PACKAGE,
-    version=config.SCRIPTS_VERSION,
+    version=config.SQL_VERSION,
     description="vsutillib." + PACKAGE + " sub package part of vsutillib",
     long_description=readme(),
     author=config.AUTHOR,
     author_email=config.EMAIL,
     license="MIT",
-    packages=["vsutillib." + PACKAGE],
+    packages=["vsutillib." + PACKAGE, "vsutillib." + PACKAGE + ".classes"],
     install_requires=[
-        "vsutillib.files>=" + config.FILES_VERSION,
-        "vsutillib.media>=" + config.MEDIA_VERSION,
-        "vsutillib.mkv>=" + config.MKV_VERSION,
-        "vsutillib.process>=" + config.PROCESS_VERSION,
+        "PySide2>=" + config.PYSIDE2_VERSION,
+        "vsutillib.macos>=" + config.MACOS_VERSION,
     ],
     zip_safe=False,
     url="https://pypi.org/project/vsutillib-" + PACKAGE + "/",

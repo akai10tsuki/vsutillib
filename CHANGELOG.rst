@@ -19,6 +19,7 @@ Added
 - getDirectoryList function like getFilesList for directories
   accepts wildcard on directory arguments
 - MKVCommandParser
+- TaskbarButtonProgress
 
 Changed
 ********

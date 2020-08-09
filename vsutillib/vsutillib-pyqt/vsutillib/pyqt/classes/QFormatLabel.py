@@ -19,7 +19,7 @@ from PySide2.QtWidgets import QWidget, QLabel
 from PySide2.QtCore import Slot, Signal
 
 
-class FormatLabel(QLabel):
+class QFormatLabel(QLabel):
     """
     Dual QProgressBar for unit and total progress
 
@@ -48,7 +48,7 @@ class FormatLabel(QLabel):
         if initValues is None:
             initValues = []
 
-        super(FormatLabel, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
         self.setTemplateSignal.connect(self.setTemplate)
 
@@ -147,7 +147,7 @@ if __name__ == "__main__":
         """Test the progress bars"""
 
         def __init__(self, *args, **kwargs):
-            super(MainWindow, self).__init__(*args, **kwargs)
+            super().__init__(*args, **kwargs)
 
             l = QGridLayout()
 

@@ -12,11 +12,12 @@ prune vsutillib/vsutillib-log
 prune vsutillib/vsutillib-macos
 prune vsutillib/vsutillib-media
 prune vsutillib/vsutillib-misc
+prune vsutillib/vsutillib-mkv
 prune vsutillib/vsutillib-network
 prune vsutillib/vsutillib-process
-prune vsutillib/vsutillib-scripts
-prune vsutillib/vsutillib-mkv
 prune vsutillib/vsutillib-pyqt
+prune vsutillib/vsutillib-scripts
+prune vsutillib/vsutillib-sql
 prune vsutillib/vsutillib-vsxml
 prune vsutillib/mkv
 prune vsutillib/pyqt

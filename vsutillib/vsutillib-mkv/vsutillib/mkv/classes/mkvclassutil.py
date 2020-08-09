@@ -6,6 +6,8 @@ import re
 
 from pathlib import Path
 
+from natsort import natsorted, ns
+
 from ..mkvutils import strPath, unQuote
 
 
@@ -108,7 +110,8 @@ class SourceFile:
                         self.matchString = match.group(0)
                         d = p.parent
                         fid = [x for x in d.glob("*" + p.suffix) if x.is_file()]
-                        fid.sort(key=strPath)
+                        # fid.sort(key=strPath)
+                        fid = natsorted(fid, alg=ns.PATH)
                         self.filesInDir.extend(fid)
                     else:
                         self.__errorFound = True

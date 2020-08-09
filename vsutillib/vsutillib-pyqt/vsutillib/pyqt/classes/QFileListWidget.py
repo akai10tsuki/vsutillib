@@ -10,14 +10,14 @@ from PySide2.QtCore import Slot, Signal
 from PySide2.QtWidgets import QMenu
 
 
-from .OutputTextWidget import OutputTextWidget
+from .QOutputTextWidget import QOutputTextWidget
 
 
 MODULELOG = logging.getLogger(__name__)
 MODULELOG.addHandler(logging.NullHandler())
 
 
-class FileListWidget(OutputTextWidget):
+class QFileListWidget(QOutputTextWidget):
     """
     QTextEdit subclass that accepts dropped files
     displays only the name of the files.
@@ -27,7 +27,7 @@ class FileListWidget(OutputTextWidget):
     filesDroppedUpdateSignal = Signal(list)
 
     def __init__(self, parent):
-        super(FileListWidget, self).__init__(parent)
+        super().__init__(parent)
 
         # self.setDragEnabled(True)
         self.fileList = []

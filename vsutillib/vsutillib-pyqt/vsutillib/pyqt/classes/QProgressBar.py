@@ -7,12 +7,27 @@ Dual progress bar intended use is horizontal position vertical layout possible
 align:
     Qt.Horizontal - Horizontal layout the default
     Qt.Vertical - Vertical layout
+
+TaskBarButtonProgress show progress bar on taskbar icon
+
 """
 
+import platform
 
-from PySide2.QtWidgets import QWidget, QHBoxLayout, QVBoxLayout, QLabel, QProgressBar, QSizePolicy
-from PySide2.QtCore import Qt, Slot
+from PySide2.QtCore import Qt, Signal, Slot
+from PySide2.QtWidgets import (
+    QWidget,
+    QHBoxLayout,
+    QVBoxLayout,
+    QLabel,
+    QProgressBar,
+    QSizePolicy,
+)
 
+if platform.system() == "Windows":
+    from PySide2.QtWinExtras import QWinTaskbarButton, QtWin
+    myAppID = "VergaraSoft.MKVBatchMultiplex.mkv.2.0.0"  # arbitrary string
+    QtWin.setCurrentProcessExplicitAppUserModelID(myAppID)
 
 class DualProgressBar(QWidget):
     """
@@ -21,9 +36,14 @@ class DualProgressBar(QWidget):
     param align - Set alignment Qt.Horizontal or Qt.Vertical
     type align - Qt.AlignmentFlags
     """
-    def __init__(self, parent=None, align=Qt.Horizontal):
-        super(DualProgressBar, self).__init__(parent)
 
+    valuesChangedSignal = Signal(int, int)
+
+    def __init__(self, parent, align=Qt.Horizontal):
+        super().__init__(parent)
+
+        self.parent = parent
+        self.taskbarButton = TaskbarButtonProgress(parent)
         self._lbl = QLabel()
         self._intControls()
         self._initLayout(align)
@@ -113,20 +133,6 @@ class DualProgressBar(QWidget):
             self.setLayout(self.vboxLayout)
 
     @Slot(int, int)
-    def setValues(self, unit, total):
-        """
-        Update values of progressbars
-
-        :param unit: value for inner loop
-        :type unit: int
-        :param total: value for outer loop
-        :type total: int
-        """
-
-        self.pbBarUnit.setValue(unit)
-        self.pbBarTotal.setValue(total)
-
-    @Slot(int, int)
     def setMaximum(self, maxUnit=100, maxTotal=100):
         """
         Set maximum values
@@ -138,6 +144,8 @@ class DualProgressBar(QWidget):
         """
         self.pbBarUnit.setMaximum(maxUnit)
         self.pbBarTotal.setMaximum(maxTotal)
+        if self.taskbarButton:
+            self.taskbarButton.progress.setMaximum(maxTotal)
 
     @Slot(int, int)
     def setMinimum(self, minUnit=0, minTotal=0):
@@ -152,6 +160,8 @@ class DualProgressBar(QWidget):
 
         self.pbBarUnit.setMinimum(minUnit)
         self.pbBarTotal.setMinimum(minTotal)
+        if self.taskbarButton:
+            self.taskbarButton.progress.setMinimum(minTotal)
 
     @Slot(int, int, int, int)
     def setRange(self, minUnit=0, maxUnit=100, minTotal=0, maxTotal=100):
@@ -170,6 +180,37 @@ class DualProgressBar(QWidget):
         """
         self.pbBarUnit.setRange(minUnit, maxUnit)
         self.pbBarTotal.setRange(minTotal, maxTotal)
+        if self.taskbarButton:
+            self.taskbarButton.progress.setRange(minTotal, maxTotal)
+
+    @Slot(int, int)
+    def setValues(self, unit, total):
+        """
+        Update values of progressbars
+
+        :param unit: value for inner loop
+        :type unit: int
+        :param total: value for outer loop
+        :type total: int
+        """
+
+        self.pbBarUnit.setValue(unit)
+        self.pbBarTotal.setValue(total)
+        if self.taskbarButton:
+            self.taskbarButton.progress.setValue(total)
+
+        self.valuesChangedSignal.emit(unit, total)
+
+    @Slot()
+    def reset(self):
+        if self.taskbarButton:
+            self.taskbarButton.progress.reset()
+
+    @Slot()
+    def initTaskbarButton(self):
+
+        if platform.system() == "Windows":
+            self.taskbarButton.initTaskbarButton()
 
     def setSizePolicy(self, horizontal, vertical):
         """
@@ -227,6 +268,52 @@ class DualProgressBar(QWidget):
         QWidget.setSizePolicy(self, horizontal, vertical)
 
 
+if platform.system() == "Windows":
+
+    class TaskbarButtonProgress(QWinTaskbarButton):
+        """
+        TaskbarProgress taskbar icon progress indicator
+        """
+
+        def __init__(self, parent):
+            super().__init__(parent)
+
+            self.platform = platform.system()
+            self.parent = parent
+            self.button = None
+            self.progress = None
+
+            if self.platform == "Windows":
+                self.button = QWinTaskbarButton(parent)
+
+        def __bool__(self):
+            if (self.button is None) or (self.progress is None):
+                return False
+            return True
+
+        def initTaskbarButton(self):
+            """
+            initTaskbarButton for late init QWinTaskbarButton
+            """
+
+            if self.platform == "Windows":
+                self.button.setWindow(self.parent.windowHandle())
+                self.progress = self.button.progress()
+                self.progress.setRange(0, 100)
+                self.progress.setVisible(True)
+
+        @Slot(int, int)
+        def setValue(self, init, total):
+
+            self.progress.setValue(total)
+
+
+else:
+
+    def TaskbarButtonProgress(parent):
+        return False
+
+
 def _VerticalBarSetup(pbBar, label):
     """Vertical progress bar widget"""
 
@@ -248,13 +335,14 @@ class SpacerWidget(QWidget):
     """
     Utility widget to maintain widgets at same extreme during resizing
     """
+
     def __init__(self, parent=None):
-        super(SpacerWidget, self).__init__(parent)
+        super().__init__(parent)
 
         self.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Expanding)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
 
     import sys
     from PySide2.QtWidgets import QApplication, QGridLayout, QMainWindow, QPushButton
@@ -263,11 +351,11 @@ if __name__ == '__main__':
         """Test the progress bars"""
 
         def __init__(self, *args, **kwargs):
-            super(MainWindow, self).__init__(*args, **kwargs)
+            super().__init__(*args, **kwargs)
 
             l = QGridLayout()
 
-            self.pb = DualProgressBar()
+            self.pb = DualProgressBar(self)
 
             b = QPushButton("Test")
             b.pressed.connect(self.test)
@@ -287,6 +375,9 @@ if __name__ == '__main__':
 
             self.show()
 
+            # this has to be defined after
+            self.pb.initTaskbarButton()
+
         def horizontal(self):
             """Horizontal progress bar"""
             self.pb.setAlignment(Qt.Horizontal)
@@ -301,11 +392,12 @@ if __name__ == '__main__':
             j = 0
             t = 0
 
-            self.pb.setMaximum(maxTotal=300)
+            self.pb.setMinimum(minTotal=0)
+            self.pb.setMaximum(maxTotal=500)
 
-            while j < 3:
+            while j < 5:
                 while i < 100:
-                    i += 0.0001
+                    i += 0.001
                     self.pb.setValues(i, t + i)
 
                 t += 100

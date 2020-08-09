@@ -2,7 +2,7 @@
 Class to save/restore configuration from file
 """
 
-# CM0003
+# CM0004
 
 import ast
 import base64
@@ -42,7 +42,7 @@ class ConfigurationSettings:
         >>> value2
         'Configuration Value'
 
-    Next exmaple using a class
+    Next example using a class
 
     .. code-block:: python
 
@@ -204,6 +204,10 @@ class ConfigurationSettings:
 
         return ConfigurationSettings.classLog()
 
+    @property
+    def configDictionary(self):
+        return self._config
+
     @log.setter
     def log(self, value):
         """set instance log variable"""
@@ -231,7 +235,7 @@ class ConfigurationSettings:
             if not ((_valueType in self._pickable) or (_valueType in self._literal)):
                 s = str(_valueType)
                 if self.log:
-                    MODULELOG.debug("CM0003: value type not supported - %s", str(s))
+                    MODULELOG.debug("CFG0003: value type not supported - %s", str(s))
                 raise TypeError("value type not supported - {}".format(s))
 
             self._configType[key] = _valueType
@@ -241,7 +245,7 @@ class ConfigurationSettings:
         else:
             s = str(key)
             if self.log:
-                MODULELOG.debug("CM0002: key must be a string - %s", str(s))
+                MODULELOG.debug("CFG0002: key must be a string - %s", str(s))
             raise TypeError("key must be a string - {}".format(s))
 
     def get(self, key):
@@ -260,9 +264,29 @@ class ConfigurationSettings:
 
         if self.log:
             s = str(key)
-            MODULELOG.debug("CM0001: key not found - %s", s)
+            MODULELOG.debug("CFG0001: key not found - %s", s)
 
         return None
+
+    def delete(self, key):
+        """
+        delete remove value from dictionary
+
+        Args:
+            key (str): configuration element
+
+        Returns:
+            object removed None if key not found
+        """
+
+        retVal = self._config.pop(key, None)
+
+        if retVal is None:
+            if self.log:
+                s = str(key)
+                MODULELOG.debug("CFG0004: key not found - %s", s)
+
+        return retVal
 
     def toXML(self, root=None, name=None):
         """
@@ -469,7 +493,9 @@ def test():
         "AdnQywACAAAAAAHmAAAAoAAACM4AAAR5AAAB7wAAAMYAAAjFAAAEcAAAAAAAAAAACgA=".encode(),
     )
     configuration.set("dict", {"key1": 1, "key2": 2, 3: b})
-    configuration.set("list", [2, 3, "list", {"key1": 1, 2: [2]}], valueType="pickle")
+    configuration.set(
+        "list", [2, 3, "list", {"key1": 1, 2: [2]}], valueType="pickle"
+    )
     configuration.set("int", 13)
     configuration.set("float", 1.3e200)
     configuration.set("complex", 1 + 3j)

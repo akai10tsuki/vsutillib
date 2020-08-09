@@ -31,7 +31,7 @@ Returns:
 
 import sys
 
-from PySide2.QtCore import Qt, QSize
+from PySide2.QtCore import Qt, QSize, Signal, Slot
 from PySide2.QtGui import QPainter, QColor
 from PySide2.QtWidgets import QWidget, QApplication, QSizePolicy
 
@@ -40,8 +40,12 @@ from .SvgColor import SvgColor
 
 class QProgressIndicator(QWidget):
     """
-    QProgressIndicator show progress animation
+    ProgressIndicator show progress animation
     """
+
+    startAnimationSignal = Signal()
+    stopAnimationSignal = Signal()
+
 
     def __init__(self, parent):
         # Call parent class constructor first
@@ -58,6 +62,9 @@ class QProgressIndicator(QWidget):
         # Set size and focus policy
         self.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         self.setFocusPolicy(Qt.NoFocus)
+
+        self.startAnimationSignal.connect(self.startAnimation)
+        self.stopAnimationSignal.connect(self.stopAnimation)
 
         # Show the widget
         self.show()
@@ -140,12 +147,13 @@ class QProgressIndicator(QWidget):
     def isAnimated(self):
         return self.timerId != -1
 
+    @Slot()
     def startAnimation(self):
         self.angle = 0
-
         if self.timerId == -1:
             self.timerId = self.startTimer(self.delay)
 
+    @Slot()
     def stopAnimation(self):
         if self.timerId != -1:
             self.killTimer(self.timerId)

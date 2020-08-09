@@ -72,7 +72,7 @@ class QthThreadWorker(QRunnable):
         funcResult=None,
         **kwargs
     ):
-        super(QthThreadWorker, self).__init__()
+        super().__init__()
 
         # Store constructor arguments (re-used for processing)
         self.function = function

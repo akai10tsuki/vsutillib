@@ -44,16 +44,22 @@ def readme():
 
 setup(
     name=config.NAME + "-" + PACKAGE,
-    version="1.5.1",
+    version=config.MKV_VERSION,
     description="vsutillib." + PACKAGE + " sub package part of vsutillib",
     long_description=readme(),
     author=config.AUTHOR,
     author_email=config.EMAIL,
     license="MIT",
     packages=["vsutillib." + PACKAGE, "vsutillib." + PACKAGE + ".classes"],
-    install_requires=["vsutillib.files", "vsutillib.misc", "vsutillib.media", "vsutillib.process"],
+    install_requires=[
+        "vsutillib.files>=" + config.FILES_VERSION,
+        "vsutillib.misc>=" + config.MISC_VERSION,
+        "vsutillib.media>=" + config.MEDIA_VERSION,
+        "vsutillib.process>=" + config.PROCESS_VERSION,
+    ],
     zip_safe=False,
-    python_requires=">=3.8, <3.9",
+    url="https://pypi.org/project/vsutillib-" + PACKAGE + "/",
+    python_requires=config.PYTHON_VERSION,
 )
 
 removeTmpDirs()

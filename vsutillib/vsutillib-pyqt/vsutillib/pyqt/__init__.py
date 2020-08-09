@@ -6,33 +6,36 @@ PySide2 related classes and functions
 
 from .classes import (
     checkColor,
-    ComboLineEdit,
     DualProgressBar,
-    FileListWidget,
-    FormatLabel,
-    GroupSignal,
     HorizontalLine,
     LineOutput,
-    OutputTextWidget,
     QActionWidget,
+    QComboLineEdit,
+    QFileListWidget,
+    QFormatLabel,
+    QGroupSignal,
     QMenuWidget,
+    QOutputTextWidget,
     QProgressIndicator,
     QPushButtonWidget,
-    QthThreadWorker,
+    QRunInThread,
+    QSignalLogHandler,
     QthThread,
-    RunInThread,
+    QthThreadWorker,
     SvgColor,
     TabWidget,
+    TabWidgetExtension,
+    TaskbarButtonProgress,
     VerticalLine,
-    WorkerSignals,
     Worker,
+    WorkerSignals,
 )
 
 from .messagebox import messageBox, messageBoxYesNo
 
 from .qtUtils import (
-    centerWidgets,
+    centerWidget,
     pushButton,
     darkPalette,
-    runFunctionInThread,
+    qtRunFunctionInThread,
 )

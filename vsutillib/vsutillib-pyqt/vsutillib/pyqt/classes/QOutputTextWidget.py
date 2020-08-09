@@ -15,17 +15,18 @@ from PySide2.QtWidgets import QTextEdit
 
 
 from .insertTextHelpers import checkColor, LineOutput
-from .SvgColor import SvgColor
+
 
 MODULELOG = logging.getLogger(__name__)
 MODULELOG.addHandler(logging.NullHandler())
 
 
-class OutputTextWidget(QTextEdit):
+class QOutputTextWidget(QTextEdit):
     """Output for running queue"""
 
     # log state
     __log = False
+    clearSignal = Signal()
     insertTextSignal = Signal(str, dict)
     setCurrentIndexSignal = Signal()
     isDarkMode = True
@@ -55,8 +56,8 @@ class OutputTextWidget(QTextEdit):
 
         return cls.__log
 
-    def __init__(self, parent=None, log=None):
-        super(OutputTextWidget, self).__init__(parent)
+    def __init__(self, parent=None, log=None, **kwargs):
+        super().__init__(parent=parent, **kwargs)
 
         self.parent = parent
         self.__log = None
@@ -65,7 +66,7 @@ class OutputTextWidget(QTextEdit):
         self.log = log
 
         self.insertTextSignal.connect(self.insertText)
-        self.setCurrentIndexSignal.connect(self._setCurrentIndex)
+        self.clearSignal.connect(super().clear)
 
     @property
     def log(self):
@@ -81,35 +82,13 @@ class OutputTextWidget(QTextEdit):
         if self.__log is not None:
             return self.__log
 
-        return OutputTextWidget.classLog()
+        return QOutputTextWidget.classLog()
 
     @log.setter
     def log(self, value):
         """set instance log variable"""
         if isinstance(value, bool) or value is None:
             self.__log = value
-
-    @property
-    def tab(self):
-        return self.__tab
-
-    @tab.setter
-    def tab(self, value):
-        self.__tab = value
-
-    @property
-    def tabWidget(self):
-        return self.__tabWidget
-
-    @tabWidget.setter
-    def tabWidget(self, value):
-        self.__tabWidget = value
-
-    @Slot()
-    def _setCurrentIndex(self):
-
-        if self.tabWidget:
-            self.tabWidget.setCurrentIndex(self.tab)
 
     def connectToInsertText(self, objSignal):
         """Connect to signal"""
@@ -135,11 +114,12 @@ class OutputTextWidget(QTextEdit):
         replaceLine = kwargs.pop(LineOutput.ReplaceLine, False)
         appendLine = kwargs.pop(LineOutput.AppendLine, False)
         appendEnd = kwargs.pop(LineOutput.AppendEnd, False)
+        overrideLog = kwargs.pop("log", None)
 
         # still no restore to default the ideal configuration
         # search will continue considering abandoning color
 
-        color = checkColor(color, OutputTextWidget.isDarkMode)
+        color = checkColor(color, QOutputTextWidget.isDarkMode)
 
         if replaceLine:
             self.moveCursor(QTextCursor.StartOfLine, QTextCursor.KeepAnchor)
@@ -160,7 +140,12 @@ class OutputTextWidget(QTextEdit):
 
         self.ensureCursorVisible()
 
-        if self.log:
+        log = self.log
+
+        if overrideLog is not None:
+            log = overrideLog
+
+        if log:
             strTmp = strTmp + strText
             strTmp = strTmp.replace("\n", " ")
 
