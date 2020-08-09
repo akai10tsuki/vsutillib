@@ -40,6 +40,26 @@ class VerifyStructure:
 
     __log = False
 
+    def __init__(
+        self, lstBaseFiles=None, lstFiles=None, destinationFile=None, log=None
+    ):
+
+        self.__analysis = None
+        self.__log = None
+        self.__status = None
+
+        self.log = log
+
+        if (lstBaseFiles is not None) and (lstFiles is not None):
+            self.verifyStructure(lstBaseFiles, lstFiles, destinationFile)
+
+    def __bool__(self):
+        return self.__status
+
+    def __str__(self):
+
+        return "".join(self.__analysis)
+
     @classmethod
     def classLog(cls, setLogging=None):
         """
@@ -63,24 +83,6 @@ class VerifyStructure:
         if setLogging is not None:
             if isinstance(setLogging, bool):
                 cls.__log = setLogging
-
-    def __init__(self, lstBaseFiles=None, lstFiles=None, destinationFile=None, log=None):
-
-        self.__analysis = None
-        self.__log = None
-        self.__status = None
-
-        self.log = log
-
-        if (lstBaseFiles is not None) and (lstFiles is not None):
-            self.verifyStructure(lstBaseFiles, lstFiles, destinationFile)
-
-    def __bool__(self):
-        return self.__status
-
-    def __str__(self):
-
-        return "".join(self.__analysis)
 
     @property
     def log(self):
@@ -139,7 +141,7 @@ class VerifyStructure:
             lstFiles (list): list of files to generate new command
         """
 
-        #msg = "Error: In structure \n\nSource:\n{}\nBase Source:\n{}\n"
+        # msg = "Error: In structure \n\nSource:\n{}\nBase Source:\n{}\n"
         self.__analysis = []
         self.__status = True
 
@@ -194,6 +196,7 @@ class VerifyStructure:
                     msg = "Error: {}"
                     msg = msg.format(error.strerror)
                     MODULELOG.error("VFS0001: %s", msg)
+
 
 def _detailAnalysis(lstAnalysis, mediaFile1, mediaFile2):
 
