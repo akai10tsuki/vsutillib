@@ -27,7 +27,7 @@ from pathlib import Path
 from vsutillib.files import ConfigurationSettings
 from vsutillib.log import LogRotateFileHandler
 
-__VERSION = (1, 6, '0')
+__VERSION = (1, 6, '1')
 
 
 FILES_VERSION = "1.6.0"
@@ -38,7 +38,7 @@ MISC_VERSION = "1.6.0"
 MKV_VERSION = "1.6.0"
 NETWORK_VERSION = "1.6.0"
 PROCESS_VERSION = "1.6.0"
-PYQT_VERSION = "1.6.0"
+PYQT_VERSION = "1.6.1"
 SCRIPTS_VERSION = "1.6.0"
 SQL_VERSION = "1.6.0"
 VSXML_VERSION = "1.6.0"
