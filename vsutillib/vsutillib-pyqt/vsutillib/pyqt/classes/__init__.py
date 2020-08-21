@@ -17,6 +17,7 @@ from .QProgressIndicator import QProgressIndicator
 from .QPushButtonWidget import QPushButtonWidget
 from .QRunInThread import QRunInThread
 from .QSignalLogHandler import QSignalLogHandler
+from .QSystemTrayIconWidget import QSystemTrayIconWidget
 from .QWorker import Worker, WorkerSignals
 from .SvgColor import SvgColor
 from .TabWidget import TabWidget

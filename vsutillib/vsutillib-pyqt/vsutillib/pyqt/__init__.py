@@ -20,6 +20,7 @@ from .classes import (
     QPushButtonWidget,
     QRunInThread,
     QSignalLogHandler,
+    QSystemTrayIconWidget,
     QthThread,
     QthThreadWorker,
     SvgColor,
