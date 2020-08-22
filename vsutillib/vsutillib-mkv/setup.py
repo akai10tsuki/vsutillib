@@ -52,9 +52,10 @@ setup(
     license="MIT",
     packages=["vsutillib." + PACKAGE, "vsutillib." + PACKAGE + ".classes"],
     install_requires=[
+        "natsort" + config.NATSORT_VERSION,
         "vsutillib.files>=" + config.FILES_VERSION,
-        "vsutillib.misc>=" + config.MISC_VERSION,
         "vsutillib.media>=" + config.MEDIA_VERSION,
+        "vsutillib.misc>=" + config.MISC_VERSION,
         "vsutillib.process>=" + config.PROCESS_VERSION,
     ],
     zip_safe=False,

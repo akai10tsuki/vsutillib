@@ -52,12 +52,12 @@ setup(
     license="MIT",
     packages=["vsutillib." + PACKAGE, "vsutillib." + PACKAGE + ".classes"],
     install_requires=[
-        "PySide2>=" + config.PYSIDE2_VERSION,
+        "PySide2" + config.PYSIDE2_VERSION,
         "vsutillib.macos>=" + config.MACOS_VERSION,
     ],
     zip_safe=False,
     url="https://pypi.org/project/vsutillib-" + PACKAGE + "/",
-    python_requires=">=3.8.1, <3.9",
+    python_requires=config.PYTHON_VERSION,
 )
 
 removeTmpDirs()
