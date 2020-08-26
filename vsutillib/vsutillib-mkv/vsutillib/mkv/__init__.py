@@ -8,6 +8,7 @@
 from .classes import (
     MKVAttachment,
     MKVAttachments,
+    MKVCommand,
     MKVCommandParser,
     MKVParseKey,
     SourceFile,
