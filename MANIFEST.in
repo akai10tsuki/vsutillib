@@ -19,8 +19,6 @@ prune vsutillib/vsutillib-pyqt
 prune vsutillib/vsutillib-scripts
 prune vsutillib/vsutillib-sql
 prune vsutillib/vsutillib-vsxml
-prune vsutillib/mkv
-prune vsutillib/pyqt
 prune vsutillib/scripts
 
 global-exclude __pycache__
