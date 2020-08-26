@@ -53,7 +53,7 @@ setup(
     packages=["vsutillib." + PACKAGE, "vsutillib." + PACKAGE + ".classes"],
     install_requires=[
         "PySide2" + config.PYSIDE2_VERSION,
-        "vsutillib.macos>=" + config.MACOS_VERSION,
+        "vsutillib-macos>=" + config.MACOS_VERSION,
     ],
     zip_safe=False,
     url="https://pypi.org/project/vsutillib-" + PACKAGE + "/",
