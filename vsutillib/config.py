@@ -28,10 +28,10 @@ from vsutillib.files import ConfigurationSettings
 from vsutillib.log import LogRotateFileHandler
 
 
-__VERSION = (1, 6, '2')
+__VERSION = (1, 6, '3')
 
 
-FILES_VERSION = "1.6.0"
+FILES_VERSION = "1.6.3"
 LOG_VERSION = "1.6.0"
 MACOS_VERSION = "1.6.0"
 MEDIA_VERSION = "1.6.2"
