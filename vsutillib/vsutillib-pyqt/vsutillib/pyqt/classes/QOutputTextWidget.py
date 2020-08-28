@@ -31,6 +31,18 @@ class QOutputTextWidget(QTextEdit):
     setCurrentIndexSignal = Signal()
     isDarkMode = False
 
+    def __init__(self, parent=None, log=None, **kwargs):
+        super().__init__(parent=parent, **kwargs)
+
+        self.parent = parent
+        self.__log = None
+        self.__tab = None
+        self.__tabWidget = None
+        self.log = log
+
+        self.insertTextSignal.connect(self.insertText)
+        self.clearSignal.connect(super().clear)
+
     @classmethod
     def classLog(cls, setLogging=None):
         """
@@ -55,18 +67,6 @@ class QOutputTextWidget(QTextEdit):
                 cls.__log = setLogging
 
         return cls.__log
-
-    def __init__(self, parent=None, log=None, **kwargs):
-        super().__init__(parent=parent, **kwargs)
-
-        self.parent = parent
-        self.__log = None
-        self.__tab = None
-        self.__tabWidget = None
-        self.log = log
-
-        self.insertTextSignal.connect(self.insertText)
-        self.clearSignal.connect(super().clear)
 
     @property
     def log(self):
@@ -114,38 +114,40 @@ class QOutputTextWidget(QTextEdit):
         replaceLine = kwargs.pop(LineOutput.ReplaceLine, False)
         appendLine = kwargs.pop(LineOutput.AppendLine, False)
         appendEnd = kwargs.pop(LineOutput.AppendEnd, False)
+        logOnly = kwargs.pop(LineOutput.LogOnly, False)
         overrideLog = kwargs.pop("log", None)
 
         # still no restore to default the ideal configuration
         # search will continue considering abandoning color
 
-        color = checkColor(color, QOutputTextWidget.isDarkMode)
+        if not logOnly:
+            color = checkColor(color, QOutputTextWidget.isDarkMode)
 
-        if replaceLine:
-            self.moveCursor(QTextCursor.StartOfLine, QTextCursor.KeepAnchor)
-        elif appendEnd:
-            self.moveCursor(QTextCursor.End)
+            if replaceLine:
+                self.moveCursor(QTextCursor.StartOfLine, QTextCursor.KeepAnchor)
+            elif appendEnd:
+                self.moveCursor(QTextCursor.End)
 
-        if color is not None:
-            self.setTextColor(color)
+            if color is not None:
+                self.setTextColor(color)
 
-        if replaceLine:
-            self.insertPlainText(strText)
-        elif appendLine:
-            self.append(strText)
-        elif appendEnd:
-            self.append(strText)
-        else:
-            self.insertPlainText(strText)
+            if replaceLine:
+                self.insertPlainText(strText)
+            elif appendLine:
+                self.append(strText)
+            elif appendEnd:
+                self.append(strText)
+            else:
+                self.insertPlainText(strText)
 
-        self.ensureCursorVisible()
+            self.ensureCursorVisible()
 
         log = self.log
 
         if overrideLog is not None:
             log = overrideLog
 
-        if log:
+        if log or logOnly:
             strTmp = strTmp + strText
             strTmp = strTmp.replace("\n", " ")
 

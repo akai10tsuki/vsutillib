@@ -60,3 +60,4 @@ class LineOutput:
     ReplaceLine = "replaceLine"
     AppendLine = "appendLine"
     AppendEnd = "appendEnd"
+    LogOnly = "logOnly"
