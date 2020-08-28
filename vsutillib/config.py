@@ -28,7 +28,7 @@ from vsutillib.files import ConfigurationSettings
 from vsutillib.log import LogRotateFileHandler
 
 
-__VERSION = (1, 6, '3')
+__VERSION = (1, 6, "3")
 
 
 FILES_VERSION = "1.6.3"
@@ -57,26 +57,27 @@ EMAIL = "akai10tsuki@gmail.com"
 
 COPYRIGHT = "2018-2020, Efrain Vergara"
 LICENSE = "MIT"
-DESCRIPTION = 'Library module with miscellaneous convenience functions and classes'
+DESCRIPTION = "Library module with miscellaneous convenience functions and classes"
 NAME = "vsutillib"
-KEYWORDS = 'mkv multimedia video audio configuration'
+KEYWORDS = "mkv multimedia video audio configuration"
 REQUIRED = [
-    'vsutillib-files>=1.5.1',
-    'vsutillib-log>=1.5.0',
-    'vsutillib-macos>=1.5.0',
-    'vsutillib-media>=1.5.1',
-    'vsutillib-mkv>=1.5.0'
-    'vsutillib-network>=1.5.0',
-    'vsutillib-process>=1.5.0',
-    'vsutillib-pyqt>=1.5.0',
-    'vsutillib-scripts>=1.5.0'
-    'vsutillib-sql>=1.5.1'
-    'vsutillib-vsxml>=1.5.0',
+    "vsutillib-files>=" + FILES_VERSION,
+    "vsutillib-log>=" + LOG_VERSION,
+    "vsutillib-macos>=" + MACOS_VERSION,
+    "vsutillib-media>=" + MEDIA_VERSION,
+    "vsutillib-misc>=" + MISC_VERSION,
+    "vsutillib-mkv>" + MKV_VERSION,
+    "vsutillib-network>=" + NETWORK_VERSION,
+    "vsutillib-process>=" + PROCESS_VERSION,
+    "vsutillib-pyqt>=" + PYQT_VERSION,
+    "vsutillib-scripts>=" + SCRIPTS_VERSION,
+    "vsutillib-sql>=" + SQL_VERSION,
+    "vsutillib-vsxml>=" + VSXML_VERSION,
 ]
-URL = 'https://github.com/akai10tsuki/vsutillib'
-PYPI = 'https://pypi.org/project/vsutillib/'
+URL = "https://github.com/akai10tsuki/vsutillib"
+PYPI = "https://pypi.org/project/vsutillib/"
 PROJECTURLS = {
-    'Source': 'https://pypi.org/project/vsutillib/#files',
+    "Source": "https://pypi.org/project/vsutillib/#files",
 }
 
 CONFIGFILE = "config.xml"
@@ -88,11 +89,8 @@ __version__ = VERSION
 
 data = ConfigurationSettings()  # pylint: disable=invalid-name
 
-def init(filesRoot=None,
-         configFile=None,
-         logFile=None,
-         name=None,
-         version=None):
+
+def init(filesRoot=None, configFile=None, logFile=None, name=None, version=None):
     """
     configures the system to save application configuration to xml file
 
@@ -125,12 +123,11 @@ def init(filesRoot=None,
         loggingFile = Path(filesPath, logFile)
 
     loghandler = LogRotateFileHandler(loggingFile, backupCount=10)
-    formatter = logging.Formatter(
-        "%(asctime)s %(levelname)-8s %(name)s %(message)s")
+    formatter = logging.Formatter("%(asctime)s %(levelname)-8s %(name)s %(message)s")
     loghandler.setFormatter(formatter)
 
-    logging.getLogger('').setLevel(logging.DEBUG)
-    logging.getLogger('').addHandler(loghandler)
+    logging.getLogger("").setLevel(logging.DEBUG)
+    logging.getLogger("").addHandler(loghandler)
     logging.info("App Start.")
     logging.info("Python: %s", sys.version)
 
