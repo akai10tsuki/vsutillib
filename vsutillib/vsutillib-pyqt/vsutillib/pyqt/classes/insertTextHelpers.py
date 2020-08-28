@@ -4,11 +4,6 @@ qtUtils:
 utility functions that use PySide2
 """
 
-
-import platform
-
-
-# from PySide2.QtCore import Qt
 from PySide2.QtGui import QColor
 
 from vsutillib.macos import isMacDarkMode
