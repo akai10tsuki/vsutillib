@@ -54,6 +54,7 @@ def readme():
         long_description = config.DESCRIPTION
     return long_description
 
+removeTmpDirs()
 
 setup(
     name=config.NAME,  # Required
@@ -89,8 +90,9 @@ setup(
         "Programming Language :: Python :: Implementation :: CPython",
     ],
     keywords=config.KEYWORDS,  # Optional
-    packages=["vsutillib"],
-    python_requires=">=3.8, <3.9",
+    packages=config.PACKAGES,
+    install_requires=config.REQUIRED,
+    python_requires=config.PYTHONVERSIONS,
     include_package_data=True,
     project_urls=config.PROJECTURLS,
 )

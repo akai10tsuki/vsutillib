@@ -44,16 +44,18 @@ SCRIPTS_VERSION = "1.6.2"
 SQL_VERSION = "1.6.2"
 VSXML_VERSION = "1.6.0"
 
+LXML_VERSION = ">=4.5"
+NATSORT_VERSION = ">=7.0.1"
 PYMEDIAINFO_VERSION = ">=4.2.1"
 PYSIDE2_VERSION = ">=5.14"
 PYTHON_VERSION = ">=3.8.1, <3.9"
-LXML_VERSION = ">=4.5"
-NATSORT_VERSION = ">=7.0.1"
+PYTHONVERSIONS = ">=3.8.1, <3.9"
 
 APPNAME = "vsutillib"
 VERSION = ".".join(map(str, __VERSION))
 AUTHOR = "Efrain Vergara"
 EMAIL = "akai10tsuki@gmail.com"
+PACKAGES = [APPNAME]
 
 COPYRIGHT = "2018-2020, Efrain Vergara"
 LICENSE = "MIT"
@@ -61,18 +63,10 @@ DESCRIPTION = "Library module with miscellaneous convenience functions and class
 NAME = "vsutillib"
 KEYWORDS = "mkv multimedia video audio configuration"
 REQUIRED = [
-    "vsutillib-files>=" + FILES_VERSION,
-    "vsutillib-log>=" + LOG_VERSION,
-    "vsutillib-macos>=" + MACOS_VERSION,
-    "vsutillib-media>=" + MEDIA_VERSION,
-    "vsutillib-misc>=" + MISC_VERSION,
-    "vsutillib-mkv>" + MKV_VERSION,
-    "vsutillib-network>=" + NETWORK_VERSION,
-    "vsutillib-process>=" + PROCESS_VERSION,
-    "vsutillib-pyqt>=" + PYQT_VERSION,
-    "vsutillib-scripts>=" + SCRIPTS_VERSION,
-    "vsutillib-sql>=" + SQL_VERSION,
-    "vsutillib-vsxml>=" + VSXML_VERSION,
+    "lxml" + LXML_VERSION,
+    "pymediainfo" + PYMEDIAINFO_VERSION,
+    "PySide2" + PYSIDE2_VERSION,
+    "natsort" + NATSORT_VERSION,
 ]
 URL = "https://github.com/akai10tsuki/vsutillib"
 PYPI = "https://pypi.org/project/vsutillib/"
