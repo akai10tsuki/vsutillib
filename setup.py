@@ -4,6 +4,7 @@
 
 import io
 import os
+import pathlib
 import shutil
 
 from distutils.command.clean import clean
@@ -13,7 +14,7 @@ from setuptools import setup
 
 from vsutillib import config
 
-ROOT = os.path.abspath(os.path.dirname(__file__))
+ROOT = pathlib.Path(__file__).parent.resolve()
 
 
 class MyInstall(install):
