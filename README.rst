@@ -89,8 +89,7 @@ Dependencies
 Usage
 =====
 
-Import the the library in your program:
-::
+Import the the library in your program:::
 
     from vsutillib import files
     from vsutillib import log
