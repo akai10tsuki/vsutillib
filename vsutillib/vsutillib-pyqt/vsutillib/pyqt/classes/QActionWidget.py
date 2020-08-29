@@ -15,7 +15,14 @@ class QActionWidget(QAction):
         tooltip (str, optional): original tooltip. Defaults to None.
     """
 
-    def __init__(self, *args, shortcut=None, tooltip=None, **kwargs):
+    #def __init__(self, *args, shortcut=None, tooltip=None, textPrefix=None, textSuffix=None, **kwargs):
+    def __init__(self, *args, **kwargs):
+
+        textPrefix = kwargs.pop("textPrefix", None)
+        textSuffix = kwargs.pop("textSuffix", None)
+        shortcut = kwargs.pop("shortcut", None)
+        tooltip = kwargs.pop("tooltip", None)
+
         super().__init__(*args, **kwargs)
 
         for p in args:
@@ -24,12 +31,20 @@ class QActionWidget(QAction):
 
         self.shortcut = shortcut
         self.tooltip = tooltip
+        self.textPrefix = ""
+        self.textSuffix = ""
 
         if shortcut is not None:
             self.setShortcut(shortcut)
 
         if tooltip is not None:
             self.setToolTip(tooltip)
+
+        if textPrefix is not None:
+            self.textPrefix = textPrefix
+
+        if textSuffix is not None:
+            self.textSuffix = textSuffix
 
     def setShortcut(self, shortcut, *args, **kwargs):
 
