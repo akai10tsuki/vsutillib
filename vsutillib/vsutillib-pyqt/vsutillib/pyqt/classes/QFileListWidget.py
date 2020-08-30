@@ -5,6 +5,7 @@ import logging
 
 from pathlib import Path
 
+from natsort import natsorted, ns
 
 from PySide2.QtCore import Slot, Signal
 from PySide2.QtWidgets import QMenu
@@ -66,6 +67,7 @@ class QFileListWidget(QOutputTextWidget):
 
             if fPath.is_dir():
                 files = [x for x in fPath.glob("*.*") if x.is_file()]
+                files = natsorted(files, alg=ns.PATH)
                 for x in files:
                     if x not in self.fileList:
                         self.fileList.append(x)
