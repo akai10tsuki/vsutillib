@@ -9,12 +9,16 @@ DSD format is preserved
 import argparse
 import sys
 import shlex
+
 from pathlib import Path
 
+from vsutillib import config
 from vsutillib.process import RunCommand
-from vsutillib.files import getFileList, getDirectoryList
+from vsutillib.files import getFileList, getDirectoryList, getExecutable
 
-VERSION = "1.5.0"
+VERSION = config.SCRIPTS_VERSION
+
+__version__ = VERSION
 
 
 class Files:  # pylint: disable=too-few-public-methods
@@ -141,6 +145,12 @@ def verifyDirectories(args, logFile):
 
 def dsf2wv():
     """Main"""
+
+    executable = getExecutable("wavpack")
+
+    if not executable:
+        print("The wavpack program not found in path.")
+        return (-1)
 
     command = "wavpack -y --import-id3 --allow-huge-tags"
 

@@ -21,11 +21,13 @@ import sys
 import shlex
 from pathlib import Path
 
+from vsutillib import config
 from vsutillib.process import RunCommand
 from vsutillib.files import getFileList, getDirectoryList
 
-VERSION = "1.5.0"
+VERSION = config.SCRIPTS_VERSION
 
+__version__ = VERSION
 
 def parserArguments():
     """construct parser"""
@@ -65,7 +67,7 @@ def parserArguments():
         "-l",
         "--logfile",
         action="store",
-        default="commandLog.txt",
+        default="",
         help="file to log output",
     )
     parser.add_argument(
@@ -98,7 +100,7 @@ def parserArguments():
 
 def printToConsoleAndFile(oFile, msg):
     """print to console and write to logfile"""
-    if oFile:
+    if oFile is not None:
         oFile.write(msg.encode())
     print(msg)
 
@@ -113,6 +115,9 @@ def setLogFile(logFileName):
     Returns:
         Pathlib.Path -- Pathlib object logfile
     """
+
+    if not logFileName:
+        return None
 
     lFile = Path(logFileName)
 
@@ -201,7 +206,9 @@ def apply2files():
 
     args = parserArguments().parse_args()
 
-    logFile = setLogFile(args.logfile).open(mode="wb")
+    logFile = None
+    if args.logfile:
+        logFile = setLogFile(args.logfile).open(mode="wb")
 
     if not args.command:
         print("Nothing to do.")
