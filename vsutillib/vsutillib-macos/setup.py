@@ -51,7 +51,7 @@ setup(
     author_email=config.EMAIL,
     license="MIT",
     packages=["vsutillib." + PACKAGE],
-    install_requires=["vsutillib.process>=" + config.PROCESS_VERSION],
+    install_requires=["vsutillib-process>=" + config.PROCESS_VERSION],
     zip_safe=False,
     url="https://pypi.org/project/vsutillib-" + PACKAGE + "/",
     python_requires=config.PYTHON_VERSION,
