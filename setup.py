@@ -4,6 +4,7 @@
 
 import io
 import os
+import pathlib
 import shutil
 
 from distutils.command.clean import clean
@@ -13,7 +14,7 @@ from setuptools import setup
 
 from vsutillib import config
 
-ROOT = os.path.abspath(os.path.dirname(__file__))
+ROOT = pathlib.Path(__file__).parent.resolve()
 
 
 class MyInstall(install):
@@ -53,6 +54,7 @@ def readme():
         long_description = config.DESCRIPTION
     return long_description
 
+removeTmpDirs()
 
 setup(
     name=config.NAME,  # Required
@@ -88,8 +90,9 @@ setup(
         "Programming Language :: Python :: Implementation :: CPython",
     ],
     keywords=config.KEYWORDS,  # Optional
-    packages=["vsutillib"],
-    python_requires=">=3.8, <3.9",
+    packages=config.PACKAGES,
+    install_requires=config.REQUIRED,
+    python_requires=config.PYTHONVERSIONS,
     include_package_data=True,
     project_urls=config.PROJECTURLS,
 )

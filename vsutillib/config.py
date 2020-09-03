@@ -27,53 +27,51 @@ from pathlib import Path
 from vsutillib.files import ConfigurationSettings
 from vsutillib.log import LogRotateFileHandler
 
-__VERSION = (1, 6, '0')
+
+__VERSION = (1, 6, "3")
 
 
-FILES_VERSION = "1.6.0"
+FILES_VERSION = "1.6.3"
 LOG_VERSION = "1.6.0"
 MACOS_VERSION = "1.6.0"
-MEDIA_VERSION = "1.6.0"
+MEDIA_VERSION = "1.6.2"
 MISC_VERSION = "1.6.0"
-MKV_VERSION = "1.6.0"
+MKV_VERSION = "1.6.2"
 NETWORK_VERSION = "1.6.0"
 PROCESS_VERSION = "1.6.0"
-PYQT_VERSION = "1.6.0"
-SCRIPTS_VERSION = "1.6.0"
-SQL_VERSION = "1.6.0"
+PYQT_VERSION = "1.6.2"
+SCRIPTS_VERSION = "1.6.2"
+SQL_VERSION = "1.6.2"
 VSXML_VERSION = "1.6.0"
 
-PYMEDIAINFO_VERSION = "4.2.1"
+LXML_VERSION = ">=4.5"
+NATSORT_VERSION = ">=7.0.1"
+PYMEDIAINFO_VERSION = ">=4.2.1"
 PYSIDE2_VERSION = ">=5.14"
 PYTHON_VERSION = ">=3.8.1, <3.9"
+PYTHONVERSIONS = ">=3.8.1, <3.9"
 
 APPNAME = "vsutillib"
 VERSION = ".".join(map(str, __VERSION))
 AUTHOR = "Efrain Vergara"
 EMAIL = "akai10tsuki@gmail.com"
+PACKAGES = [APPNAME]
 
 COPYRIGHT = "2018-2020, Efrain Vergara"
 LICENSE = "MIT"
-DESCRIPTION = 'Library module with miscellaneous convenience functions and classes'
+DESCRIPTION = "Library module with miscellaneous convenience functions and classes"
 NAME = "vsutillib"
-KEYWORDS = 'mkv multimedia video audio configuration'
+KEYWORDS = "mkv multimedia video audio configuration"
 REQUIRED = [
-    'vsutillib-files>=1.5.1',
-    'vsutillib-log>=1.5.0',
-    'vsutillib-macos>=1.5.0',
-    'vsutillib-media>=1.5.1',
-    'vsutillib-mkv>=1.5.0'
-    'vsutillib-network>=1.5.0',
-    'vsutillib-process>=1.5.0',
-    'vsutillib-pyqt>=1.5.0',
-    'vsutillib-scripts>=1.5.0'
-    'vsutillib-sql>=1.5.1'
-    'vsutillib-vsxml>=1.5.0',
+    "lxml" + LXML_VERSION,
+    "pymediainfo" + PYMEDIAINFO_VERSION,
+    "PySide2" + PYSIDE2_VERSION,
+    "natsort" + NATSORT_VERSION,
 ]
-URL = 'https://github.com/akai10tsuki/vsutillib'
-PYPI = 'https://pypi.org/project/vsutillib/'
+URL = "https://github.com/akai10tsuki/vsutillib"
+PYPI = "https://pypi.org/project/vsutillib/"
 PROJECTURLS = {
-    'Source': 'https://pypi.org/project/vsutillib/#files',
+    "Source": "https://pypi.org/project/vsutillib/#files",
 }
 
 CONFIGFILE = "config.xml"
@@ -85,11 +83,8 @@ __version__ = VERSION
 
 data = ConfigurationSettings()  # pylint: disable=invalid-name
 
-def init(filesRoot=None,
-         configFile=None,
-         logFile=None,
-         name=None,
-         version=None):
+
+def init(filesRoot=None, configFile=None, logFile=None, name=None, version=None):
     """
     configures the system to save application configuration to xml file
 
@@ -122,12 +117,11 @@ def init(filesRoot=None,
         loggingFile = Path(filesPath, logFile)
 
     loghandler = LogRotateFileHandler(loggingFile, backupCount=10)
-    formatter = logging.Formatter(
-        "%(asctime)s %(levelname)-8s %(name)s %(message)s")
+    formatter = logging.Formatter("%(asctime)s %(levelname)-8s %(name)s %(message)s")
     loghandler.setFormatter(formatter)
 
-    logging.getLogger('').setLevel(logging.DEBUG)
-    logging.getLogger('').addHandler(loghandler)
+    logging.getLogger("").setLevel(logging.DEBUG)
+    logging.getLogger("").addHandler(loghandler)
     logging.info("App Start.")
     logging.info("Python: %s", sys.version)
 

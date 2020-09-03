@@ -51,7 +51,7 @@ setup(
     author_email=config.EMAIL,
     license="MIT",
     packages=["vsutillib." + PACKAGE, "vsutillib." + PACKAGE + ".classes"],
-    install_requires=["lxml>=4.5"],
+    install_requires=["lxml" + config.LXML_VERSION],
     zip_safe=False,
     url="https://pypi.org/project/vsutillib-" + PACKAGE + "/",
     python_requires=config.PYTHON_VERSION,

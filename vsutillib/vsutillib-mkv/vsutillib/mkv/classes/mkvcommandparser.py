@@ -388,12 +388,12 @@ class MKVCommandParser:
                     )
                     if index == 0:
                         self.filesInDirByKey[MKVParseKey.outputFile] = []
-                        self.dirsByKey[MKVParseKey.outputFile] = ""
+                        self.dirsByKey[MKVParseKey.outputFile] = self.cliOutputFile.parent
                         for f in oFile.filesInDir:
-                            if self.dirsByKey[MKVParseKey.outputFile] == "":
-                                self.dirsByKey[
-                                    MKVParseKey.outputFile
-                                ] = oFile.fileName.parent
+                            #if self.dirsByKey[MKVParseKey.outputFile] == "":
+                            #    self.dirsByKey[
+                            #        MKVParseKey.outputFile
+                            #    ] = self.cliOutputFile.parent
 
                             of = self.cliOutputFile.parent.joinpath(f.stem + ".mkv")
                             of = resolveOverwrite(of)

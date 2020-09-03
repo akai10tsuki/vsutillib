@@ -72,7 +72,7 @@ class ConfigurationSettings:
         basic data types and lists, dictionaries,
         tuples or sets of these data types
 
-        - bool, byes, numbers: [int, float, complex], strings, set
+        - bool, bytes, numbers: [int, float, complex], strings, set
 
         theese types can be saved but not in lists, dictionaries,
         tuples or sets
@@ -85,7 +85,7 @@ class ConfigurationSettings:
     in the second example using a class is possible but it does not
     always work.  The scope of the class ConfigurationSettings is
     for saving simple items that serve as a configuration setting
-    for an application in different operating systems. Is recommended
+    for an application in different operating systems.  Is recommended
     not to use values that have to be pickled this will make it system
     dependent also it may be dependent of the Python version. That
     said binary values have to be througly tested.
@@ -221,8 +221,9 @@ class ConfigurationSettings:
         Args:
             key (str): configuration element
 
-            value: element value the type
-            is as explained
+            value (obj): element value the type is as explained
+
+            valueType (str): specify the type to use to save value
         """
 
         if isinstance(key, str):

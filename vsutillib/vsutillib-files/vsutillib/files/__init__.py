@@ -19,4 +19,4 @@ from .fileutil import (
     getExecutable,
     stripEncaseQuotes,
 )
-from .classes import ConfigurationSettings
+from .classes import ConfigurationSettings, DisplayPath

@@ -2,12 +2,13 @@
 
 # MKV0001
 
+#     MKVCommandNew,
+
 from .classes import (
     MKVAttachment,
     MKVAttachments,
     MKVCommand,
     MKVCommandParser,
-    MKVCommandNew,
     MKVParseKey,
     SourceFile,
     SourceFiles,
@@ -15,6 +16,7 @@ from .classes import (
     VerifyStructure,
 )
 from .mkvutils import (
+    convertToBashStyle,
     getMKVMerge,
     getMKVMergeVersion,
     numberOfTracksInCommand,

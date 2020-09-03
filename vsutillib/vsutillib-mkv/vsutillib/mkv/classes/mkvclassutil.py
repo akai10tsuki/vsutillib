@@ -8,7 +8,7 @@ from pathlib import Path
 
 from natsort import natsorted, ns
 
-from ..mkvutils import strPath, unQuote
+from ..mkvutils import unQuote
 
 
 class SourceFile:
