@@ -5,6 +5,7 @@
 #     MKVCommandNew,
 
 from .classes import (
+    MergeOptions,
     MKVAttachment,
     MKVAttachments,
     MKVCommand,

@@ -1,5 +1,6 @@
 """VS module names"""
 
+from .MergeOptions import MergeOptions
 from .mkvattachments import MKVAttachment, MKVAttachments
 from .mkvclassutil import SourceFile, SourceFiles
 from .mkvcommand import MKVCommand
