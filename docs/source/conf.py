@@ -41,11 +41,15 @@ release = config.VERSION
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
+#extensions = [
+#    'sphinx.ext.autodoc', 'sphinx.ext.coverage', 'sphinx.ext.githubpages',
+#    'sphinx.ext.ifconfig', 'sphinx.ext.inheritance_diagram',
+#    'sphinx.ext.intersphinx', 'sphinx.ext.napoleon', 'sphinx.ext.todo',
+#    'sphinx.ext.viewcode'
+#]
+
 extensions = [
-    'sphinx.ext.autodoc', 'sphinx.ext.coverage', 'sphinx.ext.githubpages',
-    'sphinx.ext.ifconfig', 'sphinx.ext.inheritance_diagram',
-    'sphinx.ext.intersphinx', 'sphinx.ext.napoleon', 'sphinx.ext.todo',
-    'sphinx.ext.viewcode'
+    'sphinx.ext.githubpages',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
