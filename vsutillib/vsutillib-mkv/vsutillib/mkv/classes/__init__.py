@@ -4,7 +4,7 @@ from .MergeOptions import MergeOptions
 from .mkvattachments import MKVAttachment, MKVAttachments
 from .mkvclassutil import SourceFile, SourceFiles
 from .mkvcommand import MKVCommand
-#from .mkvcommandNew import MKVCommandNew
-from .mkvcommandparser import MKVCommandParser, MKVParseKey
+from .MKVCommandParser import MKVCommandParser, MKVParseKey
+from .TrackOptions import TrackOptions
 from .verifystructure import VerifyStructure
 from .verifycommand import VerifyMKVCommand

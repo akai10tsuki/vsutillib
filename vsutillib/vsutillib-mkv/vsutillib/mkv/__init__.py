@@ -13,6 +13,7 @@ from .classes import (
     MKVParseKey,
     SourceFile,
     SourceFiles,
+    TrackOptions,
     VerifyMKVCommand,
     VerifyStructure,
 )
