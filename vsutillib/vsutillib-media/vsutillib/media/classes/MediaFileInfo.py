@@ -9,7 +9,7 @@ import logging
 
 from pymediainfo import MediaInfo
 
-from vsutillib.files import iso639
+from vsutillib.misc import iso639
 
 MODULELOG = logging.getLogger(__name__)
 MODULELOG.addHandler(logging.NullHandler())

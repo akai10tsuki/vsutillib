@@ -19,5 +19,4 @@ from .fileutil import (
     getExecutable,
     stripEncaseQuotes,
 )
-from .iso639 import iso639
 from .classes import ConfigurationSettings, DisplayPath
