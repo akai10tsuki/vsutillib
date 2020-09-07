@@ -146,7 +146,7 @@ class TrackOptions:
         if isinstance(translation, dict):
             self.translation = translation
 
-        strTmp = self._strOptions()
+        strTmp = self._strNonTrackIDOptions()
         for index, track in enumerate(self.tracks):
             if index == len(self.tracks) - 1:
                 strTmp += self.strOptionsByTrack(track)
@@ -154,7 +154,7 @@ class TrackOptions:
                 strTmp += self.strOptionsByTrack(track) + " "
         return strTmp
 
-    def _strOptions(self):
+    def _strNonTrackIDOptions(self):
         """
         _strOptions takes care of any general options for a track
 
