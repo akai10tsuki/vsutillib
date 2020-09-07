@@ -222,16 +222,17 @@ class MKVCommandParser:
             self._initVars()
             self.__strCommand = value
 
-            self._removeTitle()
+            if self.__strCommand:
+                self._removeTitle()
 
-            strCommand = convertToBashStyle(self.__strCommand)
+                strCommand = convertToBashStyle(self.__strCommand)
 
-            self.__bashCommand = strCommand
-            self._parse()
-            self.translations = [None] * len(self)
-            self.__readFiles = True
-            self.readFiles()
-            self.generateCommands()
+                self.__bashCommand = strCommand
+                self._parse()
+                #self.translations = [None] * self.__totalSourceFiles
+                self.__readFiles = True
+                self.readFiles()
+                self.generateCommands()
 
     @property
     def commandsGenerated(self):
@@ -362,7 +363,7 @@ class MKVCommandParser:
                     )
                     self.__errorFound = True
         else:
-            self.__lstAnalysis.append("err: mkvmerge not found.")
+            self.__lstAnalysis.append("err: mkvmerge not found in command.")
             self.__errorFound = True
 
         if matchOutputFile := reOutputFileEx.match(strCommand):
@@ -537,69 +538,69 @@ class MKVCommandParser:
         cmdTemplate = self.__bashCommand
 
         reExecutableEx = re.compile(r"^(.*?)\s--")
-        matchExecutable = reExecutableEx.match(cmdTemplate)
-        m = matchExecutable.group(1)
-        f = stripEncaseQuotes(m)
-        e = shlex.quote(f)
+        if matchExecutable := reExecutableEx.match(cmdTemplate):
+            m = matchExecutable.group(1)
+            f = stripEncaseQuotes(m)
+            e = shlex.quote(f)
 
-        ##
-        # BUG 1
-        # Reported by zFerry98
-        #
-        # When running in Windows there is no space in the mkvmerge executable path
-        # \ is use as escape
-        # Command: ['C:binmkvtoolnixmkvmerge.exe', ...
-        #
-        # Solution:
-        #   Force quotes for mkvmerge executable
-        #
-        #   Command: ['C:\\bin\\mkvtoolnix\\mkvmerge.exe'
-        ##
-        if platform.system() == "Windows":
-            if e[0:1] != "'":
-                e = "'" + f + "'"
-        ##
+            ##
+            # BUG 1
+            # Reported by zFerry98
+            #
+            # When running in Windows there is no space in the mkvmerge executable path
+            # \ is use as escape
+            # Command: ['C:binmkvtoolnixmkvmerge.exe', ...
+            #
+            # Solution:
+            #   Force quotes for mkvmerge executable
+            #
+            #   Command: ['C:\\bin\\mkvtoolnix\\mkvmerge.exe'
+            ##
+            if platform.system() == "Windows":
+                if e[0:1] != "'":
+                    e = "'" + f + "'"
+            ##
 
-        cmdTemplate = self.__bashCommand
-        cmdTemplate = cmdTemplate.replace(m, e, 1)
-        cmdTemplate = cmdTemplate.replace(
-            self.cliOutputFileMatchString, MKVParseKey.outputFile, 1
-        )
-        for index, sf in enumerate(self.oSourceFiles.sourceFiles):
-            key = "<SOURCE{}>".format(str(index))
-            cmdTemplate = cmdTemplate.replace(sf.matchString, key, 1)
-        if self.oAttachments.cmdLineAttachments:
+            cmdTemplate = self.__bashCommand
+            cmdTemplate = cmdTemplate.replace(m, e, 1)
             cmdTemplate = cmdTemplate.replace(
-                self.oAttachments.attachmentsMatchString, MKVParseKey.attachmentFiles, 1
+                self.cliOutputFileMatchString, MKVParseKey.outputFile, 1
             )
-        ##
-        # Bug #3
-        #
-        # It was not preserving the episode title
-        #
-        # Remove title before parsing and added the <TITLE> key to the template
-        # If there is no title read --title '' will be used.
-        # working with \ ' " backslash, single and double quotes in same title
-        ##
+            for index, sf in enumerate(self.oSourceFiles.sourceFiles):
+                key = "<SOURCE{}>".format(str(index))
+                cmdTemplate = cmdTemplate.replace(sf.matchString, key, 1)
+            if self.oAttachments.cmdLineAttachments:
+                cmdTemplate = cmdTemplate.replace(
+                    self.oAttachments.attachmentsMatchString, MKVParseKey.attachmentFiles, 1
+                )
+            ##
+            # Bug #3
+            #
+            # It was not preserving the episode title
+            #
+            # Remove title before parsing and added the <TITLE> key to the template
+            # If there is no title read --title '' will be used.
+            # working with \ ' " backslash, single and double quotes in same title
+            ##
 
-        # Add title to template
-        if self.__setTitles:
-            cmdTemplate = cmdTemplate.replace(
-                "--track-order", "--title " + MKVParseKey.title + " --track-order", 1
-            )
+            # Add title to template
+            if self.__setTitles:
+                cmdTemplate = cmdTemplate.replace(
+                    "--track-order", "--title " + MKVParseKey.title + " --track-order", 1
+                )
 
-        if self.cliChaptersFile:
-            cmdTemplate = cmdTemplate.replace(
-                self.cliChaptersFileMatchString, MKVParseKey.chaptersFile, 1
-            )
+            if self.cliChaptersFile:
+                cmdTemplate = cmdTemplate.replace(
+                    self.cliChaptersFileMatchString, MKVParseKey.chaptersFile, 1
+                )
 
-        if self.cliTrackOrder:
-            cmdTemplate = cmdTemplate.replace(
-                self.cliTrackOrder, MKVParseKey.trackOrder, 1
-            )
+            if self.cliTrackOrder:
+                cmdTemplate = cmdTemplate.replace(
+                    self.cliTrackOrder, MKVParseKey.trackOrder, 1
+                )
 
-        self.commandTemplate = cmdTemplate
-        self.commandTemplates = [cmdTemplate] * len(self)
+            self.commandTemplate = cmdTemplate
+            self.commandTemplates = [cmdTemplate] * len(self)
 
     def _removeTitle(self):
         """
