@@ -9,7 +9,7 @@ import logging
 
 from pymediainfo import MediaInfo
 
-from iso639 import iso639
+from vsutillib.files import iso639
 
 MODULELOG = logging.getLogger(__name__)
 MODULELOG.addHandler(logging.NullHandler())
@@ -45,7 +45,7 @@ class MediaFileInfo:
         self.format = ""
         self.title = ""
         self.menu = ""
-        self.__lstMediaTracks = []
+        self.lstMediaTracks = []
         self.__log = None
         self.log = log
         self.totalTracksByType = {"Video": 0, "Audio": 0, "Text": 0}
@@ -78,7 +78,7 @@ class MediaFileInfo:
             if track.track_type == "Menu":
                 self.menu = track
             if track.track_type in ("Video", "Audio", "Text"):
-                self.__lstMediaTracks.append(
+                self.lstMediaTracks.append(
                     MediaTrackInfo(
                         track.streamorder,
                         track.track_type,
@@ -86,7 +86,7 @@ class MediaFileInfo:
                         track.default,
                         track.forced,
                         track.title,
-                        track.codec_id,
+                        track.codec,
                         track.format,
                         track.count_of_stream_of_this_kind,
                         track.stream_identifier
@@ -94,7 +94,7 @@ class MediaFileInfo:
                 )
 
     def __contains__(self, item):
-        return item in self.__lstMediaTracks
+        return item in self.lstMediaTracks
 
     def __eq__(self, objOther):
 
@@ -123,7 +123,7 @@ class MediaFileInfo:
                 )
             bReturn = False
         elif len(self) == len(objOther):
-            for a, b in zip(self.__lstMediaTracks, objOther.lstMediaTracks):
+            for a, b in zip(self.lstMediaTracks, objOther.lstMediaTracks):
                 if a.streamorder != b.streamorder:
                     if self.log:
                         MODULELOG.debug(
@@ -192,10 +192,10 @@ class MediaFileInfo:
         return bReturn
 
     def __getitem__(self, value):
-        return self.__lstMediaTracks[value]
+        return self.lstMediaTracks[value]
 
     def __len__(self):
-        return len(self.__lstMediaTracks) if self.__lstMediaTracks else 0
+        return len(self.lstMediaTracks) if self.lstMediaTracks else 0
 
     def __str__(self):
 
@@ -204,12 +204,14 @@ class MediaFileInfo:
         )
         tmpNum = 0
 
-        for track in self.__lstMediaTracks:
-            tmpStr += "Track: {}\n".format(tmpNum)
-            tmpStr += "Order: {} - {}\n".format(track.streamorder, track.track_type)
-            tmpStr += "Codec: {}\n".format(track.codec)
-            tmpStr += "Language: {}\n".format(track.language)
-            tmpStr += "Format: {}\n\n".format(track.format)
+        for track in self.lstMediaTracks:
+            tmpStr += (
+                f"Track: {tmpNum} "
+                f"Order: {track.streamorder} - {track.track_type} "
+                f"- Codec: {track.codec} "
+                f"- Language: {track.language} "
+                f"- Format: {track.format}\n"
+            )
             tmpNum += 1
 
         return tmpStr
