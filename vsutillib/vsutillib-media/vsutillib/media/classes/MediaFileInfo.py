@@ -206,10 +206,10 @@ class MediaFileInfo:
 
         for track in self.lstMediaTracks:
             tmpStr += (
-                f"Track: {tmpNum} "
-                f"Order: {track.streamorder} - {track.track_type} "
+                f"Track: {tmpNum:>2} "
+                f"Order: {track.streamorder:>2} - {track.track_type:>5} "
                 f"- Codec: {track.codec} "
-                f"- Language: {track.language} "
+                f"- Language: {str(track.language):>4} "
                 f"- Format: {track.format}\n"
             )
             tmpNum += 1
@@ -397,25 +397,27 @@ class MediaTrackInfo:
 
     def __str__(self):
         return (
-            "Stream Order: "
-            + str(self.streamorder)
-            + "\nTrack Type Order: "
-            + str(self.typeOrder)
-            + "\nTrack Type: "
-            + str(self.track_type)
-            + "\nLanguage: "
-            + str(self.language)
-            + "\nDefault Track : "
-            + str(self.default)
-            + "\nForced Track: "
-            + str(self.forced)
-            + "\nTrack Title: "
-            + str(self.title)
-            + "\nCodec: "
-            + str(self.codec)
-            + "\nFormat: "
-            + str(self.format)
-            + "\nTracks of this kind: "
-            + str(self.totalTracksOfThisKind)
-            + "\n"
+            f"Order: {self.streamorder:>2} "
+            f"Type total: {str(self.totalTracksOfThisKind):>2} "
+            f"Type order: {self.typeOrder:>2} "
+            f"Type: {self.track_type:>5} "
+            f"Language: {str(self.language):>4} "
+            f"Default: {self.default:>3} "
+            f"Forced: {self.forced:>3} "
+            f"Format: {str(self.format):>7} "
+            f"Title: {str(self.title)}"
+        )
+
+    def __repr__(self):
+        return (
+            f"Stream Order: {self.streamorder} "
+            f"Track Type Order: {self.typeOrder} "
+            f"Track Type: {self.track_type} "
+            f"Language: {self.language} "
+            f"Default Track: {self.default} "
+            f"Forced Track: {self.forced} "
+            f"Codec: {str(self.codec)} "
+            f"Format: {str(self.format)} "
+            f"Tracks of this kind: {str(self.totalTracksOfThisKind)}"
+            f"Track Title: {str(self.title)}"
         )
