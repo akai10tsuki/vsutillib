@@ -2,7 +2,7 @@
 
 from .MergeOptions import MergeOptions
 from .mkvattachments import MKVAttachment, MKVAttachments
-from .mkvclassutil import SourceFile, SourceFiles
+from .SourceFiles import SourceFile, SourceFiles
 from .mkvcommand import MKVCommand
 from .MKVCommandParser import MKVCommandParser, MKVParseKey, generateCommand
 from .TrackOptions import TrackOptions
