@@ -5,6 +5,7 @@ Track Options - get the tracks options as set in cli
 import re
 import shlex
 
+from ..mkvutils import quoteString
 from .MergeOptions import MergeOptions
 
 
@@ -28,6 +29,7 @@ class TrackOptions:
         self.__aTracks = []
         self.__translation = {}
         self.__fileOrder = None
+        self.__mediaInfo = None
 
     @property
     def strIOptions(self):
@@ -45,6 +47,14 @@ class TrackOptions:
     def fileOrder(self, value):
         if isinstance(value, int):
             self.__fileOrder = value
+
+    @property
+    def mediaInfo(self):
+        return self.__mediaInfo
+
+    @mediaInfo.setter
+    def mediaInfo(self, value):
+        self.__mediaInfo = value
 
     @property
     def options(self):
@@ -91,7 +101,7 @@ class TrackOptions:
             )
         return orderDict
 
-    def optionsByTrack(self, track=None):
+    def optionsByTrack(self, track=None, general=False):
         """
         optionsByTrack return list with all parsed options by track
 
@@ -103,6 +113,8 @@ class TrackOptions:
             list!dict: list with track options or full dictionary
         """
 
+        if general:
+            return self._strNonTrackIDOptions()
         if track is None:
             return self.__dOptionsByTrack
         strTmp = self.__dOptionsByTrack.get(track, None)
@@ -124,10 +136,13 @@ class TrackOptions:
         aTmp = self.__dOptionsByTrack.get(track, None)
         for index, tTmp in enumerate(aTmp):
             track = self.translation.get(tTmp[1], tTmp[1])
+            option = track + ":" + tTmp[2]
+            if tTmp[0] == "--track-name":
+                option = quoteString(option)
             if index == len(aTmp) - 1:
-                strTmp += tTmp[0] + " " + track + ":" + tTmp[2]
+                strTmp += tTmp[0] + " " + option
             else:
-                strTmp += tTmp[0] + " " + track + ":" + tTmp[2] + " "
+                strTmp += tTmp[0] + " " + option + " "
 
         return strTmp
 
