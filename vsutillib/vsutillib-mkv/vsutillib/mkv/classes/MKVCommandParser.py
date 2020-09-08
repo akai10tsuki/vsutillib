@@ -48,20 +48,9 @@ from ..mkvutils import (
     stripEncaseQuotes,
     unQuote,
 )
+
 from .mkvclassutil import SourceFile, SourceFiles
-
 from .mkvattachments import MKVAttachments
-
-# from vsutillib.mkv import (
-#    convertToBashStyle,
-#    MKVAttachments,
-#    numberOfTracksInCommand,
-#    resolveOverwrite,
-#    stripEncaseQuotes,
-#    unQuote,
-# )
-# from SourceFiles import SourceFile, SourceFiles
-# from .mkvclassutil import SourceFile, SourceFiles
 
 MODULELOG = logging.getLogger(__name__)
 MODULELOG.addHandler(logging.NullHandler())
