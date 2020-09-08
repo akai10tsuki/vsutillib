@@ -23,6 +23,7 @@ from .mkvutils import (
     getMKVMerge,
     getMKVMergeVersion,
     numberOfTracksInCommand,
+    quoteString,
     resolveOverwrite,
     stripEncaseQuotes,
     unQuote,

@@ -112,6 +112,7 @@ def stripEncaseQuotes(strFile):
 
     return s
 
+
 def convertToBashStyle(strCommand):
     """
     Strip escape windows chars for the command line
@@ -199,6 +200,13 @@ def unQuote(fileName):
 
     f = stripEncaseQuotes(fileName)
     f = f.replace(r"'\''", "'")
+
+    return f
+
+def quoteString(string):
+
+    f = string.replace("'", r"'\''")
+    f = "'" + f + "'"
 
     return f
 
