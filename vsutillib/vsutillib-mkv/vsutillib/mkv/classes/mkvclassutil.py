@@ -105,6 +105,7 @@ class SourceFile:
                         self.fileName = p
                         self.mediaFileInfo = MediaFileInfo(p)
                         self.matchString = match.group(0)
+                        self.trackOptions.mediaInfo = self.mediaFileInfo
                         d = p.parent
                         fid = [x for x in d.glob("*" + p.suffix) if x.is_file()]
                         fid = natsorted(fid, alg=ns.PATH)
