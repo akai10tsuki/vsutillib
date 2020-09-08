@@ -105,10 +105,10 @@ class MKVCommandParser:
         self.cliOutputFile = None
         self.cliOutputFileMatchString = None
         self.cliTitleMatchString = None
-        self.cliTrackOrder = None
+        self.cliTracksOrder = None
 
         self.commandTemplates = []
-        self.trackOrder = []
+        self.tracksOrder = []
         self.translations = None
         self.chaptersFiles = []
         self.filesInDirByKey = {}
@@ -229,7 +229,7 @@ class MKVCommandParser:
 
                 self.__bashCommand = strCommand
                 self._parse()
-                #self.translations = [None] * self.__totalSourceFiles
+                # self.translations = [None] * self.__totalSourceFiles
                 self.__readFiles = True
                 self.readFiles()
                 self.generateCommands()
@@ -314,12 +314,12 @@ class MKVCommandParser:
         if (matchCommand := reCommandEx.match(strCommand)) and (
             len(matchCommand.groups()) == 4  # pylint: disable=used-before-assignment
         ):
-            self.cliTrackOrder = matchCommand.group(4)
+            self.cliTracksOrder = matchCommand.group(4)
             self.__lstAnalysis.append("chk: Command seems ok.")
             try:
-                d = ast.literal_eval("{" + self.cliTrackOrder + "}")
+                d = ast.literal_eval("{" + self.cliTracksOrder + "}")
                 trackTotal = numberOfTracksInCommand(strCommand)
-                s = self.cliTrackOrder.split(",")
+                s = self.cliTracksOrder.split(",")
                 if trackTotal == len(s):
                     for e in s:
                         if not e.find(":") > 0:
@@ -407,7 +407,7 @@ class MKVCommandParser:
                     self.oSourceFiles.append(oFile)
                     if self.__totalSourceFiles is None:
                         self.__totalSourceFiles = len(oFile.filesInDir)
-                        self.trackOrder = [self.cliTrackOrder] * self.__totalSourceFiles
+                        self.tracksOrder = [self.cliTracksOrder] * self.__totalSourceFiles
                     self.__lstAnalysis.append(
                         "chk: Source directory ok - {}.".format(
                             str(oFile.fileName.parent)
@@ -571,7 +571,9 @@ class MKVCommandParser:
                 cmdTemplate = cmdTemplate.replace(sf.matchString, key, 1)
             if self.oAttachments.cmdLineAttachments:
                 cmdTemplate = cmdTemplate.replace(
-                    self.oAttachments.attachmentsMatchString, MKVParseKey.attachmentFiles, 1
+                    self.oAttachments.attachmentsMatchString,
+                    MKVParseKey.attachmentFiles,
+                    1,
                 )
             ##
             # Bug #3
@@ -586,7 +588,9 @@ class MKVCommandParser:
             # Add title to template
             if self.__setTitles:
                 cmdTemplate = cmdTemplate.replace(
-                    "--track-order", "--title " + MKVParseKey.title + " --track-order", 1
+                    "--track-order",
+                    "--title " + MKVParseKey.title + " --track-order",
+                    1,
                 )
 
             if self.cliChaptersFile:
@@ -594,9 +598,9 @@ class MKVCommandParser:
                     self.cliChaptersFileMatchString, MKVParseKey.chaptersFile, 1
                 )
 
-            if self.cliTrackOrder:
+            if self.cliTracksOrder:
                 cmdTemplate = cmdTemplate.replace(
-                    self.cliTrackOrder, MKVParseKey.trackOrder, 1
+                    self.cliTracksOrder, MKVParseKey.trackOrder, 1
                 )
 
             self.commandTemplate = cmdTemplate
@@ -643,14 +647,15 @@ class MKVCommandParser:
                 keyDictionary[key] = shlex.quote(str(sourceFiles[index]))
             else:
                 keyDictionary[key] = sourceFiles[index]
-        keyDictionary[MKVParseKey.trackOrder] = self.trackOrder[index]
+        keyDictionary[MKVParseKey.trackOrder] = self.tracksOrder[index]
 
         return keyDictionary
 
     def readFiles(self):
-        self._readDirs()
-        self._template()
-        self._filesInDirByKey()
+        if not self.__errorFound:
+            self._readDirs()
+            self._template()
+            self._filesInDirByKey()
 
     def generateCommands(self):
         """
@@ -659,6 +664,9 @@ class MKVCommandParser:
 
         if not self.__errorFound:
             totalCommands = len(self.filesInDirByKey[MKVParseKey.outputFile])
+            self.__strCommands = []
+            self.__shellCommands = []
+
             for i in range(totalCommands):
 
                 cmdTemplate = self.commandTemplates[i]
@@ -667,7 +675,6 @@ class MKVCommandParser:
                 shellCommand = shlex.split(
                     strCommand
                 )  # save command as shlex.split to submit to Pipe
-
                 self.__strCommands.append(strCommand)
                 self.__shellCommands.append(shellCommand)
 
