@@ -49,7 +49,7 @@ from ..mkvutils import (
     unQuote,
 )
 
-from .mkvclassutil import SourceFile, SourceFiles
+from .SourceFiles import SourceFile, SourceFiles
 from .mkvattachments import MKVAttachments
 
 MODULELOG = logging.getLogger(__name__)
@@ -82,6 +82,7 @@ class MKVCommandParser:
         self.__strCommand = None
         self.__shellCommands = []
         self.__strCommands = []
+        self.__strOCommands = []
         self.__setTitles = False
 
         self.cliChaptersFile = None
@@ -397,7 +398,9 @@ class MKVCommandParser:
                     self.oSourceFiles.append(oFile)
                     if self.__totalSourceFiles is None:
                         self.__totalSourceFiles = len(oFile.filesInDir)
-                        self.tracksOrder = [self.cliTracksOrder] * self.__totalSourceFiles
+                        self.tracksOrder = [
+                            self.cliTracksOrder
+                        ] * self.__totalSourceFiles
                     self.__lstAnalysis.append(
                         "chk: Source directory ok - {}.".format(
                             str(oFile.fileName.parent)
@@ -656,17 +659,15 @@ class MKVCommandParser:
 
             for i in range(totalCommands):
 
-                #cmdTemplate = self.commandTemplates[i]
-                #keyDictionary = self.createKeysDictionary(i)
-                #strCommand = generateCommand(cmdTemplate, keyDictionary)
-                strCommand = self.generateCommandByIndex(i)
-                shellCommand = shlex.split(
-                    strCommand
-                )  # save command as shlex.split to submit to Pipe
-                self.__strCommands.append(strCommand)
-                self.__shellCommands.append(shellCommand)
+                self.__strCommands.append(None)
+                self.__shellCommands.append(None)
 
-    def generateCommandByIndex(self, index, shell=False):
+                _, _ = self.generateCommandByIndex(i, update=True)
+
+                # self.__strCommands[i] = strCommand
+                # self.__shellCommands[i] = shellCommand
+
+    def generateCommandByIndex(self, index, update=False):
         """
         generateCommandByIndex generate a command for a determined index
 
@@ -682,13 +683,15 @@ class MKVCommandParser:
         cmdTemplate = self.commandTemplates[index]
         keyDictionary = self.createKeysDictionary(index)
         strCommand = generateCommand(cmdTemplate, keyDictionary)
+        shellCommand = shlex.split(
+            strCommand
+        )  # save command as shlex.split to submit to Pipe
 
-        if shell:
-            strCommand = shlex.split(
-                strCommand
-            )  # save command as shlex.split to submit to Pipe
+        if update:
+            self.__strCommands[index] = strCommand
+            self.__shellCommands[index] = shellCommand
 
-        return strCommand
+        return strCommand, shellCommand
 
     def renameOutputFiles(self, newNames):
 
