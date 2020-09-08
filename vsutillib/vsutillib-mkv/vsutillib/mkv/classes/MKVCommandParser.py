@@ -229,7 +229,8 @@ class MKVCommandParser:
 
                 self.__bashCommand = strCommand
                 self._parse()
-                # self.translations = [None] * self.__totalSourceFiles
+                if not self.__errorFound:
+                    self.translations = [None] * self.__totalSourceFiles
                 self.__readFiles = True
                 self.readFiles()
                 self.generateCommands()
@@ -471,9 +472,6 @@ class MKVCommandParser:
                     )
                     self.__errorFound = True
 
-        if self.__errorFound:
-            self.__readFiles = True
-
     def _readDirs(self):
         """
         _readDirs read files in directories
@@ -669,20 +667,44 @@ class MKVCommandParser:
 
             for i in range(totalCommands):
 
-                cmdTemplate = self.commandTemplates[i]
-                keyDictionary = self.createKeysDictionary(i)
-                strCommand = generateCommand(cmdTemplate, keyDictionary)
+                #cmdTemplate = self.commandTemplates[i]
+                #keyDictionary = self.createKeysDictionary(i)
+                #strCommand = generateCommand(cmdTemplate, keyDictionary)
+                strCommand = self.generateCommandByIndex(i)
                 shellCommand = shlex.split(
                     strCommand
                 )  # save command as shlex.split to submit to Pipe
                 self.__strCommands.append(strCommand)
                 self.__shellCommands.append(shellCommand)
 
+    def generateCommandByIndex(self, index, shell=False):
+        """
+        generateCommandByIndex generate a command for a determined index
+
+        Args:
+            index (int): index of command been worked on
+            shell (bool, optional): If True return a shell command for subprocess
+                otherwise return cli command. Defaults to False.
+
+        Returns:
+            str: final command
+        """
+
+        cmdTemplate = self.commandTemplates[index]
+        keyDictionary = self.createKeysDictionary(index)
+        strCommand = generateCommand(cmdTemplate, keyDictionary)
+
+        if shell:
+            strCommand = shlex.split(
+                strCommand
+            )  # save command as shlex.split to submit to Pipe
+
+        return strCommand
+
     def renameOutputFiles(self, newNames):
 
         if len(newNames) == self.__totalSourceFiles:
             self.filesInDirByKey[MKVParseKey.outputFile] = list(newNames)
-            # if not self.__readFiles:
             self.generateCommands()
 
 
