@@ -2,8 +2,6 @@
 
 # MKV0001
 
-#     MKVCommandNew,
-
 from .classes import (
     generateCommand,
     MergeOptions,
@@ -15,6 +13,7 @@ from .classes import (
     SourceFile,
     SourceFiles,
     TrackOptions,
+    TracksOrder,
     VerifyMKVCommand,
     VerifyStructure,
 )
