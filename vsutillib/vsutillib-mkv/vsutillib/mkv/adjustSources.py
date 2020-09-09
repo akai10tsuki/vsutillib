@@ -4,7 +4,7 @@ adjustSources try and adjust tracks to account for structure difference
 
 import copy
 
-from vsutillib.media import findSimilarTrack, MediaFileInfo
+from vsutillib.media import findSimilarTrack, MediaFileInfo, MediaTrackInfo
 
 from .classes import TracksOrder
 
@@ -26,6 +26,7 @@ def adjustSources(oCommand, index):
     tracksOrder = TracksOrder(oCommand.cliTracksOrder)
     tracksOrderTranslation = {}
     sourceFiles = oCommand.oSourceFiles[index]
+    dummyTrack = MediaTrackInfo()
 
     for baseIndex, oBaseFile in enumerate(oCommand.oBaseFiles):
         baseFileInfo = oBaseFile.mediaFileInfo
@@ -35,14 +36,20 @@ def adjustSources(oCommand, index):
 
         for track in oBaseFile.trackOptions.tracks:
             i = int(track)
+            if len(baseFileInfo) <= 0:
+                # source file with no tracks
+                return False
             trackBase = baseFileInfo[i]
-            trackSource = sourceFileInfo[i]
+            if i < len(sourceFileInfo):
+                # source less tracks than base
+                trackSource = sourceFileInfo[i]
+            else:
+                trackSource = dummyTrack
             if trackBase != trackSource:
                 trackSimilar, _ = findSimilarTrack(sourceFileInfo, trackBase)
                 if trackSimilar >= 0:
                     translate[track] = str(trackSimilar)
                     trackSource = sourceFileInfo[trackSimilar]
-
         if translate:
             if not rc:
                 rc = True
