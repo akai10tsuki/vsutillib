@@ -37,9 +37,9 @@ class MediaFileInfo:
     # log state
     __log = False
 
-    def __init__(self, strMediaFile, log=None):
+    def __init__(self, mediaFile, log=None):
 
-        self.fileName = strMediaFile
+        self.fileName = mediaFile
         self.mediaInfo = None
         self.codec = ""
         self.format = ""
@@ -316,9 +316,9 @@ class MediaTrackInfo:
         self.codec = codec
         self.format = format_
         self.totalTracksOfThisKind = tracksOfThisKind
-        self.typeOrder = int(typeOrder)
+        self.typeOrder = (-1) if typeOrder is None else int(typeOrder)
         self.trackType = track_type
-        self.streamOrder = int(streamorder)
+        self.streamOrder = (-1) if streamorder is None else int(streamorder)
         self.log = log
 
     def __eq__(self, otherTrack):
