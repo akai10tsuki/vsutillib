@@ -262,7 +262,7 @@ class TrackOptions:
                         self.__strOptions[index] += " " + opt[0] + " " + opt[2]
                     option = (opt[0], match.group(1), match.group(2))
                     self.__aParsedOptions.append(option)
-                    if not currentTrack in self.__dOptionsByTrack.keys():
+                    if currentTrack not in self.__dOptionsByTrack.keys():
                         self.__dOptionsByTrack[currentTrack] = []
                         self.__aTracks.append(currentTrack)
                     self.__dOptionsByTrack[currentTrack].append(option)
