@@ -37,10 +37,19 @@ class TracksOrder:
             return self.__getitem__(self.__index - 1)
 
     def _split(self):
+        """
+        _split split the order by source:track
+        """
+
         if not self.__tracksOrder.find(",") > 0 or not self.__tracksOrder.find(":") > 0:
             self.__errorFound = True
         else:
             self.__aOrder = self.__tracksOrder.split(",")
+            for order in self.__aOrder:
+                if not order.find(":") > 0:
+                    self.__errorFound = True
+                    self.__aOrder = []
+                    break
 
     @property
     def aOrder(self):
@@ -64,9 +73,14 @@ class TracksOrder:
     def translation(self, value):
         if isinstance(value, dict):
             self.__translation = value
-            print("Proper Update.")
 
     def strOrder(self):
+        """
+        strOrder return the tracks order doing any translation as needed
+
+        Returns:
+            str: Tracks order
+        """
 
         strTmp = ""
         for track in self.aOrder:
