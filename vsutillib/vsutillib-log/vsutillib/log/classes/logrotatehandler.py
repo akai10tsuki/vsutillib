@@ -4,11 +4,12 @@ it rotates at initialization
 this means by number of executions
 """
 
-
+import pprint
 import codecs
 import logging.handlers
 import re
 import sys
+
 from pathlib import Path
 
 
@@ -35,9 +36,28 @@ class LogRotateFileHandler(logging.handlers.RotatingFileHandler):
         else:
             f = fileName
 
-        super(LogRotateFileHandler, self).__init__(f, **kwargs)
+        super().__init__(f, **kwargs)
 
         self.doRollover()
+
+    def emit(self, record):
+        """
+        emit remove line feed character from strings type arguments
+
+        Args:
+            record (LogRecord): LogRecord argument for logger
+        """
+        args = []
+
+        for arg in record.args:
+            tmp = arg
+            if isinstance(arg, str):
+                tmp = tmp.replace("\n", " ")
+            args.append(tmp)
+
+        record.args = tuple(args)
+
+        super().emit(record)
 
 
 class LogRotateFileHandlerOriginal(logging.Handler):
@@ -51,7 +71,7 @@ class LogRotateFileHandlerOriginal(logging.Handler):
     """
 
     def __init__(self, logFile, backupCount=0):
-        super(LogRotateFileHandlerOriginal, self).__init__()
+        super().__init__()
 
         self.logFile = logFile
         self.backupCount = backupCount
