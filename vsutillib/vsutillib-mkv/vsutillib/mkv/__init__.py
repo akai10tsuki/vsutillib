@@ -3,7 +3,7 @@
 # MKV0001
 
 from .classes import (
-    generateCommand,
+    IVerifyStructure,
     MergeOptions,
     MKVAttachment,
     MKVAttachments,
@@ -19,6 +19,7 @@ from .classes import (
 )
 from .mkvutils import (
     convertToBashStyle,
+    generateCommand,
     getMKVMerge,
     getMKVMergeVersion,
     numberOfTracksInCommand,
