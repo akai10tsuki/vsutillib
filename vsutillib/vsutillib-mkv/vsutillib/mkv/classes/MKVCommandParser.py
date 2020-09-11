@@ -43,6 +43,7 @@ from vsutillib.misc import XLate
 
 from ..mkvutils import (
     convertToBashStyle,
+    generateCommand,
     numberOfTracksInCommand,
     resolveOverwrite,
     stripEncaseQuotes,
@@ -698,31 +699,6 @@ class MKVCommandParser:
         if len(newNames) == self.__totalSourceFiles:
             self.filesInDirByKey[MKVParseKey.outputFile] = list(newNames)
             self.generateCommands()
-
-
-def generateCommand(template, keyDictionary, shell=False):
-    """
-    generateCommand replace keys on template using dictionary
-
-    Args:
-        template (str): command template
-        keyDictionary (dict): dictionary of keys in template
-        shell (bool, optional): return shlex list if True just the comand
-            if False. Defaults to False.
-
-    Returns:
-        (str|list): template with substitutions as string or shlex.split list
-    """
-
-    xLate = XLate(keyDictionary)  # instantiate regex dictionary translator
-    strCommand = xLate.xLate(template)
-
-    if shell:
-        strCommand = shlex.split(
-            strCommand
-        )  # save command as shlex.split to submit to Pipe
-
-    return strCommand
 
 
 class MKVParseKey:
