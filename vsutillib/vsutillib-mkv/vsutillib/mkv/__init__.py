@@ -27,4 +27,3 @@ from .mkvutils import (
     stripEncaseQuotes,
     unQuote,
 )
-from .adjustSources import adjustSources
