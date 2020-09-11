@@ -55,6 +55,32 @@ class SourceFile:
             self.__index += 1
             return self.__getitem__(self.__index - 1)
 
+    def __bool__(self):
+        return not self.__errorFound
+
+    @property
+    def baseFile(self):
+        return self.fileName
+
+    @property
+    def directory(self):
+        return self.fileName.parent
+
+    @property
+    def fileOrder(self):
+        return self.__fileOrder
+
+    @property
+    def fullMatchString(self):
+        return self.__fullMatchString
+
+    @fullMatchString.setter
+    def fullMatchString(self, value):
+        if isinstance(value, tuple):
+            self.__fullMatchString = value[0]
+            self.__fileOrder = value[1]
+            self._parse()
+
     def _parse(self):
 
         # reTrackEx = re.compile(r"(?=--language )(.*?) (?=--language|'\(')")
@@ -115,31 +141,6 @@ class SourceFile:
             else:
                 self.__errorFound = True
 
-    def __bool__(self):
-        return not self.__errorFound
-
-    @property
-    def baseFile(self):
-        return self.fileName
-
-    @property
-    def directory(self):
-        return self.fileName.parent
-
-    @property
-    def fileOrder(self):
-        return self.__fileOrder
-
-    @property
-    def fullMatchString(self):
-        return self.__fullMatchString
-
-    @fullMatchString.setter
-    def fullMatchString(self, value):
-        if isinstance(value, tuple):
-            self.__fullMatchString = value[0]
-            self.__fileOrder = value[1]
-            self._parse()
 
 class SourceFiles:
     """
