@@ -30,6 +30,11 @@ class TrackOptions:
         self.__translation = {}
         self.__fileOrder = None
         self.__mediaInfo = None
+        self.needTracksByTypeLanguage = {
+            "Video": {"all": 0},
+            "Audio": {"all": 0},
+            "Text": {"all": 0},
+        }
 
     @property
     def strIOptions(self):
@@ -55,6 +60,7 @@ class TrackOptions:
     @mediaInfo.setter
     def mediaInfo(self, value):
         self.__mediaInfo = value
+        self._tracksNeeded()
 
     @property
     def options(self):
@@ -277,6 +283,21 @@ class TrackOptions:
                 else:
                     self.__strOptions[index] += opt[0]
                     self.__aParsedOptions.append((opt[0], "", ""))
+
+    def _tracksNeeded(self):
+        if self.mediaInfo:
+            for nTrk in self.tracks:
+                trk = self.mediaInfo[int(nTrk)]
+                lang = trk.language
+                if lang in self.needTracksByTypeLanguage[trk.trackType].keys():
+                    self.needTracksByTypeLanguage[trk.trackType][lang] = (
+                        self.needTracksByTypeLanguage[trk.trackType][lang] + 1
+                    )
+                else:
+                    self.needTracksByTypeLanguage[trk.trackType][lang] = 1
+                self.needTracksByTypeLanguage[trk.trackType]["all"] = (
+                    self.needTracksByTypeLanguage[trk.trackType]["all"] + 1
+                )
 
     def _parse(self):
 
