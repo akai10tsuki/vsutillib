@@ -49,6 +49,11 @@ class MediaFileInfo:
         self.__log = None
         self.log = log
         self.totalTracksByType = {"Video": 0, "Audio": 0, "Text": 0}
+        self.totalTracksByTypeLanguage = {
+            "Video": {"all": 0},
+            "Audio": {"all": 0},
+            "Text": {"all": 0},
+        }
         self.attachments = ""
         self._initHelper()
 
@@ -71,27 +76,72 @@ class MediaFileInfo:
                     except:  # pylint: disable=bare-except
                         pass
                     self.title = self.title.strip()
-                self.totalTracksByType["Video"] = 0 if track.count_of_video_streams is None else int(track.count_of_video_streams)
-                self.totalTracksByType["Audio"] = 0 if track.count_of_audio_streams is None else int(track.count_of_audio_streams)
-                self.totalTracksByType["Text"] = 0 if track.count_of_text_streams is None else int(track.count_of_text_streams)
-                self.attachments = "" if track.attachments is None else track.attachments.split(" / ")
+                self.totalTracksByType["Video"] = (
+                    0
+                    if track.count_of_video_streams is None
+                    else int(track.count_of_video_streams)
+                )
+                self.totalTracksByType["Audio"] = (
+                    0
+                    if track.count_of_audio_streams is None
+                    else int(track.count_of_audio_streams)
+                )
+                self.totalTracksByType["Text"] = (
+                    0
+                    if track.count_of_text_streams is None
+                    else int(track.count_of_text_streams)
+                )
+                self.attachments = (
+                    "" if track.attachments is None else track.attachments.split(" / ")
+                )
+                self.totalTracksByTypeLanguage["Video"]["all"] = (
+                    0
+                    if track.count_of_video_streams is None
+                    else int(track.count_of_video_streams)
+                )
+                self.totalTracksByTypeLanguage["Audio"]["all"] = (
+                    0
+                    if track.count_of_audio_streams is None
+                    else int(track.count_of_audio_streams)
+                )
+                self.totalTracksByTypeLanguage["Text"]["all"] = (
+                    0
+                    if track.count_of_text_streams is None
+                    else int(track.count_of_text_streams)
+                )
             if track.track_type == "Menu":
                 self.menu = track
             if track.track_type in ("Video", "Audio", "Text"):
+                lang = iso639(track.language, codeOnly=True)
+                if lang in self.totalTracksByTypeLanguage[track.track_type].keys():
+                    langIndex = (
+                        self.totalTracksByTypeLanguage[track.track_type][lang] + 1
+                    )
+                else:
+                    langIndex = 0
+                self.totalTracksByTypeLanguage[track.track_type][lang] = langIndex
                 self.lstMediaTracks.append(
                     MediaTrackInfo(
                         track.streamorder,
                         track.track_type,
-                        iso639(track.language, codeOnly=True),
+                        lang,
                         track.default,
                         track.forced,
                         track.title,
                         track.codec,
                         track.format,
                         track.count_of_stream_of_this_kind,
-                        track.stream_identifier
+                        track.stream_identifier,
+                        typeLanguageOrder=langIndex,
                     )
                 )
+
+        if self.lstMediaTracks:
+            for trk in self.lstMediaTracks:
+                if trk.track_type in ("Video", "Audio", "Text"):
+                    trk.tracksLanguageOfThisKind = (
+                        self.totalTracksByTypeLanguage[trk.trackType][trk.language] + 1
+                    )
 
     def __contains__(self, item):
         return item in self.lstMediaTracks
@@ -304,7 +354,9 @@ class MediaTrackInfo:
         format_=None,
         tracksOfThisKind=None,
         typeOrder=None,
-        log=False
+        tracksLanguageOfThisKind=None,
+        typeLanguageOrder=None,
+        log=False,
     ):
 
         self.streamorder = streamorder
@@ -315,11 +367,19 @@ class MediaTrackInfo:
         self.title = title
         self.codec = codec
         self.format = format_
+        self.log = log
+        # Extending
         self.totalTracksOfThisKind = tracksOfThisKind
         self.typeOrder = (-1) if typeOrder is None else int(typeOrder)
+        self.typeLanguageOrder = (
+            (-1) if typeLanguageOrder is None else int(typeLanguageOrder)
+        )
+        self.tracksLanguageOfThisKind = (
+            (-1) if tracksLanguageOfThisKind is None else int(tracksLanguageOfThisKind)
+        )
+        # Extending compatibility
         self.trackType = track_type
         self.streamOrder = (-1) if streamorder is None else int(streamorder)
-        self.log = log
 
     def __eq__(self, otherTrack):
 
@@ -402,6 +462,8 @@ class MediaTrackInfo:
             f"Type order: {self.typeOrder:>2} "
             f"Type: {self.track_type:>5} "
             f"Language: {str(self.language):>4} "
+            f"Total: {self.tracksLanguageOfThisKind:>2} "
+            f"Order: {self.typeLanguageOrder:>2} "
             f"Default: {self.default:>3} "
             f"Forced: {self.forced:>3} "
             f"Format: {str(self.format):>7} "
@@ -418,6 +480,6 @@ class MediaTrackInfo:
             f"Forced Track: {self.forced} "
             f"Codec: {str(self.codec)} "
             f"Format: {str(self.format)} "
-            f"Tracks of this kind: {str(self.totalTracksOfThisKind)}"
+            f"Tracks of this kind: {str(self.totalTracksOfThisKind)} "
             f"Track Title: {str(self.title)}"
         )
