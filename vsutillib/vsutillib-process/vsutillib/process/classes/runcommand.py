@@ -10,7 +10,6 @@ if regexsearch regular expresion is provided the first
 match will be set on regexmatch property
 """
 # RNC0001
-# pylint: disable=bad-continuation
 
 import logging
 import platform
@@ -326,6 +325,7 @@ class RunCommand:
                         line = l
                     else:
                         line = l.decode("utf-8")
+                    # print(line)
                     self.__output.append(line)
                     self._regexMatch(line)
                     if self.__processLine is not None:
