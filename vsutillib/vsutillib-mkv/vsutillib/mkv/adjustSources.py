@@ -27,12 +27,15 @@ def adjustSources(oCommand, index):
     tracksOrderTranslation = {}
     sourceFiles = oCommand.oSourceFiles[index]
     dummyTrack = MediaTrackInfo()
+    confidence = "None"
 
     for baseIndex, oBaseFile in enumerate(oCommand.oBaseFiles):
         baseFileInfo = oBaseFile.mediaFileInfo
         sourceFileInfo = MediaFileInfo(sourceFiles[baseIndex])
         trackOptions = oBaseFile.trackOptions
         translate = {}
+        usedTrack = []
+        savedScore = (-1)
 
         for track in oBaseFile.trackOptions.tracks:
             i = int(track)
@@ -46,10 +49,29 @@ def adjustSources(oCommand, index):
             else:
                 trackSource = dummyTrack
             if trackBase != trackSource:
-                trackSimilar, _ = findSimilarTrack(sourceFileInfo, trackBase)
+                trackSimilar, score = findSimilarTrack(
+                    oBaseFile,
+                    sourceFileInfo,
+                    trackBase
+                )
+                print(f"Score = {score}")
                 if trackSimilar >= 0:
-                    translate[track] = str(trackSimilar)
-                    trackSource = sourceFileInfo[trackSimilar]
+                    if trackSimilar not in usedTrack:
+                        usedTrack.append(trackSimilar)
+                        translate[track] = str(trackSimilar)
+                        trackSource = sourceFileInfo[trackSimilar]
+                        if savedScore > 0:
+                            if score < savedScore:
+                                savedScore = score
+                        else:
+                            savedScore = score
+                    else:
+                        translate = {}
+                        break
+                else:
+                    translate = {}
+                    break
+
         if translate:
             if not rc:
                 rc = True
@@ -59,9 +81,15 @@ def adjustSources(oCommand, index):
             newTemplate = template.replace(trackOpts.options, trackOpts.strOptions(), 1)
             oCommand.commandTemplates[index] = newTemplate
             tracksOrderTranslation.update(trackOpts.orderTranslation)
+            confidence = "High"
+            if savedScore < 5:
+                confidence = "Low"
+            elif savedScore < 8:
+                confidence = "Medium"
+
 
     if tracksOrderTranslation:
         tracksOrder.translation = tracksOrderTranslation
         oCommand.tracksOrder[index] = tracksOrder.strOrder()
 
-    return rc
+    return rc, confidence
