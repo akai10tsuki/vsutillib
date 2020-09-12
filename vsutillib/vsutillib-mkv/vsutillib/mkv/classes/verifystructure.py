@@ -6,8 +6,6 @@ against the source base files use for the templates
 
 import logging
 
-from pathlib import Path
-
 from vsutillib.media import MediaFileInfo
 
 MODULELOG = logging.getLogger(__name__)
@@ -24,7 +22,7 @@ class VerifyStructure:
 
     .. code:: Python
 
-        verify = VerifyStructure(lstBaseFile, lstFiles)
+        verify = VerifyStructure(lstBaseFile, lstSourceFiles)
 
         if verify:
             # Ok to proceed
@@ -35,23 +33,25 @@ class VerifyStructure:
     Args:
         lstBaseFile (:obj:`list`, optional): list with the base files
             as found in command
-        lstFiles (:obj:`list`, optional): list of files to generate new command
+        lstSourceFiles (:obj:`list`, optional): list of files to generate new command
     """
 
     __log = False
 
     def __init__(
-        self, lstBaseFiles=None, lstFiles=None, destinationFile=None, log=None
+        self, lstBaseFiles=None, lstSourceFiles=None, destinationFile=None, log=None
     ):
 
         self.__analysis = None
         self.__log = None
         self.__status = None
+        self.__matchedTracks = []
+        self.__unmatchedTracks = []
 
         self.log = log
 
-        if (lstBaseFiles is not None) and (lstFiles is not None):
-            self.verifyStructure(lstBaseFiles, lstFiles, destinationFile)
+        if (lstBaseFiles is not None) and (lstSourceFiles is not None):
+            self.verifyStructure(lstBaseFiles, lstSourceFiles, destinationFile)
 
     def __bool__(self):
         return self.__status
@@ -130,7 +130,15 @@ class VerifyStructure:
         """
         return self.__analysis
 
-    def verifyStructure(self, lstBaseFiles, lstFiles, destinationFile=None):
+    @property
+    def matched(self):
+        return self.__matchedTracks
+
+    @property
+    def unmatched(self):
+        return self.__unmatchedTracks
+
+    def verifyStructure(self, lstBaseFiles, lstSourceFiles, destinationFile=None):
         """
         Verify if structure of files if logically equal.
 
@@ -138,19 +146,21 @@ class VerifyStructure:
         Args:
             lstBaseFile (list): list with the base files
                 as found in command
-            lstFiles (list): list of files to generate new command
+            lstSourceFiles (list): list of files to generate new command
         """
 
         # msg = "Error: In structure \n\nSource:\n{}\nBase Source:\n{}\n"
         self.__analysis = []
         self.__status = True
+        self.__matchedTracks = []
+        self.__unmatchedTracks = []
 
-        for strSource, strFile in zip(lstBaseFiles, lstFiles):
+        for sourceIndex, (baseFile, sourceFile) in enumerate(zip(lstBaseFiles, lstSourceFiles)):
 
             try:
 
-                objSource = MediaFileInfo(strSource, log=self.log)
-                objFile = MediaFileInfo(strFile, log=self.log)
+                objSource = MediaFileInfo(baseFile, log=self.log)
+                objFile = MediaFileInfo(sourceFile, log=self.log)
 
                 if objSource != objFile:
 
@@ -163,7 +173,7 @@ class VerifyStructure:
                     msg = msg.format(str(objFile), str(objSource))
                     self.__analysis.append(msg)
                     self.__status = False
-                    _detailAnalysis(self.__analysis, objFile, objSource)
+                    self._detailAnalysis(objSource, objFile, sourceIndex)
 
                     if self.log:
 
@@ -180,6 +190,9 @@ class VerifyStructure:
                         MODULELOG.debug("VFS0004: %s", msg)
 
                 else:
+                    for track in range(len(objSource.lstMediaTracks)):
+                        self.__matchedTracks.append(str(sourceIndex) + ":" + str(track))
+
                     if self.log:
                         msg = "Structure seems ok. Source: {} Base Source: {}"
                         msg = msg.format(objFile.fileName, objSource.fileName)
@@ -198,45 +211,57 @@ class VerifyStructure:
                     MODULELOG.error("VFS0001: %s", msg)
 
 
-def _detailAnalysis(lstAnalysis, mediaFile1, mediaFile2):
+    def _detailAnalysis(self, mediaFile1, mediaFile2, sourceIndex):
 
-    name1 = Path(mediaFile1.fileName).name
-    name2 = Path(mediaFile2.fileName).name
+        name1 = mediaFile1.fileName.name
+        name2 = mediaFile2.fileName.name
 
-    if mediaFile1.codec != mediaFile2.codec:
-        msg = "Codec mismatched {}: {} - {}: {}\n".format(
-            name1, mediaFile1.codec, name2, mediaFile2.codec
-        )
-        lstAnalysis.append(msg)
-    elif len(mediaFile1) != len(mediaFile2):
-        msg = "Number of tracks mismatched {}: {} - {}: {}\n".format(
-            name1, len(mediaFile1), name2, len(mediaFile2)
-        )
-        lstAnalysis.append(msg)
-    elif len(mediaFile1) == len(mediaFile2):
-        for a, b in zip(mediaFile1.lstMediaTracks, mediaFile2.lstMediaTracks):
-            if a.streamorder != b.streamorder:
-                msg = "Stream order mismatched {}: {} - {}: {}\n".format(
-                    name1, a.streamorder, name2, b.streamorder
-                )
-                lstAnalysis.append(msg)
-            elif a.track_type != b.track_type:
-                msg = "Stream type mismatched {}: {} - {}: {}\n".format(
-                    name1, a.track_type, name2, b.track_type
-                )
-                lstAnalysis.append(msg)
-            elif a.language != b.language:
-                msg = "Stream language mismatched {}: {}:{} - {}: {}:{}\n".format(
-                    name1, a.streamorder, a.language, name2, b.streamorder, b.language
-                )
-                lstAnalysis.append(msg)
-            elif (a.codec != b.codec) and (a.track_type != "Audio"):
-                msg = "Codec mismatched {}: {} - {}: {}\n".format(
-                    name1, a.codec, name2, b.codec
-                )
-                lstAnalysis.append(msg)
-            elif a.format != b.format:
-                msg = "Stream format mismatched {}: {} - {}: {}\n".format(
-                    name1, a.format, name2, b.format
-                )
-                lstAnalysis.append(msg)
+        if mediaFile1.codec != mediaFile2.codec:
+            msg = "Codec mismatched {}: {} - {}: {}\n".format(
+                name1, mediaFile1.codec, name2, mediaFile2.codec
+            )
+            self.__analysis.append(msg)
+        elif len(mediaFile1) != len(mediaFile2):
+            msg = "Number of tracks mismatched {}: {} - {}: {}\n".format(
+                name1, len(mediaFile1), name2, len(mediaFile2)
+            )
+            self.__analysis.append(msg)
+        elif len(mediaFile1) == len(mediaFile2):
+            for index, (a, b) in enumerate(
+                zip(mediaFile1.lstMediaTracks, mediaFile2.lstMediaTracks)
+            ):
+                matched = True
+                if a.streamorder != b.streamorder:
+                    msg = "Stream order mismatched {}: {} - {}: {}\n".format(
+                        name1, a.streamorder, name2, b.streamorder
+                    )
+                    self.__analysis.append(msg)
+                    matched = False
+                elif a.track_type != b.track_type:
+                    msg = "Stream type mismatched {}: {} - {}: {}\n".format(
+                        name1, a.track_type, name2, b.track_type
+                    )
+                    self.__analysis.append(msg)
+                    matched = False
+                elif a.language != b.language:
+                    msg = "Stream language mismatched {}: {}:{} - {}: {}:{}\n".format(
+                        name1, a.streamorder, a.language, name2, b.streamorder, b.language
+                    )
+                    self.__analysis.append(msg)
+                    matched = False
+                elif (a.codec != b.codec) and (a.track_type != "Audio"):
+                    msg = "Codec mismatched {}: {} - {}: {}\n".format(
+                        name1, a.codec, name2, b.codec
+                    )
+                    self.__analysis.append(msg)
+                    matched = False
+                elif a.format != b.format:
+                    msg = "Stream format mismatched {}: {} - {}: {}\n".format(
+                        name1, a.format, name2, b.format
+                    )
+                    self.__analysis.append(msg)
+                    matched = False
+                if matched:
+                    self.__matchedTracks.append(str(sourceIndex) + ":" + str(index))
+                else:
+                    self.__unmatchedTracks.append(str(sourceIndex) + ":" + str(index))
