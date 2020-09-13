@@ -457,15 +457,15 @@ class MediaTrackInfo:
 
     def __str__(self):
         return (
-            f"Order: {self.streamorder:>2} "
+            f"Order: {str(self.streamorder):>2} "
             f"Type total: {str(self.totalTracksOfThisKind):>2} "
-            f"Type order: {self.typeOrder:>2} "
-            f"Type: {self.track_type:>5} "
+            f"Type order: {str(self.typeOrder):>2} "
+            f"Type: {str(self.track_type):>5} "
             f"Language: {str(self.language):>4} "
-            f"Total: {self.tracksLanguageOfThisKind:>2} "
-            f"Order: {self.typeLanguageOrder:>2} "
-            f"Default: {self.default:>3} "
-            f"Forced: {self.forced:>3} "
+            f"Total: {str(self.tracksLanguageOfThisKind):>2} "
+            f"Order: {str(self.typeLanguageOrder):>2} "
+            f"Default: {str(self.default):>3} "
+            f"Forced: {str(self.forced):>3} "
             f"Format: {str(self.format):>7} "
             f"Title: {str(self.title)}"
         )
