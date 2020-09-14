@@ -247,6 +247,12 @@ class MKVCommandParser:
         return []
 
     @property
+    def outputFileExtension(self):
+        if isinstance(self.cliOutputFile, Path):
+            return self.cliOutputFile.suffix
+        return None
+
+    @property
     def strCommands(self):
         return self.__strCommands
 
@@ -261,10 +267,16 @@ class MKVCommandParser:
 
         strCommand = self.__bashCommand
         self.__lstAnalysis = []
+        multiTrack = False
+
+        if strCommand.find("--track-order") > 0:
+            multitrack = True
 
         rg = r"^(.*?)\s--.*?--output.(.*?)\s--.*?\s'\('\s(.*?)\s'\)'.*?--track-order\s(.*)"
+        rgOneTrack = r"^(.*?)\s--.*?--output.(.*?)\s--.*?\s'\('\s(.*?)\s'\)'.*?"
 
         reCommandEx = re.compile(rg)
+        reCommandOneTrackEx = re.compile(rgOneTrack)
         reExecutableEx = re.compile(r"^(.*?)\s--")
         reLanguageEx = re.compile(r"--ui-language (.*?) --")
         reOutputFileEx = re.compile(r".*?--output\s(.*?)\s--")
@@ -306,6 +318,7 @@ class MKVCommandParser:
         if (matchCommand := reCommandEx.match(strCommand)) and (
             len(matchCommand.groups()) == 4  # pylint: disable=used-before-assignment
         ):
+            print("Multi Track")
             self.cliTracksOrder = matchCommand.group(4)
             self.__lstAnalysis.append("chk: Command seems ok.")
             try:
@@ -327,6 +340,11 @@ class MKVCommandParser:
             except SyntaxError:
                 self.__lstAnalysis.append("err: Command track order bad format.")
                 self.__errorFound = True
+        elif (matchCommand := reCommandOneTrackEx.match(strCommand)) and (
+            len(matchCommand.groups()) == 3  # pylint: disable=used-before-assignment
+        ):
+            self.cliTracksOrder = None
+            self.__lstAnalysis.append("chk: Command seems ok.")
         else:
             self.__lstAnalysis.append("err: Command bad format.")
             self.__errorFound = True
@@ -347,7 +365,7 @@ class MKVCommandParser:
             else:
                 if test:
                     self.mkvmerge = p
-                    self.mkvpropedit = str(p.parent) + "mkvpropedit.exe"
+                    self.mkvpropedit = str(p.parent) + "mkvpropedit"
                     self.__lstAnalysis.append("chk: mkvmerge ok - {}.".format(str(p)))
                 else:
                     self.__lstAnalysis.append(
@@ -416,7 +434,9 @@ class MKVCommandParser:
                                     MKVParseKey.outputFile
                                 ] = oFile.fileName.parent
 
-                            of = self.cliOutputFile.parent.joinpath(f.stem + ".mkv")
+                            of = self.cliOutputFile.parent.joinpath(
+                                f.stem + self.outputFileExtension
+                            )
                             of = resolveOverwrite(of)
                             self.filesInDirByKey[MKVParseKey.outputFile].append(of)
                     key = "<SOURCE{}>".format(str(index))
@@ -578,11 +598,14 @@ class MKVCommandParser:
 
             # Add title to template
             if self.__setTitles:
-                cmdTemplate = cmdTemplate.replace(
-                    "--track-order",
-                    "--title " + MKVParseKey.title + " --track-order",
-                    1,
-                )
+                if self.cliTracksOrder:
+                    cmdTemplate = cmdTemplate.replace(
+                        "--track-order",
+                        "--title " + MKVParseKey.title + " --track-order",
+                        1,
+                    )
+                else:
+                    cmdTemplate += "--title " + MKVParseKey.title
 
             if self.cliChaptersFile:
                 cmdTemplate = cmdTemplate.replace(
