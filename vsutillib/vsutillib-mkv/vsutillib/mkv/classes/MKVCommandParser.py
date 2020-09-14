@@ -267,10 +267,6 @@ class MKVCommandParser:
 
         strCommand = self.__bashCommand
         self.__lstAnalysis = []
-        multiTrack = False
-
-        if strCommand.find("--track-order") > 0:
-            multitrack = True
 
         rg = r"^(.*?)\s--.*?--output.(.*?)\s--.*?\s'\('\s(.*?)\s'\)'.*?--track-order\s(.*)"
         rgOneTrack = r"^(.*?)\s--.*?--output.(.*?)\s--.*?\s'\('\s(.*?)\s'\)'.*?"
