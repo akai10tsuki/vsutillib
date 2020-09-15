@@ -375,7 +375,7 @@ class RunCommand:
                     )
                 if self.log:
                     MODULELOG.debug("RNC0002: Keyboard interrupt %s", msg)
-                raise SystemExit(0)
+                raise SystemExit(0) from error
             if rcResult := p.poll():
                 self.__returnCode = rcResult
                 rc = rcResult
