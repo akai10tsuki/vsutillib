@@ -351,6 +351,7 @@ class RunCommand:
                             rc = p.returncode
                             self.__returnCode = p.returncode
                             break
+                p.kill()
             except UnicodeDecodeError as error:
                 trb = traceback.format_exc()
                 msg = "Error: {}".format(error.reason)
@@ -379,6 +380,7 @@ class RunCommand:
             if rcResult := p.poll():
                 self.__returnCode = rcResult
                 rc = rcResult
+            p.kill()
         except FileNotFoundError as e:
             self.__error = e
 
