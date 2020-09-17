@@ -314,7 +314,6 @@ class MKVCommandParser:
         if (matchCommand := reCommandEx.match(strCommand)) and (
             len(matchCommand.groups()) == 4  # pylint: disable=used-before-assignment
         ):
-            print("Multi Track")
             self.cliTracksOrder = matchCommand.group(4)
             self.__lstAnalysis.append("chk: Command seems ok.")
             try:
