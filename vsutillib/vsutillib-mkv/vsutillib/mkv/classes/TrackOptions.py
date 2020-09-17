@@ -30,7 +30,7 @@ class TrackOptions:
         self.__translation = {}
         self.__fileOrder = None
         self.__mediaInfo = None
-        self.__trackTitleEdited = []
+        self.__trackTitleEdited = {}
         self.needTracksByTypeLanguage = {
             "Video": {"all": 0},
             "Audio": {"all": 0},
@@ -83,6 +83,10 @@ class TrackOptions:
     @property
     def tracks(self):
         return self.__aTracks
+
+    @property
+    def trackTitleEdited(self):
+        return self.__trackTitleEdited
 
     @property
     def translation(self):
@@ -303,14 +307,15 @@ class TrackOptions:
 
     def _trackTitlesEdited(self):
 
-        self.__trackTitleEdited
+        self.__trackTitleEdited = {}
 
         for key in self.trackNames:
             if self.mediaInfo[int(key)].title != self.trackNames[key][1]:
-                self.__trackTitleEdited.append(key)
+                self.__trackTitleEdited[key] = True
+            else:
+                self.__trackTitleEdited[key] = False
 
-
-    #def _parse(self):
+    # def _parse(self):
 
     #    mOptions = MergeOptions()
 
