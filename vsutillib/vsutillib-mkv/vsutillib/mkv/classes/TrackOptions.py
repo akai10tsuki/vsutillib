@@ -30,6 +30,7 @@ class TrackOptions:
         self.__translation = {}
         self.__fileOrder = None
         self.__mediaInfo = None
+        self.__trackTitleEdited = []
         self.needTracksByTypeLanguage = {
             "Video": {"all": 0},
             "Audio": {"all": 0},
@@ -61,6 +62,7 @@ class TrackOptions:
     def mediaInfo(self, value):
         self.__mediaInfo = value
         self._tracksNeeded()
+        self._trackTitlesEdited()
 
     @property
     def options(self):
@@ -273,7 +275,7 @@ class TrackOptions:
                         self.__aTracks.append(currentTrack)
                     self.__dOptionsByTrack[currentTrack].append(option)
                     if opt[0] == "--track-name":
-                        self.__dTrackNames[currentTrack] = opt[2]
+                        self.__dTrackNames[currentTrack] = [opt[2], match.group(2)]
             else:
                 index += 1
                 self.__strOptions.append("")
@@ -299,20 +301,29 @@ class TrackOptions:
                     self.needTracksByTypeLanguage[trk.trackType]["all"] + 1
                 )
 
-    def _parse(self):
+    def _trackTitlesEdited(self):
 
-        mOptions = MergeOptions()
+        self.__trackTitleEdited
 
-        for option in self.__strOptions:
-            opt = option.split(" ")[0]
-            if mOptions.hasTrackID(opt):
-                reTrackOptionsEx = re.compile(r"(.*?) (\d+):(.*?) ")
-                if match := reTrackOptionsEx.findall(option + " "):
-                    for m in match:
-                        track = m[1]
-                        if m[0] == "--track-name":
-                            self.__dTrackNames[track] = m[2]
-                        if not track in self.__dOptionsByTrack.keys():
-                            self.__dOptionsByTrack[track] = []
-                            self.__aTracks.append(track)
-                        self.__dOptionsByTrack[track].append(m)
+        for key in self.trackNames:
+            if self.mediaInfo[int(key)].title != self.trackNames[key][1]:
+                self.__trackTitleEdited.append(key)
+
+
+    #def _parse(self):
+
+    #    mOptions = MergeOptions()
+
+    #    for option in self.__strOptions:
+    #        opt = option.split(" ")[0]
+    #        if mOptions.hasTrackID(opt):
+    #            reTrackOptionsEx = re.compile(r"(.*?) (\d+):(.*?) ")
+    #            if match := reTrackOptionsEx.findall(option + " "):
+    #                for m in match:
+    #                    track = m[1]
+    #                    if m[0] == "--track-name":
+    #                        self.__dTrackNames[track] = m[2]
+    #                    if not track in self.__dOptionsByTrack.keys():
+    #                        self.__dOptionsByTrack[track] = []
+    #                        self.__aTracks.append(track)
+    #                    self.__dOptionsByTrack[track].append(m)
