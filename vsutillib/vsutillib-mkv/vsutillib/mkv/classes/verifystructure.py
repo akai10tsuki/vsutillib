@@ -155,7 +155,9 @@ class VerifyStructure:
         self.__matchedTracks = []
         self.__unmatchedTracks = []
 
-        for sourceIndex, (baseFile, sourceFile) in enumerate(zip(lstBaseFiles, lstSourceFiles)):
+        for sourceIndex, (baseFile, sourceFile) in enumerate(
+            zip(lstBaseFiles, lstSourceFiles)
+        ):
 
             try:
 
@@ -210,7 +212,6 @@ class VerifyStructure:
                     msg = msg.format(error.strerror)
                     MODULELOG.error("VFS0001: %s", msg)
 
-
     def _detailAnalysis(self, mediaFile1, mediaFile2, sourceIndex):
 
         name1 = mediaFile1.fileName.name
@@ -227,37 +228,67 @@ class VerifyStructure:
             )
             self.__analysis.append(msg)
         elif len(mediaFile1) == len(mediaFile2):
+            namePrinted = False
             for index, (a, b) in enumerate(
-                zip(mediaFile1.lstMediaTracks, mediaFile2.lstMediaTracks)
+                zip(mediaFile2.lstMediaTracks, mediaFile1.lstMediaTracks)
             ):
+                # if not namePrinted:
+                #    msg = "Source order mismatched \n{}: {} - \n{}: {}\n".format(
+                #        name1, a.streamorder, name2, b.streamorder
+                #    )
+                #    self.__analysis.append(msg)
+                #    matched = False
+
                 matched = True
                 if a.streamorder != b.streamorder:
-                    msg = "Stream order mismatched {}: {} - {}: {}\n".format(
-                        name1, a.streamorder, name2, b.streamorder
+                    # msg = "Stream order mismatched Source: {} - Base: {}\n".format(
+                    msg = (
+                        "Track "
+                        + str(index)
+                        + ": Stream order mismatched \nSource: {}\n  Base: {}\n".format(
+                            a.streamorder, b.streamorder
+                        )
                     )
                     self.__analysis.append(msg)
                     matched = False
                 elif a.track_type != b.track_type:
-                    msg = "Stream type mismatched {}: {} - {}: {}\n".format(
-                        name1, a.track_type, name2, b.track_type
+                    msg = (
+                        "Track "
+                        + str(index)
+                        + ": Stream type mismatched \nSource: {}\n  Base: {}\n".format(
+                            a.track_type, b.track_type
+                        )
                     )
                     self.__analysis.append(msg)
                     matched = False
                 elif a.language != b.language:
-                    msg = "Stream language mismatched {}: {}:{} - {}: {}:{}\n".format(
-                        name1, a.streamorder, a.language, name2, b.streamorder, b.language
+                    msg = (
+                        "Track "
+                        + str(index)
+                        + ": Stream language mismatched \nSource: {}:{}\n  Base: {}:{}\n".format(
+                            a.streamorder, a.language, b.streamorder, b.language,
+                        )
                     )
                     self.__analysis.append(msg)
                     matched = False
                 elif (a.codec != b.codec) and (a.track_type != "Audio"):
-                    msg = "Codec mismatched {}: {} - {}: {}\n".format(
-                        name1, a.codec, name2, b.codec
+                    msg = (
+                        "Track "
+                        + str(index)
+                        + ": Codec mismatched \nSource: {}\n  Base: {}\n".format(
+                            a.codec, b.codec
+                        )
                     )
                     self.__analysis.append(msg)
                     matched = False
                 elif a.format != b.format:
-                    msg = "Stream format mismatched {}: {} - {}: {}\n".format(
-                        name1, a.format, name2, b.format
+                    # msg = "Stream format mismatched {}: {} - {}: {}\n".format(
+                    msg = (
+                        "Track "
+                        + str(index)
+                        + ": Stream format mismatched \nSource: {}\n  Base: {}\n".format(
+                            a.format, b.format
+                        )
                     )
                     self.__analysis.append(msg)
                     matched = False
