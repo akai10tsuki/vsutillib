@@ -25,6 +25,7 @@ class SourceFile:
         self.__fileOrder = None
         self.options = None
         self.filesInDir = []
+        self.filesMediaInfo = []
         self.fileName = None
         self.mediaFileInfo = None
         self.matchString = None
@@ -136,6 +137,13 @@ class SourceFile:
                         fid = [x for x in d.glob("*" + p.suffix) if x.is_file()]
                         fid = natsorted(fid, alg=ns.PATH)
                         self.filesInDir.extend(fid)
+                        # Slow proccess
+                        #for f in self.filesInDir:
+                        #    if f == p:
+                        #        self.filesMediaInfo.append(self.mediaFileInfo)
+                        #    else:
+                        #        mi = MediaFileInfo(f)
+                        #        self.filesMediaInfo.append(mi)
                     else:
                         self.__errorFound = True
             else:
