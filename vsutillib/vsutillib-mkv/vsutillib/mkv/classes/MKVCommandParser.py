@@ -683,8 +683,6 @@ class MKVCommandParser:
 
                 _, _ = self.generateCommandByIndex(i, update=True)
 
-                # self.__strCommands[i] = strCommand
-                # self.__shellCommands[i] = shellCommand
 
     def generateCommandByIndex(self, index, update=False):
         """
