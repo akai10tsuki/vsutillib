@@ -258,7 +258,6 @@ class MediaFileInfo:
             tmpStr += (
                 f"Track: {tmpNum:>2} "
                 f"Order: {track.streamorder:>2} - {track.track_type:>5} "
-                f"- Codec: {track.codec} "
                 f"- Language: {str(track.language):>4} "
                 f"- Format: {track.format}\n"
             )
@@ -457,7 +456,19 @@ class MediaTrackInfo:
 
     def __str__(self):
         return (
-            f"Order: {str(self.streamorder):>2} "
+            f"ID: {str(self.streamorder):>2} "
+            f"Type: {str(self.track_type):>5} "
+            f"Type total: {str(self.totalTracksOfThisKind):>2} "
+            f"Type order: {str(self.typeOrder):>2} "
+            f"Language: {str(self.language):>4} "
+            f"Total: {str(self.tracksLanguageOfThisKind):>2} "
+            f"Order: {str(self.typeLanguageOrder):>2} "
+            f"Title: {str(self.title)}"
+        )
+
+    def __repr__(self):
+        return (
+            f"ID: {str(self.streamorder):>2} "
             f"Type total: {str(self.totalTracksOfThisKind):>2} "
             f"Type order: {str(self.typeOrder):>2} "
             f"Type: {str(self.track_type):>5} "
@@ -468,18 +479,4 @@ class MediaTrackInfo:
             f"Forced: {str(self.forced):>3} "
             f"Format: {str(self.format):>7} "
             f"Title: {str(self.title)}"
-        )
-
-    def __repr__(self):
-        return (
-            f"Stream Order: {self.streamorder} "
-            f"Track Type Order: {self.typeOrder} "
-            f"Track Type: {self.track_type} "
-            f"Language: {self.language} "
-            f"Default Track: {self.default} "
-            f"Forced Track: {self.forced} "
-            f"Codec: {str(self.codec)} "
-            f"Format: {str(self.format)} "
-            f"Tracks of this kind: {str(self.totalTracksOfThisKind)} "
-            f"Track Title: {str(self.title)}"
         )
