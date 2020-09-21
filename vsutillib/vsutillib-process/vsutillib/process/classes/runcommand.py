@@ -9,7 +9,7 @@ with every line read
 if regexsearch regular expresion is provided the first
 match will be set on regexmatch property
 """
-# RNC0001
+# RNC0004
 
 import logging
 import platform
@@ -128,7 +128,7 @@ class RunCommand:
         self.__controlQueue = controlQueue
         self.__returnCode = None
         self.__regexmatch = None
-        self.__log = None
+        self.__log = log
 
     def __bool__(self):
         if self.__command:
@@ -325,7 +325,6 @@ class RunCommand:
                         line = l
                     else:
                         line = l.decode("utf-8")
-                    # print(line)
                     self.__output.append(line)
                     self._regexMatch(line)
                     if self.__processLine is not None:
@@ -340,16 +339,15 @@ class RunCommand:
                             RunStatus.AbortJob,
                             RunStatus.AbortForced,
                         ]:
-                            # print("Aborting = {}".format(queueStatus))
                             p.kill()
                             outs, errs = p.communicate()
-                            # if outs:
-                            #    print(outs)
-                            # if errs:
-                            #    print(errs)
-                            # print("rc = ", p.returncode)
                             rc = p.returncode
                             self.__returnCode = p.returncode
+                            if self.log:
+                                msg = (
+                                    f"RNC0003: Aborting outs {outs} errs {errs} rc={rc}"
+                                )
+                                MODULELOG.debug(msg)
                             break
                 p.kill()
             except UnicodeDecodeError as error:
@@ -381,88 +379,6 @@ class RunCommand:
                 self.__returnCode = rcResult
                 rc = rcResult
             p.kill()
-        except FileNotFoundError as e:
-            self.__error = e
-
-        return rc
-
-    def _getCommandOutputBackupTwo(self):
-        """Execute command in a subprocess"""
-
-        self.__returnCode = 10000
-        rc = 1000
-        if self.__commandShlex:
-            cmd = self.__command
-        else:
-            cmd = shlex.split(self.__command)
-        try:
-            with subprocess.Popen(
-                cmd,
-                stdout=subprocess.PIPE,
-                universal_newlines=self.__universalNewLines,
-                stderr=subprocess.STDOUT,
-                creationflags=0x08000000,
-            ) as p:
-                try:
-                    for l in p.stdout:
-                        if self.__universalNewLines:
-                            line = l
-                        else:
-                            line = l.decode("utf-8")
-                        self.__output.append(line)
-                        self._regexMatch(line)
-                        if self.__processLine is not None:
-                            self.__processLine(
-                                line, *self.__processArgs, **self.__processKWArgs
-                            )
-                        if self.__controlQueue:
-                            queueStatus = self.__controlQueue.popleft()
-                            self.__controlQueue.appendleft(queueStatus)
-                            if queueStatus in [
-                                RunStatus.Abort,
-                                RunStatus.AbortJob,
-                                RunStatus.AbortForced,
-                            ]:
-                                # print("Aborting = {}".format(queueStatus))
-                                p.kill()
-                                outs, errs = p.communicate()
-                                # if outs:
-                                #    print(outs)
-                                # if errs:
-                                #    print(errs)
-                                # print("rc = ", p.returncode)
-                                rc = p.returncode
-                                self.__returnCode = p.returncode
-                                break
-                except UnicodeDecodeError as error:
-                    trb = traceback.format_exc()
-                    msg = "Error: {}".format(error.reason)
-                    self.__output.append(str(cmd) + "\n")
-                    self.__output.append(msg)
-                    self.__output.append(trb)
-                    if self.__processLine is not None:
-                        self.__processLine(
-                            line, *self.__processArgs, **self.__processKWArgs
-                        )
-                    if self.log:
-                        MODULELOG.debug("RNC0001: Unicode decode error %s", msg)
-                except KeyboardInterrupt as error:
-                    trb = traceback.format_exc()
-                    msg = "Error: {}".format(error.args)
-                    self.__output.append(str(cmd) + "\n")
-                    self.__output.append(msg)
-                    self.__output.append(trb)
-                    if self.__processLine is not None:
-                        self.__processLine(
-                            line, *self.__processArgs, **self.__processKWArgs
-                        )
-                    if self.log:
-                        MODULELOG.debug("RNC0002: Keyboard interrupt %s", msg)
-                    raise SystemExit(0)
-                if rcResult := p.poll():
-                    self.__returnCode = rcResult
-                    rc = rcResult
-                # print("Return Code = {}".format(rc))
         except FileNotFoundError as e:
             self.__error = e
 
@@ -506,7 +422,7 @@ class RunCommand:
                     self.__output.append(trb)
                     if self.__processLine is not None:
                         self.__processLine(line)
-                    raise SystemExit(0)
+                    raise SystemExit(0) from error
                 rcResult = p.poll()
                 if rcResult is not None:
                     self.__returnCode = rcResult
