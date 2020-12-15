@@ -309,11 +309,16 @@ class TrackOptions:
 
         self.__trackTitleEdited = {}
 
-        for key in self.trackNames:
-            if self.mediaInfo[int(key)].title != self.trackNames[key][1]:
-                self.__trackTitleEdited[key] = True
-            else:
-                self.__trackTitleEdited[key] = False
+        #
+        # BUG #9
+        # Don't check titles for files that don't have any
+        #
+        if self.mediaInfo.hasMediaTracks:
+            for key in self.trackNames:
+                if self.mediaInfo[int(key)].title != self.trackNames[key][1]:
+                    self.__trackTitleEdited[key] = True
+                else:
+                    self.__trackTitleEdited[key] = False
 
     # def _parse(self):
 

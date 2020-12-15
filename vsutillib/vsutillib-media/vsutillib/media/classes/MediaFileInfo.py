@@ -7,6 +7,8 @@ Get file structure information from media file
 import base64
 import logging
 
+# import pprint
+
 from pymediainfo import MediaInfo
 
 from vsutillib.misc import iso639
@@ -48,6 +50,7 @@ class MediaFileInfo:
         self.lstMediaTracks = []
         self.__log = None
         self.log = log
+        self.hasMediaTracks = False  # Fix BUG #9
         self.totalTracksByType = {"Video": 0, "Audio": 0, "Text": 0}
         self.totalTracksByTypeLanguage = {
             "Video": {"all": 0},
@@ -112,6 +115,8 @@ class MediaFileInfo:
             if track.track_type == "Menu":
                 self.menu = track
             if track.track_type in ("Video", "Audio", "Text"):
+                if not self.hasMediaTracks:
+                    self.hasMediaTracks = True
                 lang = iso639(track.language, codeOnly=True)
                 if lang in self.totalTracksByTypeLanguage[track.track_type].keys():
                     langIndex = (
@@ -235,14 +240,26 @@ class MediaFileInfo:
 
         if self.log:
             if bReturn:
-                MODULELOG.debug("MFI0012: Structure found ok.",)
+                MODULELOG.debug(
+                    "MFI0012: Structure found ok.",
+                )
             else:
-                MODULELOG.debug("MFI0013: Structure not ok.",)
+                MODULELOG.debug(
+                    "MFI0013: Structure not ok.",
+                )
 
         return bReturn
 
     def __getitem__(self, value):
-        return self.lstMediaTracks[value]
+        #
+        # BUG #9
+        # not all files have media tracks with title
+        # return None for those cases
+        #
+        try:
+            return self.lstMediaTracks[value]
+        except IndexError:
+            return None
 
     def __len__(self):
         return len(self.lstMediaTracks) if self.lstMediaTracks else 0
