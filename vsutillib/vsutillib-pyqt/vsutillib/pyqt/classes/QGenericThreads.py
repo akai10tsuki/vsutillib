@@ -8,7 +8,7 @@ import traceback
 import sys
 
 
-from PySide2.QtCore import QThread, QRunnable, Signal, Slot
+from PySide2.QtCore import QThread, QRunnable
 
 
 MODULELOG = logging.getLogger(__name__)
@@ -42,8 +42,6 @@ class QthThread(QThread):
         """Override run and start function from argument"""
 
         self.function(*self.args, **self.kwargs)
-
-        return
 
 
 class QthThreadWorker(QRunnable):
