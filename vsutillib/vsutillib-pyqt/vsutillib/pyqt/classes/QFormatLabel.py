@@ -51,6 +51,8 @@ class QFormatLabel(QLabel):
         super().__init__(*args, **kwargs)
 
         self.setTemplateSignal.connect(self.setTemplate)
+        self.setValueSignal.connect(self.setValue)
+        self.setValuesSignal.connect(self.setValues)
 
         if template is None:
             self._template = (
@@ -68,8 +70,6 @@ class QFormatLabel(QLabel):
 
     def __setitem__(self, index, value):
         self.setValueSignal.emit(index, value)
-        #self._values[index] = value
-        #self._refresh()
 
     def _refresh(self):
 
@@ -141,6 +141,7 @@ class QFormatLabel(QLabel):
 if __name__ == "__main__":
 
     import sys
+
     from PySide2.QtWidgets import QApplication, QGridLayout, QMainWindow, QPushButton
 
     class MainWindow(QMainWindow):
@@ -151,9 +152,9 @@ if __name__ == "__main__":
 
             l = QGridLayout()
 
-            self.jobInfo = FormatLabel()
-            self.formatLabel = FormatLabel(
-                "Random 1 = {0:>3d} -- Random 2 = {0:3d}", init=[0, 0]
+            self.jobInfo = QFormatLabel()
+            self.formatLabel = QFormatLabel(
+                "Random 1 = {0:>3d} -- Random 2 = {1:3d}", init=[10, 20]
             )
 
             b = QPushButton("Test 1")
