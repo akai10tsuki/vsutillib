@@ -251,15 +251,7 @@ class MediaFileInfo:
         return bReturn
 
     def __getitem__(self, value):
-        #
-        # BUG #9
-        # not all files have media tracks with title
-        # return None for those cases
-        #
-        try:
-            return self.lstMediaTracks[value]
-        except IndexError:
-            return None
+        return self.lstMediaTracks[value]
 
     def __len__(self):
         return len(self.lstMediaTracks) if self.lstMediaTracks else 0
