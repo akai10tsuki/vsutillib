@@ -35,8 +35,8 @@ from PySide6.QtWidgets import (
 )
 
 
-if platform.system() == "Windows":
-    from PySide2.QtWinExtras import QWinTaskbarButton, QtWin
+if platform.system() == "Windows6":
+    from PySide6.QtWinExtras import QWinTaskbarButton, QtWin
     MYAPPID = "VergaraSoft.MKVBatchMultiplex.mkv.2.0.0"  # arbitrary string
     QtWin.setCurrentProcessExplicitAppUserModelID(MYAPPID)
 
@@ -220,7 +220,7 @@ class DualProgressBar(QWidget):
     @Slot()
     def initTaskbarButton(self):
 
-        if platform.system() == "Windows":
+        if platform.system() == "Windows6":
             self.taskbarButton.initTaskbarButton()
 
     def setSizePolicy(self, horizontal, vertical):
@@ -279,7 +279,7 @@ class DualProgressBar(QWidget):
         QWidget.setSizePolicy(self, horizontal, vertical)
 
 
-if platform.system() == "Windows":
+if platform.system() == "Windows6":
 
     class TaskbarButtonProgress(QWinTaskbarButton):
         """
