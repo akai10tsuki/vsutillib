@@ -15,36 +15,34 @@ class QActionWidget(QAction):
         tooltip (str, optional): original tooltip. Defaults to None.
     """
 
-    #def __init__(self, *args, shortcut=None, tooltip=None, textPrefix=None, textSuffix=None, **kwargs):
     def __init__(self, *args, **kwargs):
 
         textPrefix = kwargs.pop("textPrefix", None)
         textSuffix = kwargs.pop("textSuffix", None)
         shortcut = kwargs.pop("shortcut", None)
-        tooltip = kwargs.pop("tooltip", None)
+        toolTip = kwargs.pop("toolTip", None)
+        statusTip = kwargs.pop("statusTip", None)
 
         super().__init__(*args, **kwargs)
 
         for p in args:
             if isinstance(p, str):
-                self.originaltext = p
+                self.originalText = p
 
         self.shortcut = shortcut
-        self.tooltip = tooltip
-        self.textPrefix = ""
-        self.textSuffix = ""
+        self.toolTip = toolTip
+        self.statusTip = statusTip
+        self.textPrefix = "" if textPrefix is None else textPrefix
+        self.textSuffix = "" if textSuffix is None else textSuffix
 
         if shortcut is not None:
             self.setShortcut(shortcut)
 
-        if tooltip is not None:
-            self.setToolTip(tooltip)
+        if toolTip is not None:
+            self.setToolTip(toolTip)
 
-        if textPrefix is not None:
-            self.textPrefix = textPrefix
-
-        if textSuffix is not None:
-            self.textSuffix = textSuffix
+        if statusTip is not None:
+            self.setStatusTip(statusTip)
 
     def setShortcut(self, shortcut, *args, **kwargs):
 
@@ -53,9 +51,23 @@ class QActionWidget(QAction):
 
         super().setShortcut(shortcut, *args, **kwargs)
 
-    def setToolTip(self, tooltip, *args, **kwargs):
+    def setStatusTip(self, statusTip, *args, **kwargs):
 
-        if self.tooltip is None:
-            self.tooltip = tooltip
+        if self.statusTip is None:
+            self.statusTip = statusTip
 
-        super().setToolTip(tooltip, *args, **kwargs)
+        super().setStatusTip(statusTip, *args, **kwargs)
+
+    def setText(self, text, *args, **kwargs):
+
+        if self.originalText is None:
+            self.originalText = text
+
+        super().setText(text, *args, **kwargs)
+
+    def setToolTip(self, toolTip, *args, **kwargs):
+
+        if self.toolTip is None:
+            self.toolTip = toolTip
+
+        super().setToolTip(toolTip, *args, **kwargs)
