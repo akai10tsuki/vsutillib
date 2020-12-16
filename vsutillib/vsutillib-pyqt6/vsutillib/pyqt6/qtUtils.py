@@ -9,8 +9,8 @@ import logging
 import platform
 
 from PySide6.QtCore import Qt
-from PySide6.QtGui import QPalette, QColor
-from PySide6.QtWidgets import QCheckBox, QDesktopWidget, QPushButton, QToolTip
+from PySide6.QtGui import QPalette, QColor, QDesktopServices
+from PySide6.QtWidgets import QCheckBox, QPushButton, QToolTip
 
 from vsutillib.macos import isMacDarkMode
 
@@ -31,7 +31,7 @@ def centerWidget(widget, parent=None):
 
     else:
         widget.move(
-            QDesktopWidget().availableGeometry().center()
+            QDesktopServices().availableGeometry().center()
             - widget.frameGeometry().center()
         )
 
