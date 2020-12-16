@@ -11,6 +11,7 @@ match will be set on regexmatch property
 """
 # RNC0004
 
+import io
 import logging
 import platform
 import re
@@ -260,7 +261,10 @@ class RunCommand:
         """
 
         self._reset()
-        self._getCommandOutput()
+        if self.__universalNewLines:
+            self._getCommandOutputText()
+        else:
+            self._getCommandOutputBinary()
         if self.__output:
             return True
         return False
@@ -294,7 +298,7 @@ class RunCommand:
                     for i in m.groups():
                         self.__regexmatch.append(i)
 
-    def _getCommandOutput(self):
+    def _getCommandOutputText(self):
         """Execute command in a subprocess"""
 
         self.__returnCode = 10000
@@ -308,7 +312,7 @@ class RunCommand:
                 p = subprocess.Popen(
                     cmd,
                     stdout=subprocess.PIPE,
-                    universal_newlines=self.__universalNewLines,
+                    universal_newlines=True,
                     stderr=subprocess.STDOUT,
                     creationflags=subprocess.CREATE_NO_WINDOW,
                 )
@@ -316,15 +320,18 @@ class RunCommand:
                 p = subprocess.Popen(
                     cmd,
                     stdout=subprocess.PIPE,
-                    universal_newlines=self.__universalNewLines,
+                    universal_newlines=True,
                     stderr=subprocess.STDOUT,
                 )
             try:
-                for l in p.stdout:
-                    if self.__universalNewLines:
-                        line = l
-                    else:
-                        line = l.decode("utf-8")
+                for line in p.stdout:
+                    # if self.__universalNewLines:
+                    # Text Mode
+                    #    line = l
+                    # else:
+                    # Binary Mode
+                    #    line = l.decode("utf-8")
+
                     self.__output.append(line)
                     self._regexMatch(line)
                     if self.__processLine is not None:
@@ -384,7 +391,7 @@ class RunCommand:
 
         return rc
 
-    def _getCommandOutputBackup(self):
+    def _getCommandOutputBinary(self):
         """Execute command in a subprocess"""
 
         self.__returnCode = 10000
@@ -395,33 +402,55 @@ class RunCommand:
             cmd = shlex.split(self.__command)
         try:
             with subprocess.Popen(
-                cmd, stdout=subprocess.PIPE, bufsize=1, stderr=subprocess.STDOUT
+                cmd,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                creationflags=subprocess.CREATE_NO_WINDOW,
             ) as p:
+                reader = io.TextIOWrapper(p.stdout, encoding="utf8")
                 try:
-                    for l in iter(p.stdout):
-                        line = l.decode("utf-8")
-                        self.__output.append(line)
-                        self._regexMatch(line)
+                    while ch := reader.read(1):
+
+                        self.__output.append(ch)
+                        # self._regexMatch(line)
                         if self.__processLine is not None:
                             self.__processLine(
-                                line, *self.__processArgs, **self.__processKWArgs
+                                ch, *self.__processArgs, **self.__processKWArgs
                             )
+                        if self.__controlQueue:
+                            queueStatus = self.__controlQueue.popleft()
+                            self.__controlQueue.appendleft(queueStatus)
+                            if queueStatus in [
+                                RunStatus.Abort,
+                                RunStatus.AbortJob,
+                                RunStatus.AbortForced,
+                            ]:
+                                p.kill()
+                                outs, errs = p.communicate()
+                                rc = p.returncode
+                                self.__returnCode = p.returncode
+                                if self.log:
+                                    msg = f"RNC0003: Aborting outs {outs} errs {errs} rc={rc}"
+                                    MODULELOG.debug(msg)
+                                break
+                    p.kill()
+
                 except UnicodeDecodeError as error:
                     trb = traceback.format_exc()
                     msg = "Error: {}".format(error.reason)
                     self.__output.append(str(cmd) + "\n")
                     self.__output.append(msg)
                     self.__output.append(trb)
-                    if self.__processLine is not None:
-                        self.__processLine(line)
+                    # if self.__processLine is not None:
+                    #    self.__processLine(line)
                 except KeyboardInterrupt as error:
                     trb = traceback.format_exc()
                     msg = "Error: {}".format(error.args)
                     self.__output.append(str(cmd) + "\n")
                     self.__output.append(msg)
                     self.__output.append(trb)
-                    if self.__processLine is not None:
-                        self.__processLine(line)
+                    # if self.__processLine is not None:
+                    #    self.__processLine(line)
                     raise SystemExit(0) from error
                 rcResult = p.poll()
                 if rcResult is not None:
