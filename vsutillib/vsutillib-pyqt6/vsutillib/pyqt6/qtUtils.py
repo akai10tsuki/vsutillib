@@ -6,13 +6,13 @@ utility functions that use PySide2
 
 
 import logging
-import platform
+#import platform
 
-from PySide6.QtCore import Qt
+#from PySide6.QtCore import Qt
 from PySide6.QtGui import QPalette, QColor, QDesktopServices
-from PySide6.QtWidgets import QCheckBox, QPushButton, QToolTip
+from PySide6.QtWidgets import QPushButton, QToolTip
 
-from vsutillib.macos import isMacDarkMode
+#from vsutillib.macos import isMacDarkMode
 
 from .classes import QRunInThread, SvgColor
 
@@ -58,6 +58,7 @@ def pushButton(label, function, tooltip):
 
 
 def darkPalette(app=None):
+    """Use dark theme on windows 10"""
 
     palette = QPalette()
 
