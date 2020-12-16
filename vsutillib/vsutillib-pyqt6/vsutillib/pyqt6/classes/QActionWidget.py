@@ -16,7 +16,6 @@ class QActionWidget(QAction):
         tooltip (str, optional): original tooltip. Defaults to None.
     """
 
-    #def __init__(self, *args, shortcut=None, tooltip=None, textPrefix=None, textSuffix=None, **kwargs):
     def __init__(self, *args, **kwargs):
 
         textPrefix = kwargs.pop("textPrefix", None)
