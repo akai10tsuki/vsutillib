@@ -28,7 +28,7 @@ class QActionWidget(QAction):
 
         for p in args:
             if isinstance(p, str):
-                self.originaltext = p
+                self.originalText = p
 
         self.shortcut = shortcut
         self.tooltip = tooltip
