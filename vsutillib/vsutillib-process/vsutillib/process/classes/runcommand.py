@@ -325,13 +325,6 @@ class RunCommand:
                 )
             try:
                 for line in p.stdout:
-                    # if self.__universalNewLines:
-                    # Text Mode
-                    #    line = l
-                    # else:
-                    # Binary Mode
-                    #    line = l.decode("utf-8")
-
                     self.__output.append(line)
                     self._regexMatch(line)
                     if self.__processLine is not None:
@@ -405,18 +398,19 @@ class RunCommand:
                 cmd,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.STDOUT,
+                universal_newlines=False,
                 creationflags=subprocess.CREATE_NO_WINDOW,
             ) as p:
                 reader = io.TextIOWrapper(p.stdout, encoding="utf8")
                 try:
                     while ch := reader.read(1):
-
-                        self.__output.append(ch)
-                        # self._regexMatch(line)
                         if self.__processLine is not None:
-                            self.__processLine(
+                            if line := self.__processLine(
                                 ch, *self.__processArgs, **self.__processKWArgs
-                            )
+                            ):
+                                self.__output.append(line)
+                                self._regexMatch(line)
+
                         if self.__controlQueue:
                             queueStatus = self.__controlQueue.popleft()
                             self.__controlQueue.appendleft(queueStatus)
