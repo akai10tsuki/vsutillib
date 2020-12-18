@@ -105,6 +105,7 @@ class MKVCommandParser:
         self.filesInDirByKey = {}
         self.dirsByKey = {}
         self.titles = []
+        self.newNames = []
 
         self.oAttachments = MKVAttachments()
         self.oBaseFiles = []
@@ -713,7 +714,8 @@ class MKVCommandParser:
     def renameOutputFiles(self, newNames):
 
         if len(newNames) == self.__totalSourceFiles:
-            self.filesInDirByKey[MKVParseKey.outputFile] = list(newNames)
+            self.newNames = list(newNames)
+            self.filesInDirByKey[MKVParseKey.outputFile] = self.newNames
             self.generateCommands()
 
 
