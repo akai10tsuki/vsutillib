@@ -5,6 +5,7 @@ sql related classes
 import re
 import sqlite3
 
+from pathlib import Path
 from sqlite3 import Error as SQLiteError
 
 
@@ -56,7 +57,7 @@ class SqlDb:
         self.__conn = None
         self.__lastError = None
 
-        if isinstance(database, str):
+        if isinstance(database, (Path, str)):
             dbFile = database
         elif self.__dbFile is not None:
             dbFile = self.__dbFile
