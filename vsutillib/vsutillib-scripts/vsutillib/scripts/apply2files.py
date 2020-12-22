@@ -22,12 +22,14 @@ import shlex
 from pathlib import Path
 
 from vsutillib import config
+from vsutillib.misc import staticVars
 from vsutillib.process import RunCommand
 from vsutillib.files import getFileList, getDirectoryList
 
 VERSION = config.SCRIPTS_VERSION
 
 __version__ = VERSION
+
 
 def parserArguments():
     """construct parser"""
@@ -226,9 +228,9 @@ def apply2files():
 
     processLine = None
     if args.verbose:
-        processLine = sys.stdout.write
+        processLine = processCommandOutput
 
-    cli = RunCommand(processLine=processLine)
+    cli = RunCommand(processLine=processLine, universalNewLines=False)
 
     for d in args.directory:
 
@@ -275,6 +277,33 @@ def apply2files():
                     logFile.write("\n\n".encode())
 
     return None
+
+
+@staticVars(line="")
+def processCommandOutput(ch):  # pylint: disable=invalid-name
+    """
+    Convenience function that interprets lines in a stream of characters.
+
+    Args:
+        ch (str): characters to display
+
+    Returns:
+        str: Complete line including "\n" character when "\n" is received.
+        None if character received is not a newline.
+    """
+
+    processCommandOutput.line += ch
+    sys.stdout.write(ch)
+    sys.stdout.flush()
+
+    if ch != "\n":
+        return None
+
+    line = processCommandOutput.line
+
+    processCommandOutput.line = ""
+
+    return line
 
 
 if __name__ == "__main__":

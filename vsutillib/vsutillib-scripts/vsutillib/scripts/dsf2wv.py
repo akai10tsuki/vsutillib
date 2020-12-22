@@ -13,6 +13,7 @@ import shlex
 from pathlib import Path
 
 from vsutillib import config
+from vsutillib.misc import staticVars
 from vsutillib.process import RunCommand
 from vsutillib.files import getFileList, getDirectoryList, getExecutable
 
@@ -150,7 +151,7 @@ def dsf2wv():
 
     if not executable:
         print("The wavpack program not found in path.")
-        return (-1)
+        return -1
 
     command = "wavpack -y --import-id3 --allow-huge-tags"
 
@@ -166,15 +167,17 @@ def dsf2wv():
 
     processLine = None
     if args.verbose:
-        processLine = sys.stdout.write
+        # processLine = sys.stdout.write
+        processLine = processCommandOutput
 
     cli = RunCommand(
         regexsearch=[
             r"created (.*?) in.* (.*?)%",
-            r"sor.\W(.*?) Version (.*)\r",
+            r"sor.\W(.*?) Version (.*)",
             r"temp file (.*?) to (.*)!",
         ],
         processLine=processLine,
+        universalNewLines=False,
     )
 
     workFiles = Files()
@@ -201,7 +204,7 @@ def dsf2wv():
             cliCommand = command + " " + shlex.quote(f)
             cli.command = cliCommand
 
-            msg = "Processing file [{}]\n".format(f)
+            msg = "Processing file [{}]".format(f)
             printToConsoleAndFile(logFile, msg)
 
             if args.debug:
@@ -213,9 +216,9 @@ def dsf2wv():
 
                 cli.run()
 
-                version = ""
+                version = "\n" if args.verbose else ""
                 if fc := cli.regexmatch[1]:
-                    version = "WavPack {} Version {} ".format(fc[0], fc[1])
+                    version += "WavPack {} Version {} ".format(fc[0], fc[1])
 
                 if fc := cli.regexmatch[0]:
                     if len(fc) == 2:
@@ -237,6 +240,33 @@ def dsf2wv():
             for f in workFiles.noMatch:
                 msg = "Check file '{}'\n".format(f)
                 logFile.write(msg.encode())
+
+
+@staticVars(line="")
+def processCommandOutput(ch):  # pylint: disable=invalid-name
+    """
+    Convenience function that interprets lines in a stream of characters.
+
+    Args:
+        ch (str): characters to display
+
+    Returns:
+        str: Complete line including "\n" character when "\n" is received.
+        None if character received is not a newline.
+    """
+
+    processCommandOutput.line += ch
+    sys.stdout.write(ch)
+    sys.stdout.flush()
+
+    if ch != "\n":
+        return None
+
+    line = processCommandOutput.line
+
+    processCommandOutput.line = ""
+
+    return line
 
 
 if __name__ == "__main__":
