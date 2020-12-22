@@ -19,6 +19,8 @@ import shlex
 import subprocess
 import traceback
 
+from vsutillib.misc import staticVars
+
 MODULELOG = logging.getLogger(__name__)
 MODULELOG.addHandler(logging.NullHandler())
 
@@ -34,19 +36,26 @@ class RunCommand:
     match will be set on regexmatch property
 
     Args:
-        command (str): command to execute
-        commandShlex (:obj:`bool`): True if command is shlex.split
-            False otherwise. Defaults to False.
-        processLine (:obj:`function`, optional): Function called with
-            every line read. Defaults to None.
-        processArgs (:obj:`list`, optional): Variable length list to
-            pass to processLine. Defaults to None.
-        processKWArgs (:obj:`list`, optional): Arbitrary keyword
-            arguments to pass to processLine. Defaults to None.
-        regexsearch (:obj:`str`, optional): Regex applied to every
-            line read. Defaults to None
-        universalNewLine (:obj:`bool`): True to read in text mode
-            False to read binary mode. Defaults to False.
+        **command** (str): command to execute
+
+        **commandShlex** (:obj:`bool`): True if command is shlex.split
+        False otherwise. Defaults to False.
+
+        **processLine** (:obj:`function`, optional): Function called with
+        every line read if working in text mode. If working in binary it
+        receives character by character. Defaults to None.
+
+        **processArgs** (:obj:`list`, optional): Variable length list to
+        pass to processLine. Defaults to None.
+
+        **processKWArgs** (:obj:`list`, optional): Arbitrary keyword
+        arguments to pass to processLine. Defaults to None.
+
+        **regexsearch** (:obj:`str`, optional): Regex applied to every
+        line read. Defaults to None
+
+        **universalNewLine** (:obj:`bool`): True to read in text mode
+        False to read binary mode. Defaults to False.
 
     Raises:
 
@@ -98,9 +107,13 @@ class RunCommand:
 
         self.__commandShlex = commandShlex
         self.__processLine = processLine
-        self.__universalNewLines = universalNewLines
-        self.__processArgs = []
 
+        self.__universalNewLines = universalNewLines
+        if not self.__universalNewLines:
+            if self.__processLine is None:
+                self.__processLine = processCommandOutput
+
+        self.__processArgs = []
         if processArgs is not None:
             if isinstance(processArgs, list):
                 self.__processArgs = processArgs
@@ -108,7 +121,6 @@ class RunCommand:
                 raise ValueError("processLineParam has to be a list")
 
         self.__processKWArgs = {}
-
         if processKWArgs is not None:
             if isinstance(processKWArgs, dict):
                 self.__processKWArgs = processKWArgs
@@ -454,6 +466,30 @@ class RunCommand:
             self.__error = e
 
         return rc
+
+
+@staticVars(line="")
+def processCommandOutput(ch):  # pylint: disable=invalid-name
+    """
+    Convenience function that interprets lines in a stream of characters.
+
+    Args:
+        ch (str): characters to display
+
+    Returns:
+        str: Complete line including "\n" character when "\n" is received.
+        None if character received is not a newline.
+    """
+
+    processCommandOutput.line += ch
+    if ch != "\n":
+        return None
+
+    line = processCommandOutput.line
+
+    processCommandOutput.line = ""
+
+    return line
 
 
 class RunStatus:
