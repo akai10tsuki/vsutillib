@@ -70,15 +70,17 @@ Fixed:
 ******
 - fix handling of files with single quotes
 
-scripts
--------
+scripts package
+~~~~~~~~~~~~~~~
 
 Changed
 *******
 
 - bump version
 - dsf2wv accepts wildcard on directory argument
+- dsf2wv uses binary output subprocess.Pipe
 - apply2files accepts wildcard on directory argument
+- mkvrun used binary output for subprocess.Pipe
 
 Fixed
 *****
