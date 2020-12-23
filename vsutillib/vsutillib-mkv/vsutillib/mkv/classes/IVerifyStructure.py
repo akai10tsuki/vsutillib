@@ -25,5 +25,6 @@ class IVerifyStructure(VerifyStructure):
     def verifyStructure(self, oCommand, index): # pylint: disable=arguments-differ
         baseFiles = oCommand.baseFiles
         sourceFiles = oCommand.oSourceFiles[index]
+        destinationFile = oCommand.destinationFiles[index]
 
-        super().verifyStructure(baseFiles, sourceFiles)
+        super().verifyStructure(baseFiles, sourceFiles, destinationFile)
