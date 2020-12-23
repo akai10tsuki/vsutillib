@@ -2,6 +2,7 @@
 
 # MKV0001
 
+# Classes
 from .classes import (
     IVerifyStructure,
     MergeOptions,
@@ -17,6 +18,9 @@ from .classes import (
     VerifyMKVCommand,
     VerifyStructure,
 )
+
+# Functions
+from .adjustSources import adjustSources
 from .mkvutils import (
     convertToBashStyle,
     generateCommand,
