@@ -14,6 +14,7 @@ from .classes import (
     SourceFiles,
     TrackOptions,
     TracksOrder,
+    VerifyMKVCommand,
     VerifyStructure,
 )
 

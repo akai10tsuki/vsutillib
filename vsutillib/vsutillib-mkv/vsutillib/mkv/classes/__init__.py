@@ -7,4 +7,5 @@ from .MKVCommandParser import MKVCommandParser, MKVParseKey
 from .SourceFiles import SourceFile, SourceFiles
 from .TrackOptions import TrackOptions
 from .TracksOrder import TracksOrder
+from .VerifyMKVCommand import VerifyMKVCommand
 from .VerifyStructure import VerifyStructure
