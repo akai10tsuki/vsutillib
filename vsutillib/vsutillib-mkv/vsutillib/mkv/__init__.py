@@ -8,14 +8,12 @@ from .classes import (
     MergeOptions,
     MKVAttachment,
     MKVAttachments,
-    MKVCommand,
     MKVCommandParser,
     MKVParseKey,
     SourceFile,
     SourceFiles,
     TrackOptions,
     TracksOrder,
-    VerifyMKVCommand,
     VerifyStructure,
 )
 
