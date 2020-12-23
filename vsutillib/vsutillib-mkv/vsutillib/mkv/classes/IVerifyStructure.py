@@ -2,7 +2,7 @@
 IVerifyStructure
 """
 
-from .verifystructure import VerifyStructure
+from .VerifyStructure import VerifyStructure
 
 class IVerifyStructure(VerifyStructure):
     """

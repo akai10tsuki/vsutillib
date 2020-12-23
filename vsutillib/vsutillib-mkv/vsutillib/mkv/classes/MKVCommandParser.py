@@ -49,7 +49,7 @@ from ..mkvutils import (
 )
 
 from .SourceFiles import SourceFile, SourceFiles
-from .mkvattachments import MKVAttachments
+from .MKVAttachments import MKVAttachments
 
 MODULELOG = logging.getLogger(__name__)
 MODULELOG.addHandler(logging.NullHandler())
