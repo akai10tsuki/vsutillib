@@ -9,6 +9,8 @@ import logging
 
 # import pprint
 
+from pathlib import PurePath
+
 from pymediainfo import MediaInfo
 
 from vsutillib.misc import iso639
