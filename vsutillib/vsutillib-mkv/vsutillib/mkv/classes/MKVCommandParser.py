@@ -38,8 +38,6 @@ from pathlib import Path
 from natsort import natsorted, ns
 
 from vsutillib.media import MediaFileInfo
-from vsutillib.misc import XLate
-
 
 from ..mkvutils import (
     convertToBashStyle,
