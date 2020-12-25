@@ -6,4 +6,4 @@ Import names for process
 
 from .multithreading import GenericThreadWorker, QueueThreadWorker, ThreadWorker
 from .multiprocessing import ProcessWorker, QueueProcessWorker
-from .runcommand import RunCommand
+from .RunCommand import RunCommand
