@@ -138,12 +138,12 @@ class SourceFile:
                         fid = natsorted(fid, alg=ns.PATH)
                         self.filesInDir.extend(fid)
                         # Slow proccess
-                        #for f in self.filesInDir:
-                        #    if f == p:
-                        #        self.filesMediaInfo.append(self.mediaFileInfo)
-                        #    else:
-                        #        mi = MediaFileInfo(f)
-                        #        self.filesMediaInfo.append(mi)
+                        for f in self.filesInDir:
+                            if f == p:
+                                self.filesMediaInfo.append(self.mediaFileInfo)
+                            else:
+                                mi = MediaFileInfo(f)
+                                self.filesMediaInfo.append(mi)
                     else:
                         self.__errorFound = True
             else:
