@@ -11,7 +11,7 @@ from .MergeOptions import MergeOptions
 
 class TrackOptions:
     """
-     TrackOptions
+    TrackOptions
     """
 
     def __init__(self, options=None):
@@ -79,6 +79,18 @@ class TrackOptions:
     @property
     def trackNames(self):
         return self.__dTrackNames
+
+    def trackNameMatch(self, track):
+        if isinstance(track, int):
+            strTrack = str(track)
+        if isinstance(track, str):
+            strTrack = track
+
+        strTmp = None
+        if strTrack in self.trackNames:
+            strTmp = "--track-name " + quoteString(self.trackNames[strTrack][0])
+
+        return strTmp
 
     @property
     def tracks(self):
