@@ -113,13 +113,14 @@ def adjustSources(oCommand, index, algorithm=1):
             elif savedScore < 8:
                 confidence = "Medium"
 
-        if not foundBadTrack:
-            # No needed tracks failed match.
-            # Nothing to do go ahead with command.
-            confidence = "High - Needed track(s) matched."
-            rc = True
+    if not foundBadTrack:
+        # No needed tracks failed match.
+        # Nothing to do go ahead with command.
+        confidence = "High - Needed track(s) matched."
+        rc = True
 
     if tracksOrderTranslation and oCommand.cliTracksOrder:
+        # Why this?????
         tracksOrder.translation = tracksOrderTranslation
         oCommand.tracksOrder[index] = tracksOrder.strOrder()
 
