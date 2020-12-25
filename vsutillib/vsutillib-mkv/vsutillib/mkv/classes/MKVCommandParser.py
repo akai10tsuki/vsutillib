@@ -507,7 +507,8 @@ class MKVCommandParser:
 
         # get title from first source file and use that if defined
         if self.__setTitles:
-            for f in self.oSourceFiles.sourceFiles[0].filesInDir:
+            #for f in self.oSourceFiles.sourceFiles[0].filesInDir:
+            for mediaInfo in self.oSourceFiles.sourceFiles[0].filesMediaInfo:
                 mediaInfo = MediaFileInfo(str(f))
                 if mediaInfo:
                     self.titles.append(mediaInfo.title)
