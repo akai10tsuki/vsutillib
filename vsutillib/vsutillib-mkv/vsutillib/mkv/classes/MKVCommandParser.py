@@ -24,12 +24,71 @@ Properties update
 
 <MKVPROPEDIT.EXE> <SOURCE> --edit info --set title=<TITLE>
 
+Flow:
+
+1. Receive command.
+2. initialize variables
+3. save command in internal variable self.__strCommand
+4. remove title from command we want to preserve what title is set by file
+    - Temp OUT:
+5. convert to bash style easier to parse
+6. start parsing self._parse()
+    - prepare regular expressions
+    - first regEx for the whole command to see if general structure is sound
+    Look for:
+        - mkvmerge executable
+        - output file
+        - first source must have at least one
+        - track order checking for sound list of tracks
+        - check for one track file and set self.cliTrackOrder to None if True
+    - second regEx language used in the command line for to english for now
+        - Temp OUT:
+    - create template with function commandTemplate()
+        - substitute keys in command
+            - <OUTPUTFILE> for the output file name
+            - <SOURCE0> .. <SOURCEN> for the source files
+            - <TITLE> for file title if given
+            - <CHAPTERS> for chapters file if given
+            - <ATTACHMENTS> attachments if given
+            - <ORDER> for the track order if case of adjustments by file
+    - from commandTemplate resolve executable file and save it in self.mkvmerge and
+    also set self.mkvpropedit
+    - from commandTemplate resolve the output file directory
+    - from commandTemplate resolve the source files
+        - create SourceFile object for everyone and save each one in the
+        self.oSourceFiles (SourceFiles()) object
+        - set the total number of files when reading the total of files for the
+        first source file.  Any other source must match this number.  Create the
+        list for all the output files.
+        - set the total for list self.cliTrackOrder create list for all commands
+        in case needed for adjustment
+        - works with self.dirsByKey and self.filesByKey this means that the
+        directory for every source dirsByKey and every file filesByKey are saved
+        the keys are <OUTPUTFILE> and <SOURCE0> ... <SOURCEN>. Collitions with
+        the output file are solved for no overwrite
+    - from commandTemplate resolve chapter file in command line
+
+7. if no error in parsing set self.translations for any adjustments later
+8. set self.__readFiles to True
+9. read the files self.readFiles() this is here for testing purposes if user
+corrects a problem the test functions can re-read the files.
+    - self._readDirs()
+        - setup attachments from oAttachments update for commandTemplate the
+        program will test if the attachment are in a directory that have a
+        subdirectory for every source file
+        - titles are read for every file code is here for future use now it
+        read from the files but it will read from the internet eventually
+        - read the chapter files into a list
+    - self._filesInDirByKey()
+        - fill the attachment, titles and chapters file by key
+10. generate the commands self.generateCommands()
+
+
 """
 # MCP0003
 
 import ast
 import logging
-import platform
 import re
 import shlex
 
@@ -37,19 +96,22 @@ from pathlib import Path
 
 from natsort import natsorted, ns
 
-from vsutillib.media import MediaFileInfo
+# from vsutillib.media import MediaFileInfo
 
+from ..generateCommandTemplate import generateCommandTemplate
 from ..mkvutils import (
-    convertToBashStyle,
-    generateCommand,
-    numberOfTracksInCommand,
-    resolveOverwrite,
-    stripEncaseQuotes,
-    unQuote,
+   convertToBashStyle,
+   generateCommand,
+   numberOfTracksInCommand,
+   resolveOverwrite,
+   stripEncaseQuotes,
+   unQuote,
 )
 
 from .SourceFiles import SourceFile, SourceFiles
 from .MKVAttachments import MKVAttachments
+from .MKVParseKey import MKVParseKey
+
 
 MODULELOG = logging.getLogger(__name__)
 MODULELOG.addHandler(logging.NullHandler())
@@ -71,7 +133,6 @@ class MKVCommandParser:
         self.command = strCommand
 
     def _initVars(self):
-
         self.__bashCommand = None
         self.__errorFound = False
         self.__log = None
@@ -82,13 +143,11 @@ class MKVCommandParser:
         self.__shellCommands = []
         self.__strCommands = []
         self.__strOCommands = []
-        self.__setTitles = False
+        self.__setTitles = True
 
         self.cliChaptersFile = None
         self.cliChaptersFileMatchString = None
-        self.chaptersLanguage = None
         self.commandTemplate = None
-        self.language = None
         self.mkvmerge = None
         self.mkvpropedit = None
         self.cliOutputFile = None
@@ -106,7 +165,6 @@ class MKVCommandParser:
         self.newNames = []
 
         self.oAttachments = MKVAttachments()
-        self.oBaseFiles = []
         self.oSourceFiles = SourceFiles()
 
     def __bool__(self):
@@ -213,8 +271,6 @@ class MKVCommandParser:
             self.__strCommand = value
 
             if self.__strCommand:
-                self._removeTitle()
-
                 strCommand = convertToBashStyle(self.__strCommand)
 
                 self.__bashCommand = strCommand
@@ -246,6 +302,10 @@ class MKVCommandParser:
         return []
 
     @property
+    def oBaseFiles(self):
+        return self.oSourceFiles.sourceFiles
+
+    @property
     def outputFileExtension(self):
         if isinstance(self.cliOutputFile, Path):
             return self.cliOutputFile.suffix
@@ -269,47 +329,18 @@ class MKVCommandParser:
 
         rg = r"^(.*?)\s--.*?--output.(.*?)\s--.*?\s'\('\s(.*?)\s'\)'.*?--track-order\s(.*)"
         rgOneTrack = r"^(.*?)\s--.*?--output.(.*?)\s--.*?\s'\('\s(.*?)\s'\)'.*?"
-
         reCommandEx = re.compile(rg)
         reCommandOneTrackEx = re.compile(rgOneTrack)
-        reExecutableEx = re.compile(r"^(.*?)\s--")
-        reLanguageEx = re.compile(r"--ui-language (.*?) --")
-        reOutputFileEx = re.compile(r".*?--output\s(.*?)\s--")
 
-        reFilesEx = re.compile(
-            (
-                r"(?=--audio-tracks "
-                r"|--video-tracks "
-                r"|--subtitle-tracks "
-                r"|--button-tracks "
-                r"|--track-tags "
-                r"|--attachments "
-                r"|--no-audio "
-                r"|--no-video "
-                r"|--no-subtitles "
-                r"|--no-buttons "
-                r"|--no-track-tags "
-                r"|--no-chapters "
-                r"|--no-attachments "
-                r"|--no-global-tags "
-                r"|--chapter-charset "
-                r"|--chapter-language "
-                r"|--language "
-                r")"
-                r"(.*?) '\(' (.*?) '\)'"
-            )
-        )
-        reChaptersFileEx = re.compile(
-            r"--chapter-language (.*?) --chapters (.*?) (?=--)"
-        )
         self.__errorFound = False
 
-        # To look Ok must match the 4 expected groups in the
+        # To be sound and look Ok
+        # must match the 4 expected groups in the
         # command line
         # 1: mkvmerge name with fullpath
         # 2: output file
         # 3: at list one source
-        # 4: track order
+        # 4: track order for files with more than one track
         if (matchCommand := reCommandEx.match(strCommand)) and (
             len(matchCommand.groups()) == 4  # pylint: disable=used-before-assignment
         ):
@@ -343,11 +374,15 @@ class MKVCommandParser:
             self.__lstAnalysis.append("err: Command bad format.")
             self.__errorFound = True
 
-        if matchUILanguage := reLanguageEx.search(strCommand):
-            self.language = matchUILanguage.group(1)
+        self.commandTemplate, dMatch = generateCommandTemplate(
+            strCommand, attachments=self.oAttachments, setTitle=self.__setTitles
+        )
 
-        if matchExecutable := reExecutableEx.match(strCommand):
-            f = stripEncaseQuotes(matchExecutable.group(1))
+        # if matchUILanguage := reLanguageEx.search(strCommand):
+        #    self.language = matchUILanguage.group(1)
+
+        if dMatch[MKVParseKey.mkvmergeMatch]:
+            f = stripEncaseQuotes(dMatch[MKVParseKey.mkvmergeMatch])
             p = Path(f)
             try:
                 test = p.is_file()
@@ -370,10 +405,10 @@ class MKVCommandParser:
             self.__lstAnalysis.append("err: mkvmerge not found in command.")
             self.__errorFound = True
 
-        if matchOutputFile := reOutputFileEx.match(strCommand):
+        if dMatch[MKVParseKey.outputMatch]:
             self.cliOutputFile = None
             self.cliOutputFileMatchString = None
-            f = stripEncaseQuotes(matchOutputFile.group(1))
+            f = stripEncaseQuotes(dMatch[MKVParseKey.outputMatch])
             f = f.replace(r"'\''", "'")
             p = Path(f)
             try:
@@ -388,7 +423,7 @@ class MKVCommandParser:
             else:
                 if test:
                     self.cliOutputFile = p
-                    self.cliOutputFileMatchString = matchOutputFile.group(1)
+                    # self.cliOutputFileMatchString = matchOutputFile.group(1)
                     self.__lstAnalysis.append(
                         "chk: Destination directory ok = {}.".format(str(p.parent))
                     )
@@ -403,11 +438,10 @@ class MKVCommandParser:
             self.__errorFound = True
             self.__lstAnalysis.append("err: No output file found in command.")
 
-        if matchFiles := reFilesEx.finditer(strCommand):
-            for index, match in enumerate(matchFiles):
-                oFile = SourceFile(match.group(0), index)
+        if dMatch[MKVParseKey.baseFilesMatch]:
+            for index, match in enumerate(dMatch[MKVParseKey.baseFilesMatch]):
+                oFile = SourceFile(match, index)
                 if oFile:
-                    self.oBaseFiles.append(oFile)
                     self.oSourceFiles.append(oFile)
                     if self.__totalSourceFiles is None:
                         self.__totalSourceFiles = len(oFile.filesInDir)
@@ -420,6 +454,9 @@ class MKVCommandParser:
                         )
                     )
                     if index == 0:
+                        # Fill the output files list for files by key
+                        # resolving any overwrite first source is the
+                        # base for the output file names
                         self.filesInDirByKey[MKVParseKey.outputFile] = []
                         self.dirsByKey[MKVParseKey.outputFile] = ""
                         for f in oFile.filesInDir:
@@ -450,14 +487,14 @@ class MKVCommandParser:
             self.__errorFound = True
             self.__lstAnalysis.append("err: No source file found in command.")
 
+        self.commandTemplates = [self.commandTemplate] * len(self)
+
         #
         # Optional
         #
-        if matchChaptersFile := reChaptersFileEx.search(strCommand):
-            self.chaptersLanguage = matchChaptersFile.group(1)
+        if dMatch[MKVParseKey.chaptersMatch]:
             self.cliChaptersFile = None
-            self.cliChaptersFileMatchString = None
-            f = unQuote(matchChaptersFile.group(2))
+            f = unQuote(dMatch[MKVParseKey.chaptersMatch])
             p = Path(f)
             try:
                 test = p.is_file()
@@ -469,7 +506,6 @@ class MKVCommandParser:
             else:
                 if test:
                     self.cliChaptersFile = p
-                    self.cliChaptersFileMatchString = matchChaptersFile.group(2)
                     self.__lstAnalysis.append(
                         "chk: Chapters file ok - {}.".format(str(p.parent))
                     )
@@ -484,16 +520,8 @@ class MKVCommandParser:
         _readDirs read files in directories
         """
 
-        reAttachmentsEx = re.compile(
-            (
-                r"--attachment-name (.*?) --attachment-mime-type "
-                r"(.*?) --attach-file (.*?)(?= --)"
-            )
-        )
-
         # Attachments can be in command for all files or one directory per file
-        if reAttachmentsEx.finditer(self.__bashCommand):
-            self.oAttachments.strCommand = self.__bashCommand
+        if self.oAttachments:
             if self.oAttachments.isAttachmentsDirByEpisode:
                 for oDir in self.oAttachments.attachmentsDirs:
                     self.__lstAnalysis.append(
@@ -507,9 +535,8 @@ class MKVCommandParser:
 
         # get title from first source file and use that if defined
         if self.__setTitles:
-            #for f in self.oSourceFiles.sourceFiles[0].filesInDir:
+            # ADD to library
             for mediaInfo in self.oSourceFiles.sourceFiles[0].filesMediaInfo:
-                mediaInfo = MediaFileInfo(str(f))
                 if mediaInfo:
                     self.titles.append(mediaInfo.title)
                 else:
@@ -539,106 +566,6 @@ class MKVCommandParser:
         if self.chaptersFiles:
             self.filesInDirByKey[MKVParseKey.chaptersFile] = self.chaptersFiles
 
-    def _template(self):
-
-        cmdTemplate = self.__bashCommand
-
-        reExecutableEx = re.compile(r"^(.*?)\s--")
-        if matchExecutable := reExecutableEx.match(cmdTemplate):
-            m = matchExecutable.group(1)
-            f = stripEncaseQuotes(m)
-            e = shlex.quote(f)
-
-            ##
-            # BUG 1
-            # Reported by zFerry98
-            #
-            # When running in Windows there is no space in the mkvmerge executable path
-            # \ is use as escape
-            # Command: ['C:binmkvtoolnixmkvmerge.exe', ...
-            #
-            # Solution:
-            #   Force quotes for mkvmerge executable
-            #
-            #   Command: ['C:\\bin\\mkvtoolnix\\mkvmerge.exe'
-            ##
-            if platform.system() == "Windows":
-                if e[0:1] != "'":
-                    e = "'" + f + "'"
-            ##
-
-            cmdTemplate = self.__bashCommand
-            cmdTemplate = cmdTemplate.replace(m, e, 1)
-            cmdTemplate = cmdTemplate.replace(
-                self.cliOutputFileMatchString, MKVParseKey.outputFile, 1
-            )
-            for index, sf in enumerate(self.oSourceFiles.sourceFiles):
-                key = "<SOURCE{}>".format(str(index))
-                cmdTemplate = cmdTemplate.replace(sf.matchString, key, 1)
-            if self.oAttachments.cmdLineAttachments:
-                cmdTemplate = cmdTemplate.replace(
-                    self.oAttachments.attachmentsMatchString,
-                    MKVParseKey.attachmentFiles,
-                    1,
-                )
-            ##
-            # Bug #3
-            #
-            # It was not preserving the episode title
-            #
-            # Remove title before parsing and added the <TITLE> key to the template
-            # If there is no title read --title '' will be used.
-            # working with \ ' " backslash, single and double quotes in same title
-            ##
-
-            # Add title to template
-            if self.__setTitles:
-                if self.cliTracksOrder:
-                    cmdTemplate = cmdTemplate.replace(
-                        "--track-order",
-                        "--title " + MKVParseKey.title + " --track-order",
-                        1,
-                    )
-                else:
-                    cmdTemplate += "--title " + MKVParseKey.title
-
-            if self.cliChaptersFile:
-                cmdTemplate = cmdTemplate.replace(
-                    self.cliChaptersFileMatchString, MKVParseKey.chaptersFile, 1
-                )
-
-            if self.cliTracksOrder:
-                cmdTemplate = cmdTemplate.replace(
-                    self.cliTracksOrder, MKVParseKey.trackOrder, 1
-                )
-
-            self.commandTemplate = cmdTemplate
-            self.commandTemplates = [cmdTemplate] * len(self)
-
-    def _removeTitle(self):
-        """
-        _removeTitle remove --title option from command
-        """
-
-        ##
-        # Bug #3
-        #
-        # It was not preserving the episode title
-        #
-        # Remove title before parsing and added the <TITLE> key to the template
-        # If there is no title read --title '' will be used.
-        # working with \ ' " backslash, single and double quotes in same title
-        ##
-
-        reTitleEx = re.compile(r".*?--title\s(.*?)\s--")
-
-        if matchTitle := reTitleEx.match(self.__strCommand):
-            self.cliTitleMatchString = matchTitle.group(1)
-
-            self.__strCommand = self.__strCommand.replace(
-                "--title " + self.cliTitleMatchString + " ", "", 1
-            )
-
     def createKeysDictionary(self, index):
         """
         createKeysDictionary create a keys dictionary for template substitution
@@ -651,20 +578,14 @@ class MKVCommandParser:
         """
 
         keyDictionary = {}
-        for key, sourceFiles in self.filesInDirByKey.items():
+        for key, sourceFile in self.filesInDirByKey.items():
             if key != MKVParseKey.attachmentFiles:
-                keyDictionary[key] = shlex.quote(str(sourceFiles[index]))
+                keyDictionary[key] = shlex.quote(str(sourceFile[index]))
             else:
-                keyDictionary[key] = sourceFiles[index]
+                keyDictionary[key] = sourceFile[index]
         keyDictionary[MKVParseKey.trackOrder] = self.tracksOrder[index]
 
         return keyDictionary
-
-    def readFiles(self):
-        if not self.__errorFound:
-            self._readDirs()
-            self._template()
-            self._filesInDirByKey()
 
     def generateCommands(self):
         """
@@ -682,7 +603,6 @@ class MKVCommandParser:
                 self.__shellCommands.append(None)
 
                 _, _ = self.generateCommandByIndex(i, update=True)
-
 
     def generateCommandByIndex(self, index, update=False):
         """
@@ -710,18 +630,14 @@ class MKVCommandParser:
 
         return strCommand, shellCommand
 
+    def readFiles(self):
+        if not self.__errorFound:
+            self._readDirs()
+            self._filesInDirByKey()
+
     def renameOutputFiles(self, newNames):
 
         if len(newNames) == self.__totalSourceFiles:
             self.newNames = list(newNames)
             self.filesInDirByKey[MKVParseKey.outputFile] = self.newNames
             self.generateCommands()
-
-
-class MKVParseKey:
-
-    attachmentFiles = "<ATTACHMENTS>"
-    chaptersFile = "<CHAPTERS>"
-    outputFile = "<OUTPUTFILE>"
-    title = "<TITLE>"
-    trackOrder = "<ORDER>"
