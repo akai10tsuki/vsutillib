@@ -8,8 +8,8 @@ from .classes import (
     MergeOptions,
     MKVAttachment,
     MKVAttachments,
-    MKVCommandParser,
     MKVParseKey,
+    MKVCommandParser,
     SourceFile,
     SourceFiles,
     TrackOptions,
@@ -20,6 +20,7 @@ from .classes import (
 
 # Functions
 from .adjustSources import adjustSources
+from .generateCommandTemplate import generateCommandTemplate
 from .mkvutils import (
     convertToBashStyle,
     generateCommand,
