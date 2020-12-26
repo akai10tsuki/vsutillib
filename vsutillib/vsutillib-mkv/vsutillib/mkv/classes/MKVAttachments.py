@@ -91,7 +91,7 @@ class MKVAttachments:
         self.__totalSourceFiles = None
         self.__strCommand = None
 
-        self.__attachments = []
+        # self.__attachments = []
         self.__attachmentsFiles = []
         self.__attachmentsDirs = []
         self.__attachmentsStr = []
@@ -102,7 +102,7 @@ class MKVAttachments:
         self.__cmdLineAttachmentsDirs = []
 
     def __bool__(self):
-        return bool(self.__attachments)
+        return bool(self.__cmdLineAttachments)
 
     def __contains__(self, item):
         return item in self.__cmdLineAttachments
@@ -123,9 +123,9 @@ class MKVAttachments:
         else:
             self.__index += 1
 
-    @property
-    def attachments(self):
-        return self.__attachments
+    #@property
+    #def attachments(self):
+    #    return self.__attachments
 
     @property
     def attachmentsDirs(self):
@@ -165,6 +165,12 @@ class MKVAttachments:
 
     @property
     def attachmentsSpan(self):
+        """
+        attachmentsSpan start an stop attachment in command line
+
+        Returns:
+            tuple: begin end of attachment information on command line
+        """
         span = ()
         if self.__cmdLineAttachments:
             span = (
@@ -172,6 +178,19 @@ class MKVAttachments:
                 self.__cmdLineAttachments[-1].span[1],
             )
         return span
+
+    @property
+    def command(self):
+        return self.__strCommand
+
+    @command.setter
+    def command(self, value):
+        if isinstance(value, str):
+            self._initVars()
+            self.__strCommand = value
+            self._parse()
+            if self.__cmdLineAttachments:
+                self._readDirs()
 
     @property
     def strCommand(self):
