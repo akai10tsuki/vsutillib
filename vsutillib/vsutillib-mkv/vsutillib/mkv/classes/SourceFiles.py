@@ -13,9 +13,10 @@ from vsutillib.media import MediaFileInfo
 from ..mkvutils import unQuote
 from .TrackOptions import TrackOptions
 
+
 class SourceFile:
     """
-     Tracks and file names
+    Tracks and file names
     """
 
     def __init__(self, fullMatchString=None, fileOrder=None):
@@ -28,7 +29,7 @@ class SourceFile:
         self.filesMediaInfo = []
         self.fileName = None
         self.mediaFileInfo = None
-        self.matchString = None
+        self.fileMatchString = None
         self.trackOptions = TrackOptions()
 
         # for iterator
@@ -82,7 +83,75 @@ class SourceFile:
             self.__fileOrder = value[1]
             self._parse()
 
+    def fullMatchStringWithKey(self):
+        subEx = re.compile(r"(.*?) ('\(' (.*?) '\)')")
+        keySub = f"\\1 <SOURCE{str(self.fileOrder)}>"
+        strTmp = subEx.sub(keySub, self.fullMatchString)
+
+        return strTmp
+
+    def fullMatchStringCorrected(self, withKey=False):
+        """
+        fullMatchStringCorrected remove track-name if not edited
+
+        Args:
+            withKey (bool, optional): If True return string with key instead of
+            file string. Defaults to False.
+
+        Returns:
+            str: string with substitutions if any
+        """
+        strTmp = self.fullMatchString
+        for track, edited in self.trackOptions.trackTitleEdited.items():
+            if not edited:
+                trackName = self.trackOptions.trackNameMatch(track)
+                strTmp = strTmp.replace(" " + trackName, "", 1) # pylint: disable=no-member
+        if withKey:
+            key  = f"<SOURCE{str(self.fileOrder)}>"
+            strTmp = strTmp.replace(self.fileMatchString, key, 1)
+        return strTmp
+
     def _parse(self):
+
+        reInputEx = re.compile(r"(.*?)\s('\('\s(.*?)\s'\)')")
+        self.fileName = None
+
+        if self.__fullMatchString:
+            if match := reInputEx.search(self.__fullMatchString):
+                self.options = match.group(1)  # Options
+                self.trackOptions.options = self.options
+                self.trackOptions.fileOrder = self.fileOrder
+
+                f = unQuote(match.group(3))  # Source file name
+                p = Path(f)
+
+                try:
+                    test = p.is_file()
+                except OSError:
+                    self.__errorFound = True
+                else:
+                    if test:
+                        self.fileName = p
+                        self.mediaFileInfo = MediaFileInfo(p)
+                        self.fileMatchString = match.group(2)  # bad
+                        self.trackOptions.mediaInfo = self.mediaFileInfo
+                        d = p.parent
+                        fid = [x for x in d.glob("*" + p.suffix) if x.is_file()]
+                        fid = natsorted(fid, alg=ns.PATH)
+                        self.filesInDir.extend(fid)
+                        # Slow proccess
+                        for f in self.filesInDir:
+                            if f == p:
+                                self.filesMediaInfo.append(self.mediaFileInfo)
+                            else:
+                                mi = MediaFileInfo(f)
+                                self.filesMediaInfo.append(mi)
+                    else:
+                        self.__errorFound = True
+            else:
+                self.__errorFound = True
+
+    def _parseOld(self):
 
         reOptionsEx = re.compile(
             (
@@ -107,6 +176,7 @@ class SourceFile:
             )
         )
         reSourcesEx = re.compile(r"'\('\s(.*?)\s'\)'")
+        reInputEx = re.compile(r"(.*?)\s'\('\s(.*?)\s'\)'")
         self.fileName = None
 
         if self.__fullMatchString:
@@ -149,7 +219,7 @@ class SourceFile:
 
 class SourceFiles:
     """
-     One sequence of SourceFile class elements
+    One sequence of SourceFile class elements
     """
 
     def __init__(self):
@@ -174,7 +244,7 @@ class SourceFiles:
                 tmp.append(e[index])
             return tmp
 
-        #if isinstance(index, tuple):
+        # if isinstance(index, tuple):
         #    print("Tuple " + str(index[0]))
         #    return self.__sourceFiles[index[0]]
 
@@ -185,7 +255,7 @@ class SourceFiles:
 
     def __len__(self):
         if self.__sourceFiles:
-            return len(self.__sourceFiles[0]) # files read for first source
+            return len(self.__sourceFiles[0])  # files read for first source
         return len(self.__sourceFiles)
 
     def __next__(self):
@@ -205,4 +275,8 @@ class SourceFiles:
 
     @property
     def sourceFiles(self):
+        return self.__sourceFiles
+
+    @property
+    def oBaseFiles(self):
         return self.__sourceFiles

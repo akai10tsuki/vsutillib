@@ -11,7 +11,9 @@ from .MergeOptions import MergeOptions
 
 class TrackOptions:
     """
-    TrackOptions
+    TrackOptions get the options for a source file found in the match string
+
+
     """
 
     def __init__(self, options=None):
@@ -31,6 +33,7 @@ class TrackOptions:
         self.__fileOrder = None
         self.__mediaInfo = None
         self.__trackTitleEdited = {}
+        self.__hasNamesToPreserve = False
         self.needTracksByTypeLanguage = {
             "Video": {"all": 0},
             "Audio": {"all": 0},
@@ -65,6 +68,10 @@ class TrackOptions:
         self._trackTitlesEdited()
 
     @property
+    def hasNamesToPreserve(self):
+        return self.__hasNamesToPreserve
+
+    @property
     def options(self):
         return self.__options
 
@@ -81,6 +88,15 @@ class TrackOptions:
         return self.__dTrackNames
 
     def trackNameMatch(self, track):
+        """
+        trackNameMatch track names
+
+        Args:
+            track (int, str): track number
+
+        Returns:
+            str: track name option
+        """
         if isinstance(track, int):
             strTrack = str(track)
         if isinstance(track, str):
@@ -331,6 +347,8 @@ class TrackOptions:
                     self.__trackTitleEdited[key] = True
                 else:
                     self.__trackTitleEdited[key] = False
+                    if not self.__hasNamesToPreserve:
+                        self.__hasNamesToPreserve = True
 
     # def _parse(self):
 
