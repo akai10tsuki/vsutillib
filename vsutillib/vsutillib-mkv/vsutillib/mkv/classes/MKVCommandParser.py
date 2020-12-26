@@ -146,13 +146,13 @@ class MKVCommandParser:
         self.__setTitles = True
 
         self.cliChaptersFile = None
-        self.cliChaptersFileMatchString = None
         self.commandTemplate = None
+        self.originalCommandTemplate = None
         self.mkvmerge = None
         self.mkvpropedit = None
         self.cliOutputFile = None
-        self.cliOutputFileMatchString = None
-        self.cliTitleMatchString = None
+        # self.cliOutputFileMatchString = None
+        # self.cliTitleMatchString = None
         self.cliTracksOrder = None
 
         self.commandTemplates = []
@@ -407,7 +407,7 @@ class MKVCommandParser:
 
         if dMatch[MKVParseKey.outputMatch]:
             self.cliOutputFile = None
-            self.cliOutputFileMatchString = None
+            # self.cliOutputFileMatchString = None
             f = stripEncaseQuotes(dMatch[MKVParseKey.outputMatch])
             f = f.replace(r"'\''", "'")
             p = Path(f)
@@ -486,6 +486,10 @@ class MKVCommandParser:
         else:
             self.__errorFound = True
             self.__lstAnalysis.append("err: No source file found in command.")
+
+        self.originalCommandTemplate = self.commandTemplate
+
+        preserveNames(self)
 
         self.commandTemplates = [self.commandTemplate] * len(self)
 
@@ -641,3 +645,24 @@ class MKVCommandParser:
             self.newNames = list(newNames)
             self.filesInDirByKey[MKVParseKey.outputFile] = self.newNames
             self.generateCommands()
+
+def preserveNames(self):
+    """
+    preserveNames alter template if track names have to be preserved
+    """
+
+    cmdTemplate = self.originalCommandTemplate
+    correctionDone = False
+
+    for oBaseFile in self.oSourceFiles.oBaseFiles:
+
+        if oBaseFile.trackOptions.hasNamesToPreserve:
+            matchString = oBaseFile.fullMatchStringWithKey()
+            templateCorrection = oBaseFile.fullMatchStringCorrected(withKey=True)
+            cmdTemplate = cmdTemplate.replace(matchString, templateCorrection, 1)
+            print()
+            if not correctionDone:
+                correctionDone = True
+
+    if correctionDone:
+        self.commandTemplate = cmdTemplate
