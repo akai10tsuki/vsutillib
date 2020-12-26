@@ -6,8 +6,6 @@ import platform
 import re
 import shlex
 
-import pprint
-
 from .classes import MKVAttachments
 from .classes.MKVParseKey import MKVParseKey
 from .mkvutils import stripEncaseQuotes
@@ -32,8 +30,6 @@ def generateCommandTemplate(bashCommand, attachments=None, setTitle=False):
     """
 
     cmdTemplate = bashCommand
-
-    pprint.pprint(MKVParseKey.__dict__.keys())
 
     dMatch = {}
     dMatch[MKVParseKey.mkvmergeMatch] = None
@@ -87,11 +83,7 @@ def generateCommandTemplate(bashCommand, attachments=None, setTitle=False):
                 if index == 0:
                     regEx = r"<OUTPUTFILE>\s(.*?)\s<SOURCE0>"
                 else:
-                    regEx = (
-                        f"<SOURCE{str(index - 1)}>"
-                        + r"\s(.*?)\s"
-                        + key
-                    )
+                    regEx = f"<SOURCE{str(index - 1)}>" + r"\s(.*?)\s" + key
                     regEx.format(str(index - 1), str(index))
                 options = re.search(regEx, cmdTemplate)
                 dMatch[MKVParseKey.baseFilesMatch].append(
@@ -142,18 +134,3 @@ def generateCommandTemplate(bashCommand, attachments=None, setTitle=False):
             cmdTemplate = cmdTemplate.replace(match.group(1), MKVParseKey.trackOrder, 1)
 
     return (cmdTemplate, dMatch)
-
-class MKVParseKeyLocal:
-    """
-    Keys used for Template matching and matching dictionary
-    """
-
-    attachmentFiles = "<ATTACHMENTS>"
-    chaptersFile = "<CHAPTERS>"
-    outputFile = "<OUTPUTFILE>"
-    title = "<TITLE>"
-    trackOrder = "<ORDER>"
-    mkvmergeMatch = "mkvmergeMatch"
-    outputMatch = "outputMatch"
-    baseFilesMatch = "baseFilesMatch"
-    chaptersMatch = "chaptersMatch"
