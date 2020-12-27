@@ -127,10 +127,12 @@ class MKVCommandParser:
 
     __log = False
 
-    def __init__(self, strCommand=None, log=None):
+    def __init__(self, strCommand=None, preserveTrackNames=None, log=None):
 
         self.log = log
         self.command = strCommand
+        if preserveTrackNames is not None:
+            self.preserveTrackNames = preserveTrackNames
 
     def _initVars(self):
         self.__bashCommand = None
@@ -144,6 +146,7 @@ class MKVCommandParser:
         self.__strCommands = []
         self.__strOCommands = []
         self.__setTitles = True
+        self.__preserveTrackNames = False
 
         self.cliChaptersFile = None
         self.commandTemplate = None
@@ -312,6 +315,15 @@ class MKVCommandParser:
         return None
 
     @property
+    def preserveTrackNames(self):
+        return bool(self.__preserveTrackNames)
+
+    @preserveTrackNames.setter
+    def preserveTrackNames(self, value):
+        if isinstance(value, bool):
+            self.__preserveTrackNames = value
+
+    @property
     def strCommands(self):
         return self.__strCommands
 
@@ -374,7 +386,7 @@ class MKVCommandParser:
             self.__lstAnalysis.append("err: Command bad format.")
             self.__errorFound = True
 
-        self.commandTemplate, dMatch = generateCommandTemplate(
+        self.originalCommandTemplate, dMatch = generateCommandTemplate(
             strCommand, attachments=self.oAttachments, setTitle=self.__setTitles
         )
 
@@ -487,9 +499,10 @@ class MKVCommandParser:
             self.__errorFound = True
             self.__lstAnalysis.append("err: No source file found in command.")
 
-        self.originalCommandTemplate = self.commandTemplate
+        self.commandTemplate = str(self.originalCommandTemplate)
 
-        preserveNames(self)
+        #if self.preserveTrackNames:
+        #    preserveNames(self)
 
         self.commandTemplates = [self.commandTemplate] * len(self)
 
@@ -660,7 +673,6 @@ def preserveNames(self):
             matchString = oBaseFile.fullMatchStringWithKey()
             templateCorrection = oBaseFile.fullMatchStringCorrected(withKey=True)
             cmdTemplate = cmdTemplate.replace(matchString, templateCorrection, 1)
-            print()
             if not correctionDone:
                 correctionDone = True
 

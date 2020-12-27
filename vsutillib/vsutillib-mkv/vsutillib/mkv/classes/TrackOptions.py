@@ -161,6 +161,28 @@ class TrackOptions:
 
         return strTmp
 
+    def strTrackName(self, track):
+        """
+        strOptionsByTrack recreate options with lookup in track substitution dictionary
+
+        Args:
+            track (str): track id
+
+        Returns:
+            str: option for track id
+        """
+
+        strTmp = ""
+        aTmp = self.trackNames.get(track, None)
+        if aTmp is not None:
+            tmpTrack = self.translation.get(track, track)
+            option =  tmpTrack + ":" + aTmp[1]
+            option = quoteString(option)
+            strTmp = "--track-name " + option
+
+        return strTmp
+
+
     def strOptionsByTrack(self, track):
         """
         strOptionsByTrack recreate options with lookup in track substitution dictionary
@@ -349,21 +371,3 @@ class TrackOptions:
                     self.__trackTitleEdited[key] = False
                     if not self.__hasNamesToPreserve:
                         self.__hasNamesToPreserve = True
-
-    # def _parse(self):
-
-    #    mOptions = MergeOptions()
-
-    #    for option in self.__strOptions:
-    #        opt = option.split(" ")[0]
-    #        if mOptions.hasTrackID(opt):
-    #            reTrackOptionsEx = re.compile(r"(.*?) (\d+):(.*?) ")
-    #            if match := reTrackOptionsEx.findall(option + " "):
-    #                for m in match:
-    #                    track = m[1]
-    #                    if m[0] == "--track-name":
-    #                        self.__dTrackNames[track] = m[2]
-    #                    if not track in self.__dOptionsByTrack.keys():
-    #                        self.__dOptionsByTrack[track] = []
-    #                        self.__aTracks.append(track)
-    #                    self.__dOptionsByTrack[track].append(m)
