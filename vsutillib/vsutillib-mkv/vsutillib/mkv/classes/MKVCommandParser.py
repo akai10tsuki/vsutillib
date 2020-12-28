@@ -488,12 +488,12 @@ class MKVCommandParser:
                     if len(oFile.filesInDir) != self.__totalSourceFiles:
                         self.__errorFound = True
                         self.__lstAnalysis.append(
-                            "err: Error source files TOTAL mismatched." + match.group(0)
+                            "err: Error source files TOTAL mismatched." + match
                         )
                 else:
                     self.__errorFound = True
                     self.__lstAnalysis.append(
-                        "err: Error reading source files." + match.group(2)
+                        "err: Error reading source files." + match
                     )
         else:
             self.__errorFound = True
