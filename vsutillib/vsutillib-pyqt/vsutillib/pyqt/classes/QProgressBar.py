@@ -25,9 +25,13 @@ from PySide2.QtWidgets import (
 )
 
 if platform.system() == "Windows":
-    from PySide2.QtWinExtras import QWinTaskbarButton, QtWin
-    myAppID = "VergaraSoft.MKVBatchMultiplex.mkv.2.0.0"  # arbitrary string
-    QtWin.setCurrentProcessExplicitAppUserModelID(myAppID)
+    import ctypes
+    from PySide2.QtWinExtras import QWinTaskbarButton
+
+    myAppID = "VergaraSoft.MKVBatchMultiplex.mkv.2.1.0"  # arbitrary string
+    #QtWin.setCurrentProcessExplicitAppUserModelID(myAppID)
+    #myappid = u'mycompany.myproduct.subproduct.version' # arbitrary string
+    ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myAppID)
 
 class DualProgressBar(QWidget):
     """
