@@ -55,10 +55,21 @@ def adjustSources(oCommand, index, algorithm=1):
             if len(baseFileInfo) <= 0:
                 # source file with no tracks
                 suffix = PurePath(baseFileInfo.fileName).suffix # pathlib.Path or str
-                if suffix not in (".avi", ".ogm", ".mka", ".mks", ".mkv", ".mp4"):
+                if suffix in (
+                    ".srt",
+                    ".ssa",
+                    ".ass",
+                    ".pgs",
+                    ".idx",
+                    ".vob",
+                    ".vtt",
+                    ".usf",
+                    ".dvb",
+                    ".smi",
+                ):
+                    # Hope this are the supported subs move to config.
                     continue
-                else:
-                    return False, "Low"
+                return False, "Low"
             trackBase = baseFileInfo[i]
             if i < len(sourceFileInfo):
                 # source less tracks than base
