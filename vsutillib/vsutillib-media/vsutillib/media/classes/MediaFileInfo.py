@@ -7,6 +7,8 @@ Get file structure information from media file
 import base64
 import logging
 
+from pathlib import PurePath
+
 # import pprint
 
 from pymediainfo import MediaInfo
@@ -42,6 +44,7 @@ class MediaFileInfo:
     def __init__(self, mediaFile, log=None):
 
         self.fileName = mediaFile
+        self.suffix = ""
         self.mediaInfo = None
         self.codec = ""
         self.format = ""
@@ -61,7 +64,7 @@ class MediaFileInfo:
         self._initHelper()
 
     def _initHelper(self):
-
+        self.suffix = PurePath(self.fileName).suffix
         try:
             fileMediaInfo = MediaInfo.parse(self.fileName)
             self.mediaInfo = fileMediaInfo
@@ -72,6 +75,7 @@ class MediaFileInfo:
             if track.track_type == "General":
                 self.codec = track.codec
                 self.format = track.format
+
                 if track.title is not None:
                     self.title = track.title
                     try:
@@ -115,8 +119,29 @@ class MediaFileInfo:
             if track.track_type == "Menu":
                 self.menu = track
             if track.track_type in ("Video", "Audio", "Text"):
+                #
+                # BUG #9
+                # When the subtitle file is UTF-8 with BOM the track information
+                # is not generated.  So assume no text file has any track info.
+                #
+                if self.suffix in (
+                    ".srt",
+                    ".ssa",
+                    ".ass",
+                    ".pgs",
+                    ".idx",
+                    ".vob",
+                    ".vtt",
+                    ".usf",
+                    ".dvb",
+                    ".smi",
+                ):
+                    self.hasMediaTracks = False
+                    continue
+
                 if not self.hasMediaTracks:
                     self.hasMediaTracks = True
+
                 lang = iso639(track.language, codeOnly=True)
                 if lang in self.totalTracksByTypeLanguage[track.track_type].keys():
                     langIndex = (
