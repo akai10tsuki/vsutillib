@@ -100,12 +100,12 @@ from natsort import natsorted, ns
 
 from ..generateCommandTemplate import generateCommandTemplate
 from ..mkvutils import (
-   convertToBashStyle,
-   generateCommand,
-   numberOfTracksInCommand,
-   resolveOverwrite,
-   stripEncaseQuotes,
-   unQuote,
+    convertToBashStyle,
+    generateCommand,
+    numberOfTracksInCommand,
+    resolveOverwrite,
+    stripEncaseQuotes,
+    unQuote,
 )
 
 from .SourceFiles import SourceFile, SourceFiles
@@ -501,7 +501,7 @@ class MKVCommandParser:
 
         self.commandTemplate = str(self.originalCommandTemplate)
 
-        #if self.preserveTrackNames:
+        # if self.preserveTrackNames:
         #    preserveNames(self)
 
         self.commandTemplates = [self.commandTemplate] * len(self)
@@ -583,7 +583,7 @@ class MKVCommandParser:
         if self.chaptersFiles:
             self.filesInDirByKey[MKVParseKey.chaptersFile] = self.chaptersFiles
 
-    def createKeysDictionary(self, index):
+    def createKeysDictionary(self, index, tracksOrder=None):
         """
         createKeysDictionary create a keys dictionary for template substitution
 
@@ -600,7 +600,10 @@ class MKVCommandParser:
                 keyDictionary[key] = shlex.quote(str(sourceFile[index]))
             else:
                 keyDictionary[key] = sourceFile[index]
-        keyDictionary[MKVParseKey.trackOrder] = self.tracksOrder[index]
+        if tracksOrder is not None:
+            keyDictionary[MKVParseKey.trackOrder] = tracksOrder
+        else:
+            keyDictionary[MKVParseKey.trackOrder] = self.tracksOrder[index]
 
         return keyDictionary
 
@@ -621,7 +624,9 @@ class MKVCommandParser:
 
                 _, _ = self.generateCommandByIndex(i, update=True)
 
-    def generateCommandByIndex(self, index, update=False):
+    def generateCommandByIndex(
+        self, index, update=False, template=None, tracksOrder=None
+    ):
         """
         generateCommandByIndex generate a command for a determined index
 
@@ -634,8 +639,11 @@ class MKVCommandParser:
             str: final command
         """
 
-        cmdTemplate = self.commandTemplates[index]
-        keyDictionary = self.createKeysDictionary(index)
+        if template is not None:
+            cmdTemplate = template
+        else:
+            cmdTemplate = self.commandTemplates[index]
+        keyDictionary = self.createKeysDictionary(index, tracksOrder=tracksOrder)
         strCommand = generateCommand(cmdTemplate, keyDictionary)
         shellCommand = shlex.split(
             strCommand
@@ -658,6 +666,7 @@ class MKVCommandParser:
             self.newNames = list(newNames)
             self.filesInDirByKey[MKVParseKey.outputFile] = self.newNames
             self.generateCommands()
+
 
 def preserveNames(self):
     """
