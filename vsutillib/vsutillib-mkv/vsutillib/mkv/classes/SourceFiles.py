@@ -236,7 +236,18 @@ class SourceFiles:
         return item in self.__sourceFiles
 
     def __getitem__(self, index):
-        """ __getitem__ from SourceFile is finally called"""
+        """
+        __getitem__ implement access using []
+
+        Args:
+            index (int, slice): index or slice to access member
+
+        Raises:
+            IndexError: raise if index error if index in not int or slice
+
+        Returns:
+            list: list with the source files for command at index
+        """
 
         if isinstance(index, (int, slice)):
             tmp = []
