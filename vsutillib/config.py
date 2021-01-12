@@ -28,21 +28,21 @@ from vsutillib.files import ConfigurationSettings
 from vsutillib.log import LogRotateFileHandler
 
 
-__VERSION = (1, 6, "5", "dev4")
+__VERSION = (1, 6, "5", "dev5")
 
 
-FILES_VERSION = "1.6.5" # 1.6.3
+FILES_VERSION = "1.6.5"  # 1.6.3
 LOG_VERSION = "1.6.0"
 MACOS_VERSION = "1.6.1"
-MEDIA_VERSION = "1.6.5" # 1.6.2
+MEDIA_VERSION = "1.6.5"  # 1.6.2
 MISC_VERSION = "1.6.5"  # 1.6.0
-MKV_VERSION = "1.6.5"   # 1.6.2
+MKV_VERSION = "1.6.5"  # 1.6.2
 NETWORK_VERSION = "1.6.0"
-PROCESS_VERSION = "1.6.5" # 1.6.0
-PYQT_VERSION = "1.6.5" # "1.6.2"
+PROCESS_VERSION = "1.6.5"  # 1.6.0
+PYQT_VERSION = "1.6.5"  # 1.6.2
 PYQT6_VERSION = "1.6.0"
-SCRIPTS_VERSION = "1.6.5" # "1.6.2"
-SQL_VERSION = "1.6.5" # 1.6.2
+SCRIPTS_VERSION = "1.6.5"  # 1.6.2
+SQL_VERSION = "1.6.5"  # 1.6.2
 VSXML_VERSION = "1.6.0"
 
 LXML_VERSION = ">=4.5"
