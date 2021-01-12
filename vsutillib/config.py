@@ -59,7 +59,7 @@ AUTHOR = "Efrain Vergara"
 EMAIL = "akai10tsuki@gmail.com"
 PACKAGES = [APPNAME]
 
-COPYRIGHT = "2018-2020, Efrain Vergara"
+COPYRIGHT = "2018-2021, Efrain Vergara"
 LICENSE = "MIT"
 DESCRIPTION = "Library module with miscellaneous convenience functions and classes"
 NAME = "vsutillib"
