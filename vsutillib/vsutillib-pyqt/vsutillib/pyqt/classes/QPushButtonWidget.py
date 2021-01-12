@@ -15,14 +15,19 @@ class QPushButtonWidget(QPushButton):
         tooltip (str, optional): original tooltip. Defaults to None.
     """
 
-    def __init__(self, *args, function=None, toolTip=None, **kwargs):
+    def __init__(self, *args, function=None, toolTip=None, originalText=None, **kwargs):
         super().__init__(*args, **kwargs)
 
-        for p in args:
-            if isinstance(p, str):
-                # Save first string found assume is the button label
-                self.originalText = p
-                break
+        self.__originalText = None
+
+        if originalText is not None:
+            self.originalText = originalText
+        else:
+            for p in args:
+                if isinstance(p, str):
+                    # Save first string found assume is the button label
+                    self.originalText = p
+                    break
 
         self.toolTip = toolTip
 
@@ -38,3 +43,19 @@ class QPushButtonWidget(QPushButton):
             self.toolTip = toolTip
 
         super().setToolTip(toolTip, *args, **kwargs)
+
+    def setText(self, text, *args, **kwargs):
+
+        if self.originalText is None:
+            self.originalText = text
+
+        super().setText(text, *args, **kwargs)
+
+    @property
+    def originalText(self):
+        return self.__originalText
+
+    @originalText.setter
+    def originalText(self, value):
+        if isinstance(value, str):
+            self.__originalText = value
