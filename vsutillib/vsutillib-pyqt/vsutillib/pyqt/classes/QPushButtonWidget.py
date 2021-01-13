@@ -15,19 +15,31 @@ class QPushButtonWidget(QPushButton):
         tooltip (str, optional): original tooltip. Defaults to None.
     """
 
-    def __init__(self, *args, function=None, toolTip=None, originalText=None, **kwargs):
-        super().__init__(*args, **kwargs)
+    # def __init__(self, *args, function=None, toolTip=None, originalText=None, **kwargs):
+
+    def __init__(self, *args, **kwargs):
+
+        function = kwargs.pop("function", None)
+        margins = kwargs.pop("margins", None)
+        # originalText = kwargs.pop("originalText", None)
+        textPrefix = kwargs.pop("textPrefix", None)
+        textSuffix = kwargs.pop("textSuffix", None)
+        toolTip = kwargs.pop("toolTip", None)
 
         self.__originalText = None
+        self.textPrefix = "" if textPrefix is None else textPrefix
+        self.textSuffix = "" if textSuffix is None else textSuffix
+        self.margins = "" if margins is None else margins
 
-        if originalText is not None:
-            self.originalText = originalText
-        else:
-            for p in args:
-                if isinstance(p, str):
-                    # Save first string found assume is the button label
-                    self.originalText = p
-                    break
+        newArgs = []
+        for p in args:
+            if isinstance(p, str):
+                self.originalText = p
+                p = self.lText
+            newArgs.append(p)
+        newArgs = tuple(newArgs)
+
+        super().__init__(*newArgs, **kwargs)
 
         self.toolTip = toolTip
 
@@ -39,17 +51,17 @@ class QPushButtonWidget(QPushButton):
 
     def setToolTip(self, toolTip, *args, **kwargs):
 
-        if self.toolTip is None:
+        if self.toolTip is not None:
             self.toolTip = toolTip
 
-        super().setToolTip(toolTip, *args, **kwargs)
+        super().setToolTip(_(toolTip), *args, **kwargs)
 
     def setText(self, text, *args, **kwargs):
 
         if self.originalText is None:
             self.originalText = text
 
-        super().setText(text, *args, **kwargs)
+        super().setText(self.lText, *args, **kwargs)
 
     @property
     def originalText(self):
@@ -59,3 +71,20 @@ class QPushButtonWidget(QPushButton):
     def originalText(self, value):
         if isinstance(value, str):
             self.__originalText = value
+
+    @property
+    def lText(self):
+        return (
+            self.margins
+            + self.textPrefix
+            + _(self.originalText)
+            + self.textSuffix
+            + self.margins
+        )
+
+    def setLanguage(self):
+        if self.toolTip is not None:
+            super().setToolTip(_(self.toolTip))
+
+        if self.originalText is not None:
+            super().setText(self.lText)

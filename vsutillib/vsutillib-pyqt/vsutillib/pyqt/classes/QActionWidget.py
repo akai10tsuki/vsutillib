@@ -22,18 +22,25 @@ class QActionWidget(QAction):
         shortcut = kwargs.pop("shortcut", None)
         toolTip = kwargs.pop("toolTip", None)
         statusTip = kwargs.pop("statusTip", None)
+        margins = kwargs.pop("margins", None)
 
-        super().__init__(*args, **kwargs)
+        self.textPrefix = "" if textPrefix is None else textPrefix
+        self.textSuffix = "" if textSuffix is None else textSuffix
+        self.margins = "" if margins is None else margins
 
+        newArgs = []
         for p in args:
             if isinstance(p, str):
                 self.originalText = p
+                p = self.lText
+            newArgs.append(p)
+        newArgs = tuple(newArgs)
+
+        super().__init__(*newArgs, **kwargs)
 
         self.shortcut = shortcut
         self.toolTip = toolTip
         self.statusTip = statusTip
-        self.textPrefix = "" if textPrefix is None else textPrefix
-        self.textSuffix = "" if textSuffix is None else textSuffix
 
         if shortcut is not None:
             self.setShortcut(shortcut)
@@ -49,25 +56,50 @@ class QActionWidget(QAction):
         if self.shortcut is None:
             self.shortcut = shortcut
 
-        super().setShortcut(shortcut, *args, **kwargs)
+        super().setShortcut(_(shortcut), *args, **kwargs)
 
     def setStatusTip(self, statusTip, *args, **kwargs):
 
         if self.statusTip is None:
             self.statusTip = statusTip
 
-        super().setStatusTip(statusTip, *args, **kwargs)
+        super().setStatusTip(_(statusTip), *args, **kwargs)
 
     def setText(self, text, *args, **kwargs):
 
         if self.originalText is None:
             self.originalText = text
 
-        super().setText(text, *args, **kwargs)
+        super().setText(self.lText, *args, **kwargs)
 
     def setToolTip(self, toolTip, *args, **kwargs):
 
         if self.toolTip is None:
             self.toolTip = toolTip
 
-        super().setToolTip(toolTip, *args, **kwargs)
+        super().setToolTip(_(toolTip), *args, **kwargs)
+
+    @property
+    def lText(self):
+        return (
+            self.margins
+            + self.textPrefix
+            + _(self.originalText)
+            + self.textSuffix
+            + self.margins
+        )
+
+    def setLanguage(self):
+        """Set language for widget labels"""
+
+        if self.toolTip is not None:
+            super().setToolTip(_(self.toolTip))
+
+        if self.originalText is not None:
+            super().setText(self.lText)
+
+        if self.statusTip is not None:
+            super().setStatusTip(_(self.statusTip))
+
+        if self.shortcut is not None:
+            super().setShortcut(_(self.shortcut))
