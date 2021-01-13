@@ -14,6 +14,7 @@ from .classes import (
     QFileListWidget,
     QFormatLabel,
     QGroupSignal,
+    QLabelWidget,
     QMenuWidget,
     QOutputTextWidget,
     QProgressIndicator,
