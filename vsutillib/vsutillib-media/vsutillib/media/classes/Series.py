@@ -1,6 +1,7 @@
 """
 
 Series class to get series information from TVMaze
+https://www.tvmaze.com/api
 
 """
 
