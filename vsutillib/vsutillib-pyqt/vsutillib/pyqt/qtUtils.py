@@ -65,6 +65,7 @@ def darkPalette(app=None):
     disabledColor = QColor(127, 127, 127)
 
     palette.setColor(QPalette.AlternateBase, darkColor)
+    palette.setColor(QPalette.Background, darkColor)
     palette.setColor(QPalette.Base, QColor(18, 18, 18))
     palette.setColor(QPalette.BrightText, SvgColor.red)
     palette.setColor(QPalette.Button, darkColor)
@@ -84,6 +85,7 @@ def darkPalette(app=None):
 
     if app is not None:
         app.setStyle("Fusion")
+        print("Fussion")
         #app.setStyle("windowsvista")
         app.setPalette(palette)
 
