@@ -5,6 +5,7 @@ used in internationalization
 
 from PySide2.QtWidgets import QLabel
 
+
 class QLabelWidget(QLabel):
     """Override QLabel __init__ to save text"""
 
@@ -20,7 +21,6 @@ class QLabelWidget(QLabel):
         self.textPrefix = "" if textPrefix is None else textPrefix
         self.textSuffix = "" if textSuffix is None else textSuffix
         self.margins = "" if margins is None else margins
-
 
         newArgs = []
         for p in args:
@@ -61,3 +61,11 @@ class QLabelWidget(QLabel):
     def setLanguage(self):
         if self.originalText is not None:
             super().setText(self.lText)
+
+
+# This if for Pylance _() is not defined
+def _(dummy):
+    return dummy
+
+
+del _

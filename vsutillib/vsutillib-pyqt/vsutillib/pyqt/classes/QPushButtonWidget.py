@@ -88,3 +88,10 @@ class QPushButtonWidget(QPushButton):
 
         if self.originalText is not None:
             super().setText(self.lText)
+
+# This if for Pylance _() is not defined
+def _(dummy):
+    return dummy
+
+
+del _

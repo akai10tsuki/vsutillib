@@ -8,10 +8,13 @@ from PySide2.QtWidgets import QAction
 
 class QActionWidget(QAction):
     """
-    QActionWidget subclass of QAction save original shortcut and tooltip for locale application
+    QActionWidget subclass of QAction save original shortcut and tooltip for
+    locale application
 
     Args:
-        shortcut (str, optional): original shortcut string representation. Defaults to None.
+        shortcut (str, optional): original shortcut string representation.
+        Defaults to None.
+
         tooltip (str, optional): original tooltip. Defaults to None.
     """
 
@@ -103,3 +106,11 @@ class QActionWidget(QAction):
 
         if self.shortcut is not None:
             super().setShortcut(_(self.shortcut))
+
+
+# This if for Pylance _() is not defined
+def _(dummy):
+    return dummy
+
+
+del _

@@ -5,6 +5,7 @@ used in internationalization
 
 from PySide2.QtWidgets import QMenu
 
+
 class QMenuWidget(QMenu):
     """Override QMenu __init__ to save title"""
 
@@ -20,7 +21,6 @@ class QMenuWidget(QMenu):
         self.titlePrefix = "" if titlePrefix is None else titlePrefix
         self.titleSuffix = "" if titleSuffix is None else titleSuffix
         self.margins = "" if margins is None else margins
-
 
         newArgs = []
         for p in args:
@@ -61,3 +61,11 @@ class QMenuWidget(QMenu):
     def setLanguage(self):
         if self.originalTitle is not None:
             super().setTitle(self.lTitle)
+
+
+# This if for Pylance _() is not defined
+def _(dummy):
+    return dummy
+
+
+del _
