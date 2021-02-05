@@ -13,10 +13,13 @@ Returns:
 
 """
 
-from PySide2.QtWidgets import QMessageBox
+from PySide2.QtGui import QIcon
+from PySide2.QtWidgets import QAbstractButton, QWidget, QMessageBox
 
 
-def messageBox(self, title, text, icon=QMessageBox.Information):
+def messageBox(
+    self: QWidget, title: str, text: str, icon: QIcon = QMessageBox.Information
+) -> QAbstractButton:
     """
     Working on generic message box
     """
@@ -25,8 +28,6 @@ def messageBox(self, title, text, icon=QMessageBox.Information):
     m.setWindowTitle(title)
     m.setText(text)
     m.setIcon(icon)
-    # yesButton = m.addButton('Yes', QMessageBox.ButtonRole.YesRole)
-    # noButton = m.addButton('No', QMessageBox.ButtonRole.NoRole)
     m.setDefaultButton(QMessageBox.Ok)
     m.setFont(self.font())
     m.exec_()
@@ -34,7 +35,9 @@ def messageBox(self, title, text, icon=QMessageBox.Information):
     return QMessageBox.Ok
 
 
-def messageBoxYesNo(self, title, text, icon):
+def messageBoxYesNo(
+    self: QWidget, title: str, text: str, icon: QIcon
+) -> QAbstractButton:
     """
     Yes | No message box
     """

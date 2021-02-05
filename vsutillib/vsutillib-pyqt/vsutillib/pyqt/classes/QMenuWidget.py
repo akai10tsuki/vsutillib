@@ -10,7 +10,7 @@ class QMenuWidget(QMenu):
     """Override QMenu __init__ to save title"""
 
     # title=None, titlePrefix=None, titleSuffix=None):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: str, **kwargs: str) -> None:
 
         titlePrefix = kwargs.pop("titlePrefix", None)
         titleSuffix = kwargs.pop("titleSuffix", None)
@@ -32,7 +32,7 @@ class QMenuWidget(QMenu):
 
         super().__init__(*newArgs, **kwargs)
 
-    def setTitle(self, title, *args, **kwargs):
+    def setTitle(self, title: str, *args: str, **kwargs: str) -> None:
 
         if self.originalTitle is None:
             self.originalTitle = title
@@ -40,7 +40,7 @@ class QMenuWidget(QMenu):
         super().setTitle(self.lTitle, *args, **kwargs)
 
     @property
-    def lTitle(self):
+    def lTitle(self) -> str:
         return (
             self.margins
             + self.titlePrefix
@@ -50,21 +50,21 @@ class QMenuWidget(QMenu):
         )
 
     @property
-    def originalTitle(self):
+    def originalTitle(self) -> str:
         return self.__originalTitle
 
     @originalTitle.setter
-    def originalTitle(self, value):
+    def originalTitle(self, value: str) -> None:
         if isinstance(value, str):
             self.__originalTitle = value
 
-    def setLanguage(self):
+    def setLanguage(self) -> None:
         if self.originalTitle is not None:
             super().setTitle(self.lTitle)
 
 
 # This if for Pylance _() is not defined
-def _(dummy):
+def _(dummy: str) -> str:
     return dummy
 
 

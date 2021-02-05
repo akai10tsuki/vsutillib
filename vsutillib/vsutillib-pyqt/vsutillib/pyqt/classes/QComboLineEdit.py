@@ -3,9 +3,10 @@ ComboBox sub-class of QComboBox permits removal of highlighted item in the popup
     list with Del key
 """
 
+from typing import Optional
 
 from PySide2.QtCore import Qt, Signal, Slot, QObject, QEvent
-from PySide2.QtWidgets import QApplication, QComboBox
+from PySide2.QtWidgets import QApplication, QComboBox, QWidget
 
 
 class QComboLineEdit(QComboBox):
@@ -19,7 +20,7 @@ class QComboLineEdit(QComboBox):
 
     itemsChangeSignal = Signal()
 
-    def __init__(self, parent=None, popup=False):
+    def __init__(self, parent: Optional[QWidget] = None, popup: bool = False) -> None:
         super().__init__()
 
         self.__tab = None
@@ -32,21 +33,20 @@ class QComboLineEdit(QComboBox):
         self.setEditable(True)
         self.lineEdit().setClearButtonEnabled(True)
 
-
-    def isPopup(self):
+    def isPopup(self) -> bool:
         return self.__popup
 
-    def showPopup(self):
+    def showPopup(self) -> None:
 
         self.__popup = True
         super().showPopup()
 
-    def hidePopup(self):
+    def hidePopup(self) -> None:
 
         self.__popup = False
         super().hidePopup()
 
-    def eventFilter(self, obj, event):
+    def eventFilter(self, obj: QObject, event: QEvent) -> bool:
 
         if obj == self.view():
             if event.type() == QEvent.KeyPress:
@@ -60,7 +60,7 @@ class QComboLineEdit(QComboBox):
 
         return QObject.eventFilter(self, obj, event)
 
-    def keyPressEvent(self, event):
+    def keyPressEvent(self, event: QEvent) -> None:
 
         if event.key() in [Qt.Key_Enter, Qt.Key_Return]:
             modifiers = QApplication.keyboardModifiers()
@@ -71,6 +71,6 @@ class QComboLineEdit(QComboBox):
             QComboBox.keyPressEvent(self, event)
 
     @Slot(int)
-    def saveHighlighted(self, index):
+    def saveHighlighted(self, index: int) -> None:
 
         self.__highlighted = index

@@ -2,10 +2,12 @@
  QFrame Lines for separators
 """
 
-from PySide2.QtWidgets import QFrame
+from typing import Optional
+
+from PySide2.QtWidgets import QFrame, QWidget
 
 class HorizontalLine(QFrame):
-    def __init__(self, parent=None, width=1):
+    def __init__(self, parent: Optional[QWidget] = None, width: int = 1) -> None:
         super().__init__(parent)
 
         self.setFrameShape(QFrame.HLine)
@@ -13,7 +15,7 @@ class HorizontalLine(QFrame):
         self.setLineWidth(width)
 
 class VerticalLine(QFrame):
-    def __init__(self, parent=None, width=1):
+    def __init__(self, parent: Optional[QWidget] = None, width: int = 1) -> None:
         super().__init__(parent)
 
         self.setFrameShape(QFrame.VLine)

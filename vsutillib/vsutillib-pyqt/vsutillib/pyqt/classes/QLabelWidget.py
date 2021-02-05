@@ -3,6 +3,8 @@ subclass of QMenu to save text
 used in internationalization
 """
 
+from typing import Any
+
 from PySide2.QtWidgets import QLabel
 
 
@@ -10,7 +12,7 @@ class QLabelWidget(QLabel):
     """Override QLabel __init__ to save text"""
 
     # text=None, textPrefix=None, textSuffix=None):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: str, **kwargs: str) -> None:
 
         textPrefix = kwargs.pop("textPrefix", None)
         textSuffix = kwargs.pop("textSuffix", None)
@@ -32,7 +34,7 @@ class QLabelWidget(QLabel):
 
         super().__init__(*newArgs, **kwargs)
 
-    def setText(self, text, *args, **kwargs):
+    def setText(self, text: str, *args: str, **kwargs: str) -> None:
 
         if self.originalText is None:
             self.originalText = text
@@ -40,7 +42,7 @@ class QLabelWidget(QLabel):
         super().setText(self.lText, *args, **kwargs)
 
     @property
-    def lText(self):
+    def lText(self) -> str:
         return (
             self.margins
             + self.textPrefix
@@ -50,21 +52,21 @@ class QLabelWidget(QLabel):
         )
 
     @property
-    def originalText(self):
+    def originalText(self) -> str:
         return self.__originalText
 
     @originalText.setter
-    def originalText(self, value):
+    def originalText(self, value: str) -> None:
         if isinstance(value, str):
             self.__originalText = value
 
-    def setLanguage(self):
+    def setLanguage(self) -> None:
         if self.originalText is not None:
             super().setText(self.lText)
 
 
 # This if for Pylance _() is not defined
-def _(dummy):
+def _(dummy: str) -> str:
     return dummy
 
 

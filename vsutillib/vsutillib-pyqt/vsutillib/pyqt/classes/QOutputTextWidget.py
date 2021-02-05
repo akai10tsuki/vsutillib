@@ -8,10 +8,11 @@ Output widget form just to output text in color
 
 import logging
 
+from typing import Dict, Optional, Union
 
 from PySide2.QtCore import Qt, Signal, Slot
-from PySide2.QtGui import QTextCursor
-from PySide2.QtWidgets import QTextEdit
+from PySide2.QtGui import QColor, QTextCursor
+from PySide2.QtWidgets import QTextEdit, QWidget
 
 
 from .insertTextHelpers import checkColor, LineOutput
@@ -31,7 +32,12 @@ class QOutputTextWidget(QTextEdit):
     setCurrentIndexSignal = Signal()
     isDarkMode = False
 
-    def __init__(self, parent=None, log=None, **kwargs):
+    def __init__(
+        self,
+        parent: Optional[QWidget] = None,
+        log: Optional[bool] = None,
+        **kwargs: str
+    ) -> None:
         super().__init__(parent=parent, **kwargs)
 
         self.parent = parent
@@ -44,7 +50,7 @@ class QOutputTextWidget(QTextEdit):
         self.clearSignal.connect(super().clear)
 
     @classmethod
-    def classLog(cls, setLogging=None):
+    def classLog(cls, setLogging: Optional[bool] = None) -> bool:
         """
         get/set logging at class level
         every class instance will log
@@ -69,7 +75,7 @@ class QOutputTextWidget(QTextEdit):
         return cls.__log
 
     @property
-    def log(self):
+    def log(self) -> bool:
         """
         class property can be used to override the class global
         logging setting
@@ -85,18 +91,18 @@ class QOutputTextWidget(QTextEdit):
         return QOutputTextWidget.classLog()
 
     @log.setter
-    def log(self, value):
+    def log(self, value: bool) -> None:
         """set instance log variable"""
         if isinstance(value, bool) or value is None:
             self.__log = value
 
-    def connectToInsertText(self, objSignal):
+    def connectToInsertText(self, objSignal: Signal) -> None:
         """Connect to signal"""
 
         objSignal.connect(self.insertText)
 
     @Slot(str, dict)
-    def insertText(self, strText, kwargs):
+    def insertText(self, strText: str, kwargs: Dict[str, Union[QColor, bool]]):
         """
         insertText - Insert text in output window.
         Cannot use standard keyword arguments on

@@ -14,6 +14,8 @@ TaskBarButtonProgress show progress bar on taskbar icon
 
 import platform
 
+from collections.abc import Callable
+
 from PySide2.QtCore import Qt, Signal, Slot
 from PySide2.QtWidgets import (
     QWidget,
@@ -25,13 +27,58 @@ from PySide2.QtWidgets import (
 )
 
 if platform.system() == "Windows":
+
     import ctypes
     from PySide2.QtWinExtras import QWinTaskbarButton
 
     myAppID = "VergaraSoft.MKVBatchMultiplex.mkv.2.1.0"  # arbitrary string
-    #QtWin.setCurrentProcessExplicitAppUserModelID(myAppID)
-    #myappid = u'mycompany.myproduct.subproduct.version' # arbitrary string
+    # QtWin.setCurrentProcessExplicitAppUserModelID(myAppID)
+    # myAppid = u'myCompany.myProduct.subproduct.version' # arbitrary string
     ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myAppID)
+
+    class TaskbarButtonProgress(QWinTaskbarButton):
+        """
+        TaskbarProgress taskbar icon progress indicator
+        """
+
+        def __init__(self, parent):
+            super().__init__(parent)
+
+            self.platform = platform.system()
+            self.parent = parent
+            self.button = None
+            self.progress = None
+
+            if self.platform == "Windows":
+                self.button = QWinTaskbarButton(parent)
+
+        def __bool__(self):
+            if (self.button is None) or (self.progress is None):
+                return False
+            return True
+
+        def initTaskbarButton(self):
+            """
+            initTaskbarButton for late init QWinTaskbarButton
+            """
+
+            if self.platform == "Windows":
+                self.button.setWindow(self.parent.windowHandle())
+                self.progress = self.button.progress()
+                self.progress.setRange(0, 100)
+                self.progress.setVisible(True)
+
+        @Slot(int, int)
+        def setValue(self, init, total):
+
+            self.progress.setValue(total)
+
+
+else:
+
+    def TaskbarButtonProgress(parent):
+        return False
+
 
 class DualProgressBar(QWidget):
     """
@@ -272,50 +319,15 @@ class DualProgressBar(QWidget):
         QWidget.setSizePolicy(self, horizontal, vertical)
 
 
-if platform.system() == "Windows":
+class SpacerWidget(QWidget):
+    """
+    Utility widget to maintain widgets at same extreme during resizing
+    """
 
-    class TaskbarButtonProgress(QWinTaskbarButton):
-        """
-        TaskbarProgress taskbar icon progress indicator
-        """
+    def __init__(self, parent=None):
+        super().__init__(parent)
 
-        def __init__(self, parent):
-            super().__init__(parent)
-
-            self.platform = platform.system()
-            self.parent = parent
-            self.button = None
-            self.progress = None
-
-            if self.platform == "Windows":
-                self.button = QWinTaskbarButton(parent)
-
-        def __bool__(self):
-            if (self.button is None) or (self.progress is None):
-                return False
-            return True
-
-        def initTaskbarButton(self):
-            """
-            initTaskbarButton for late init QWinTaskbarButton
-            """
-
-            if self.platform == "Windows":
-                self.button.setWindow(self.parent.windowHandle())
-                self.progress = self.button.progress()
-                self.progress.setRange(0, 100)
-                self.progress.setVisible(True)
-
-        @Slot(int, int)
-        def setValue(self, init, total):
-
-            self.progress.setValue(total)
-
-
-else:
-
-    def TaskbarButtonProgress(parent):
-        return False
+        self.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Expanding)
 
 
 def _VerticalBarSetup(pbBar, label):
@@ -333,17 +345,6 @@ def _VerticalBarSetup(pbBar, label):
     widget.setLayout(vbox)
 
     return widget
-
-
-class SpacerWidget(QWidget):
-    """
-    Utility widget to maintain widgets at same extreme during resizing
-    """
-
-    def __init__(self, parent=None):
-        super().__init__(parent)
-
-        self.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Expanding)
 
 
 if __name__ == "__main__":

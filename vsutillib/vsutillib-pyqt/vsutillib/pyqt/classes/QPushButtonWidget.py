@@ -17,7 +17,7 @@ class QPushButtonWidget(QPushButton):
 
     # def __init__(self, *args, function=None, toolTip=None, originalText=None, **kwargs):
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: str, **kwargs: str) -> None:
 
         function = kwargs.pop("function", None)
         margins = kwargs.pop("margins", None)
@@ -49,14 +49,14 @@ class QPushButtonWidget(QPushButton):
         if toolTip is not None:
             self.setToolTip(toolTip)
 
-    def setToolTip(self, toolTip, *args, **kwargs):
+    def setToolTip(self, toolTip: str, *args: str, **kwargs: str) -> None:
 
         if self.toolTip is not None:
             self.toolTip = toolTip
 
         super().setToolTip(_(toolTip), *args, **kwargs)
 
-    def setText(self, text, *args, **kwargs):
+    def setText(self, text: str, *args: str, **kwargs: str) -> None:
 
         if self.originalText is None:
             self.originalText = text
@@ -64,16 +64,16 @@ class QPushButtonWidget(QPushButton):
         super().setText(self.lText, *args, **kwargs)
 
     @property
-    def originalText(self):
+    def originalText(self) -> str:
         return self.__originalText
 
     @originalText.setter
-    def originalText(self, value):
+    def originalText(self, value: str) -> None:
         if isinstance(value, str):
             self.__originalText = value
 
     @property
-    def lText(self):
+    def lText(self) -> str:
         return (
             self.margins
             + self.textPrefix
@@ -82,7 +82,7 @@ class QPushButtonWidget(QPushButton):
             + self.margins
         )
 
-    def setLanguage(self):
+    def setLanguage(self) -> None:
         if self.toolTip is not None:
             super().setToolTip(_(self.toolTip))
 
@@ -90,7 +90,7 @@ class QPushButtonWidget(QPushButton):
             super().setText(self.lText)
 
 # This if for Pylance _() is not defined
-def _(dummy):
+def _(dummy: str) -> str:
     return dummy
 
 

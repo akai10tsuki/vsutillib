@@ -18,7 +18,7 @@ class QActionWidget(QAction):
         tooltip (str, optional): original tooltip. Defaults to None.
     """
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: str, **kwargs: str) -> None:
 
         textPrefix = kwargs.pop("textPrefix", None)
         textSuffix = kwargs.pop("textSuffix", None)
@@ -54,28 +54,28 @@ class QActionWidget(QAction):
         if statusTip is not None:
             self.setStatusTip(statusTip)
 
-    def setShortcut(self, shortcut, *args, **kwargs):
+    def setShortcut(self, shortcut: str, *args: str, **kwargs: str) -> str:
 
         if self.shortcut is None:
             self.shortcut = shortcut
 
         super().setShortcut(_(shortcut), *args, **kwargs)
 
-    def setStatusTip(self, statusTip, *args, **kwargs):
+    def setStatusTip(self, statusTip: str, *args: str, **kwargs: str) -> None:
 
         if self.statusTip is None:
             self.statusTip = statusTip
 
         super().setStatusTip(_(statusTip), *args, **kwargs)
 
-    def setText(self, text, *args, **kwargs):
+    def setText(self, text: str, *args: str, **kwargs: str) -> str:
 
         if self.originalText is None:
             self.originalText = text
 
         super().setText(self.lText, *args, **kwargs)
 
-    def setToolTip(self, toolTip, *args, **kwargs):
+    def setToolTip(self, toolTip: str, *args: str, **kwargs: str) -> None:
 
         if self.toolTip is None:
             self.toolTip = toolTip
@@ -83,7 +83,7 @@ class QActionWidget(QAction):
         super().setToolTip(_(toolTip), *args, **kwargs)
 
     @property
-    def lText(self):
+    def lText(self) -> str:
         return (
             self.margins
             + self.textPrefix
@@ -92,7 +92,7 @@ class QActionWidget(QAction):
             + self.margins
         )
 
-    def setLanguage(self):
+    def setLanguage(self) -> None:
         """Set language for widget labels"""
 
         if self.toolTip is not None:
@@ -109,7 +109,7 @@ class QActionWidget(QAction):
 
 
 # This if for Pylance _() is not defined
-def _(dummy):
+def _(dummy: str) -> str:
     return dummy
 
 
