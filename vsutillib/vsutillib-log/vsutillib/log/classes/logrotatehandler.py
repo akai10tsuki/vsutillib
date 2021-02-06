@@ -4,15 +4,15 @@ it rotates at initialization
 this means by number of executions
 """
 
-import pprint
 import codecs
 import logging.handlers
 import re
 import sys
 
 from pathlib import Path
+from typing import Any, Optional, Union
 
-
+F = Union[Path, str]
 class LogRotateFileHandler(logging.handlers.RotatingFileHandler):
 
     """
@@ -28,7 +28,7 @@ class LogRotateFileHandler(logging.handlers.RotatingFileHandler):
             initialization
     """
 
-    def __init__(self, fileName, **kwargs):
+    def __init__(self, fileName: F, **kwargs: Any) -> None:
 
         # Python 3.5 open not compatible with pathlib
         if sys.version_info[:2] == (3, 5):
@@ -40,7 +40,7 @@ class LogRotateFileHandler(logging.handlers.RotatingFileHandler):
 
         self.doRollover()
 
-    def emit(self, record):
+    def emit(self, record: str) -> None:
         """
         emit remove line feed character from strings type arguments
 
@@ -70,7 +70,7 @@ class LogRotateFileHandlerOriginal(logging.Handler):
     :type backupCount: int
     """
 
-    def __init__(self, logFile, backupCount=0):
+    def __init__(self, logFile: F, backupCount: Optional[int] = 0) -> None:
         super().__init__()
 
         self.logFile = logFile
@@ -78,7 +78,7 @@ class LogRotateFileHandlerOriginal(logging.Handler):
         self._rollover()
         self.logFilePointer = None
 
-    def _rollover(self):
+    def _rollover(self) -> None:
         """Rollover log files"""
         regEx = re.compile(r".*\.log\.(\d+)")
 
@@ -119,7 +119,7 @@ class LogRotateFileHandlerOriginal(logging.Handler):
             logFile.replace(rollFile)
             # logFile.touch(exist_ok=True)
 
-    def emit(self, record):
+    def emit(self, record: str) -> None:
         """
         Write record entry to log file
         """

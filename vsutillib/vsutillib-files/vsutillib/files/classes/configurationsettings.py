@@ -4,6 +4,8 @@ Class to save/restore configuration from file
 
 # CM0004
 
+from __future__ import annotations
+
 import ast
 import base64
 import logging
@@ -13,6 +15,7 @@ import xml.etree.ElementTree as ET
 import xml.dom.minidom as DOM
 
 from pathlib import Path
+from typing import ClassVar, Dict, List, Optional, Tuple, Union
 
 MODULELOG = logging.getLogger(__name__)
 MODULELOG.addHandler(logging.NullHandler())
@@ -104,7 +107,7 @@ class ConfigurationSettings:
     # data that can be treated as literal
     # theese are human readable easier
     # to use on different systems
-    _literal = [
+    _literal: ClassVar[List[str]] = [
         "bool",
         "bytes",
         "complex",
@@ -119,10 +122,16 @@ class ConfigurationSettings:
 
     # pickable types are python specific maybe
     # even version specific
-    _pickable = ["range", "bytearray", "frozenset", "function", "pickle"]
+    _pickable: ClassVar[List[str]] = [
+        "range",
+        "bytearray",
+        "frozenset",
+        "function",
+        "pickle",
+    ]
 
     @classmethod
-    def classLog(cls, setLogging=None):
+    def classLog(cls, setLogging: Optional[Union[bool, None]] = ...) -> bool:
         """
         get/set logging at class level
         every class instance will log
@@ -146,7 +155,7 @@ class ConfigurationSettings:
 
         return cls.__log
 
-    def __init__(self, configFile=None):
+    def __init__(self, configFile: Union[str, Path] = None) -> None:
 
         self._config = {}
         self._configType = {}
@@ -159,19 +168,19 @@ class ConfigurationSettings:
         # global logging override
         self.__log = None
 
-    def __contains__(self, value):
+    def __contains__(self, value: object) -> bool:
         return value in self._config
 
-    def __getitem__(self, key):
+    def __getitem__(self, key: str) -> object:
         return self._config[key]
 
-    def __setitem__(self, key, value):
+    def __setitem__(self, key: str, value: object) -> None:
         self._config[key] = value
 
-    def __iter__(self):
+    def __iter__(self) -> ConfigurationSettings:
         return self
 
-    def __next__(self):
+    def __next__(self) -> Tuple[int, object]:
         if self._current >= self._len:
             self._current = 0
             raise StopIteration
@@ -180,14 +189,14 @@ class ConfigurationSettings:
             key = list(self._config)[self._current - 1]
             return [key, self._config[key]]
 
-    def __bool__(self):
-        return len(self._config)
+    def __bool__(self) -> bool:
+        return bool(len(self._config))
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self._config)
 
     @property
-    def log(self):
+    def log(self) -> bool:
         """
         class property can be used to override the class global
         logging setting
@@ -205,16 +214,16 @@ class ConfigurationSettings:
         return ConfigurationSettings.classLog()
 
     @property
-    def configDictionary(self):
+    def configDictionary(self) -> Dict[str, object]:
         return self._config
 
     @log.setter
-    def log(self, value):
+    def log(self, value: bool) -> None:
         """set instance log variable"""
         if isinstance(value, bool) or value is None:
             self.__log = value
 
-    def set(self, key, value, valueType=None):
+    def set(self, key: str, value: object, valueType: Optional[str] = None) -> None:
         """
         set value at key in dictionary
 
@@ -249,7 +258,7 @@ class ConfigurationSettings:
                 MODULELOG.debug("CFG0002: key must be a string - %s", str(s))
             raise TypeError("key must be a string - {}".format(s))
 
-    def get(self, key):
+    def get(self, key: str) -> Union[object, None]:
         """
         get value from dictionary
 
@@ -269,7 +278,7 @@ class ConfigurationSettings:
 
         return None
 
-    def delete(self, key):
+    def delete(self, key: str) -> Union[object, None]:
         """
         delete remove value from dictionary
 
@@ -289,7 +298,9 @@ class ConfigurationSettings:
 
         return retVal
 
-    def toXML(self, root=None, name=None):
+    def toXML(
+        self, root: Optional[ET.Element] = None, name: Optional[str] = None
+    ) -> ET.Element:
         """
         Returns the configuration in XML format
         if root is None returns the current configuration
@@ -317,6 +328,7 @@ class ConfigurationSettings:
             if key in self._configType:
                 valueType = self._configType[key]
 
+            tValue = None
             if valueType in self._literal:
                 tValue = value
             elif valueType in self._pickable:
@@ -333,7 +345,7 @@ class ConfigurationSettings:
 
         return root
 
-    def fromXML(self, xmlDoc, name=None):
+    def fromXML(self, xmlDoc: ET, name: Optional[str] = None):
         """
         Restore configuration from xml name parameter
         permit various configuration sets on same
@@ -365,7 +377,7 @@ class ConfigurationSettings:
 
             self.set(key, value, valueType=valueType)
 
-    def xmlPrettyPrint(self, root=None):
+    def xmlPrettyPrint(self, root: Optional[ET.Element] = None) -> str:
         """
         Returns configuration xml Pretty Printed
 
@@ -388,7 +400,7 @@ class ConfigurationSettings:
 
         return xmlPretty
 
-    def setConfigFile(self, xmlFile):
+    def setConfigFile(self, xmlFile: Union[str, Path]):
         """
         sets the file for reading and writing to
         """
@@ -402,7 +414,9 @@ class ConfigurationSettings:
 
         self._configFile = xf
 
-    def saveToFile(self, xmlFile=None, rootName=None):
+    def saveToFile(
+        self, xmlFile: Optional[Union[str, Path]] = None, rootName: Optional[str] = None
+    ) -> None:
         """
         save configuration to file in xml format
 
@@ -418,6 +432,8 @@ class ConfigurationSettings:
 
         if rootName is None:
             rootTag = "VergaraSoft"
+        else:
+            rootTag = rootName
 
         root = ET.Element(rootTag)
 
@@ -425,7 +441,7 @@ class ConfigurationSettings:
         tree = ET.ElementTree(xmlConfig)
         tree.write(str(xf))
 
-    def readFromFile(self, xmlFile=None):
+    def readFromFile(self, xmlFile: Optional[Union[str, Path]] = None):
         """
         save configuration to file in xml format
 
@@ -454,20 +470,20 @@ class ConfigurationSettings:
 class Abc:
     """Test class"""
 
-    def __init__(self, param):
+    def __init__(self, param: object) -> None:
         self.value = param
 
-    def getValue(self):
+    def getValue(self) -> object:
         """Test method"""
         return self.value
 
 
-def print13():
+def print13() -> None:
     """function for testing"""
     print("Print from function = 13")
 
 
-def test():
+def test() -> None:
     """Testing read and write configuration to file"""
 
     classInstance = Abc(13)
@@ -494,9 +510,7 @@ def test():
         "AdnQywACAAAAAAHmAAAAoAAACM4AAAR5AAAB7wAAAMYAAAjFAAAEcAAAAAAAAAAACgA=".encode(),
     )
     configuration.set("dict", {"key1": 1, "key2": 2, 3: b})
-    configuration.set(
-        "list", [2, 3, "list", {"key1": 1, 2: [2]}], valueType="pickle"
-    )
+    configuration.set("list", [2, 3, "list", {"key1": 1, 2: [2]}], valueType="pickle")
     configuration.set("int", 13)
     configuration.set("float", 1.3e200)
     configuration.set("complex", 1 + 3j)

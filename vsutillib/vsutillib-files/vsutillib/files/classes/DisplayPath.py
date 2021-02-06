@@ -3,16 +3,19 @@ pretty print tree
 """
 
 from pathlib import Path
+from typing import Callable, ClassVar, List, Optional, Union
 
 from natsort import natsorted, ns
+
+F = Union[Path, str]
 
 
 class Prefix:
 
-    filenameMiddle = "├──"
-    filenameLast = "└──"
-    parentMiddle = "    "
-    parentLast = "│   "
+    filenameMiddle: ClassVar[str] = "├──"
+    filenameLast: ClassVar[str] = "└──"
+    parentMiddle: ClassVar[str] = "    "
+    parentLast: ClassVar[str] = "│   "
 
     # filenameMiddle = "├─"
     # filenameLast = "└─"
@@ -23,7 +26,7 @@ class Prefix:
 class DisplayPath:
     """DisplayPath"""
 
-    def __init__(self, path, parentPath, isLast):
+    def __init__(self, path: F, parentPath: F, isLast: bool) -> None:
         self.path = Path(str(path))
         self.parentPath = parentPath
         self.isLast = isLast
@@ -33,7 +36,14 @@ class DisplayPath:
             self.depth = 0
 
     @classmethod
-    def makeTree(cls, root, parent=None, isLast=False, criteria=None, fileList=None):
+    def makeTree(
+        cls,
+        root: F,
+        parent: Optional[F] = None,
+        isLast: Optional[bool] = False,
+        criteria: Optional[Callable[[F], bool]] = None,
+        fileList: List[Path] = None,
+    ):
         """makeTree"""
 
         root = Path(str(root))
@@ -49,7 +59,8 @@ class DisplayPath:
             children = natsorted(fileList, alg=ns.PATH)
         else:
             children = natsorted(
-                list(path for path in root.iterdir() if criteria(path)), alg=ns.PATH,
+                list(path for path in root.iterdir() if criteria(path)),
+                alg=ns.PATH,
             )
         count = 1
         for path in children:
@@ -63,16 +74,16 @@ class DisplayPath:
             count += 1
 
     @classmethod
-    def _defaultCriteria(cls, path):  # pylint: disable=unused-argument
+    def _defaultCriteria(cls, path: F) -> bool:  # pylint: disable=unused-argument
         return True
 
     @property
-    def displayname(self):
+    def displayname(self) -> str:
         if self.path.is_dir():
             return self.path.name + "/"
         return self.path.name
 
-    def displayable(self):
+    def displayable(self) -> str:
         """displayable"""
 
         if self.parentPath is None:
