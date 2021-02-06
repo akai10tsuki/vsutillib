@@ -122,6 +122,7 @@ class MKVAttachments:
             raise StopIteration
         else:
             self.__index += 1
+            return self.__cmdLineAttachments[self.__index]
 
     #@property
     #def attachments(self):
