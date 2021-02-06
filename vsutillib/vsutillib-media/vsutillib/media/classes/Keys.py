@@ -30,7 +30,8 @@ class MTKeys:
     endDate = "endDate"
     premiereDate = "premiereDate"
     network = "network"
-
+    urlGetShows = "urlGetShows"
+    status = "status"
 
     moviedb = "moviedb"
     omdb = "omdb"
