@@ -92,7 +92,6 @@ def darkPalette(app: Optional[QApplication] = None) -> QPalette:
 
     if app is not None:
         app.setStyle("Fusion")
-        print("Fussion")
         app.setPalette(palette)
 
         toolTipPalette = QPalette()
