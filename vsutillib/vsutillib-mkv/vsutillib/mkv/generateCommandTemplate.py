@@ -2,6 +2,7 @@
     commandTemplate
 """
 
+import logging
 import platform
 import re
 import shlex
@@ -10,6 +11,8 @@ from .classes import MKVAttachments
 from .classes.MKVParseKey import MKVParseKey
 from .mkvutils import stripEncaseQuotes
 
+MODULELOG = logging.getLogger(__name__)
+MODULELOG.addHandler(logging.NullHandler())
 
 def generateCommandTemplate(bashCommand, attachments=None, setTitle=False):
     """
@@ -92,8 +95,10 @@ def generateCommandTemplate(bashCommand, attachments=None, setTitle=False):
 
         if attachments is None:
             oAttachments = MKVAttachments()
+            MODULELOG.debug("GCT0001: Init attacment class.")
         else:
             oAttachments = attachments
+            MODULELOG.debug("GCT0002: Attacment already initialized.")
 
         oAttachments.command = bashCommand
 
