@@ -450,6 +450,9 @@ class MKVCommandParser:
             self.__errorFound = True
             self.__lstAnalysis.append("err: No output file found in command.")
 
+        #
+        # From here IO starts
+        #
         if dMatch[MKVParseKey.baseFilesMatch]:
             for index, match in enumerate(dMatch[MKVParseKey.baseFilesMatch]):
                 oFile = SourceFile(match, index)
@@ -568,9 +571,9 @@ class MKVCommandParser:
         if self.log:
             for line in self.__lstAnalysis:
                 if line.find("chk:") >= 0:
-                    MODULELOG.debug("MCM0001: %s", line)
+                    MODULELOG.debug("MCP0001: %s", line)
                 elif line.find("err:") >= 0:
-                    MODULELOG.error("MCM0002: %s", line)
+                    MODULELOG.error("MCP0002: %s", line)
 
     def _filesInDirByKey(self):
 
