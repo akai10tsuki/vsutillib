@@ -311,7 +311,7 @@ class VerifyMKVCommand:
         n=1
         for match in matchAttachments:
             f=_unQuote(match.group(1))
-            p=Path(p)
+            p=Path(f)
             try:
                 test=p.is_file()
             except OSError:
