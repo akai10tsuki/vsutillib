@@ -19,11 +19,13 @@ class SourceFile:
     Tracks and file names
     """
 
-    def __init__(self, fullMatchString=None, fileOrder=None):
+    def __init__(self, fullMatchString=None, fileOrder=None, fullInfo=False):
 
         self.__fullMatchString = None
         self.__errorFound = False
         self.__fileOrder = None
+        self.__fullInfo = False
+
         self.options = None
         self.filesInDir = []
         self.filesMediaInfo = []
@@ -35,6 +37,7 @@ class SourceFile:
         # for iterator
         self.__index = 0
 
+        self.fullInfo = fullInfo
         self.fullMatchString = (fullMatchString, fileOrder)
 
     def __contains__(self, item):
@@ -71,6 +74,15 @@ class SourceFile:
     @property
     def fileOrder(self):
         return self.__fileOrder
+
+    @property
+    def fullInfo(self):
+        return self.__fullInfo
+
+    @fullInfo.setter
+    def fullInfo(self, value):
+        if isinstance(value, bool):
+            self.__fullInfo = value
 
     @property
     def fullMatchString(self):
@@ -144,7 +156,10 @@ class SourceFile:
                             if f == p:
                                 self.filesMediaInfo.append(self.mediaFileInfo)
                             else:
-                                mi = MediaFileInfo(f)
+                                if self.fullInfo:
+                                    mi = MediaFileInfo(f)
+                                else:
+                                    mi = None
                                 self.filesMediaInfo.append(mi)
                     else:
                         self.__errorFound = True
