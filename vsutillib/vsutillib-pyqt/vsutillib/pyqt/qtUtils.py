@@ -6,11 +6,17 @@ utility functions that use PySide2
 
 
 import logging
-import platform
 
-from PySide2.QtCore import Qt
+from typing import Any, Callable, Optional
+
 from PySide2.QtGui import QPalette, QColor
-from PySide2.QtWidgets import QCheckBox, QDesktopWidget, QPushButton, QToolTip
+from PySide2.QtWidgets import (
+    QApplication,
+    QDesktopWidget,
+    QPushButton,
+    QWidget,
+    QToolTip,
+)
 
 from vsutillib.macos import isMacDarkMode
 
@@ -20,7 +26,8 @@ MODULELOG = logging.getLogger(__name__)
 MODULELOG.addHandler(logging.NullHandler())
 
 
-def centerWidget(widget, parent=None):
+# def centerWidget(widget: QWidget, parent: Optional[QWidget] = None) -> None:
+def centerWidget(widget: QWidget, parent: Optional[QWidget] = None) -> None:
     """center widget based on parent or screen geometry"""
 
     if parent is None:
@@ -36,7 +43,7 @@ def centerWidget(widget, parent=None):
         )
 
 
-def pushButton(label, function, tooltip):
+def pushButton(label: str, function: Callable[..., None], tooltip: str) -> QPushButton:
     """
     pushButton convenience function for QPushButton definitions
 
@@ -57,7 +64,7 @@ def pushButton(label, function, tooltip):
     return button
 
 
-def darkPalette(app=None):
+def darkPalette(app: Optional[QApplication] = None) -> QPalette:
 
     palette = QPalette()
 
@@ -65,6 +72,7 @@ def darkPalette(app=None):
     disabledColor = QColor(127, 127, 127)
 
     palette.setColor(QPalette.AlternateBase, darkColor)
+    palette.setColor(QPalette.Background, darkColor)
     palette.setColor(QPalette.Base, QColor(18, 18, 18))
     palette.setColor(QPalette.BrightText, SvgColor.red)
     palette.setColor(QPalette.Button, darkColor)
@@ -84,7 +92,6 @@ def darkPalette(app=None):
 
     if app is not None:
         app.setStyle("Fusion")
-        #app.setStyle("windowsvista")
         app.setPalette(palette)
 
         toolTipPalette = QPalette()
@@ -96,18 +103,27 @@ def darkPalette(app=None):
 
     return palette
 
-def qtRunFunctionInThread(function, *args, **kwargs):
+
+def qtRunFunctionInThread(
+    function: Callable[..., None], *args: Any, **kwargs: Any
+) -> None:
     """
     Pass the function to execute Other args,
     kwargs are passed to the run function
     """
 
+    #
+    # Expected callback functions
+    #
     funcStart = kwargs.pop("funcStart", None)
     funcFinished = kwargs.pop("funcFinished", None)
     funcResult = kwargs.pop("funcResult", None)
 
     worker = QRunInThread(function, *args, **kwargs)
 
+    #
+    # Connect expected callbacks with corresponding Signal
+    #
     if funcStart is not None:
         worker.startSignal.connect(funcStart)
     if funcFinished is not None:

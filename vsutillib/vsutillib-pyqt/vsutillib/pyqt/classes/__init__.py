@@ -9,6 +9,7 @@ from .QFormatLabel import QFormatLabel
 from .QFileListWidget import QFileListWidget
 from .QGenericThreads import QthThread, QthThreadWorker
 from .QGroupSignal import QGroupSignal
+from .QLabelWidget import QLabelWidget
 from .QLineFrame import HorizontalLine, VerticalLine
 from .QMenuWidget import QMenuWidget
 from .QOutputTextWidget import QOutputTextWidget

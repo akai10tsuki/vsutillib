@@ -14,14 +14,17 @@ Todo: Hide and un hide at current position.  Possibly the widget itself do
 
 import logging
 
+from typing import ClassVar, List, Tuple, Optional
+
 from PySide2.QtCore import Signal
-from PySide2.QtWidgets import QTabWidget
+from PySide2.QtWidgets import QTabWidget, QWidget
 
 # from ..utils import Text
 
 MODULELOG = logging.getLogger(__name__)
 MODULELOG.addHandler(logging.NullHandler())
 
+TabElement = Tuple[QWidget, str, str]
 
 class TabWidget(QTabWidget):
     """Main Widget"""
@@ -32,7 +35,11 @@ class TabWidget(QTabWidget):
     setCurrentIndexSignal = Signal(int)
     setCurrentWidgetSignal = Signal(object)
 
-    def __init__(self, parent=None, tabWidgets=None):
+    def __init__(
+        self,
+        parent: Optional[QWidget] = None,
+        tabWidgets: Optional[List[TabElement]] = None,
+    ) -> None:
         super().__init__()
 
         self.parent = parent
@@ -45,33 +52,34 @@ class TabWidget(QTabWidget):
         self.setCurrentIndexSignal.connect(super().setCurrentIndex)
         self.setCurrentWidgetSignal.connect(super().setCurrentWidget)
 
-    def _initUI(self, tabWidgets):
+    def _initUI(self, tabWidgets: List[TabElement]) -> None:
         """Setup Widget Layout"""
 
         if tabWidgets is not None:
             self.__tabWidgets.extend(tabWidgets)
 
             for tw in tabWidgets:
-                tabIndex = self.addTab(tw[0], tw[1])
-                self.setTabToolTip(tabIndex, tw[2])
+                tabIndex = self.addTab(tw[Key.Widget], tw[Key.Title])
+                self.setTabToolTip(tabIndex, tw[Key.ToolTip])
+                widget = tw[Key.Widget]
 
                 try:
-                    tw[0].tab = tabIndex
+                    widget.tab = tabIndex
                 except:  # pylint: disable=bare-except
                     pass
 
                 try:
-                    tw[0].title = tw[1]
+                    widget.title = tw[Key.Title]
                 except:  # pylint: disable=bare-except
                     pass
 
                 try:
-                    tw[0].tabWidget = self
+                    widget.tabWidget = self
                 except:  # pylint: disable=bare-except
                     pass
 
     @classmethod
-    def classLog(cls, setLogging=None):
+    def classLog(cls, setLogging: Optional[bool] = None) -> bool:
         """
         get/set logging at class level
         every class instance will log
@@ -95,7 +103,7 @@ class TabWidget(QTabWidget):
         return cls.__log
 
     @property
-    def log(self):
+    def log(self) -> bool:
         """
         class property can be used to override the class global
         logging setting
@@ -111,27 +119,27 @@ class TabWidget(QTabWidget):
         return TabWidget.classLog()
 
     @log.setter
-    def log(self, value):
+    def log(self, value: bool) -> None:
         """set instance log variable"""
         if isinstance(value, bool) or value is None:
             self.__log = value
 
-    def tabInserted(self, index):
+    def tabInserted(self, index: int) -> None:
 
         for tabIndex in range(self.count()):
             widget = self.widget(tabIndex)
             widget.tab = tabIndex
 
-    def tabRemoved(self, index):
+    def tabRemoved(self, index: int) -> None:
 
         for tabIndex in range(self.count()):
             widget = self.widget(tabIndex)
             widget.tab = tabIndex
 
-    def addTabs(self, tabWidgets):
+    def addTabs(self, tabWidgets: List[TabElement]) -> None:
         self._initUI(tabWidgets)
 
-    def setLanguage(self):
+    def setLanguage(self) -> None:
         """
         setLanguage set tabs labels according to locale
         """
@@ -139,3 +147,15 @@ class TabWidget(QTabWidget):
         for i, (__, label, tooltip) in enumerate(self.__tabWidgets):
             self.setTabText(i, _(label))
             self.setTabToolTip(i, _(tooltip))
+
+class Key:
+
+    Widget: ClassVar[int] = 0
+    Title: ClassVar[int] = 1
+    ToolTip: ClassVar[int] = 2
+
+def _(dummy: str) -> str:
+    return dummy
+
+
+del _

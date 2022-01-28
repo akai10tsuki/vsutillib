@@ -1,0 +1,29 @@
+from typing import Dict, List, Optional
+
+# type aliases
+# TVMazeData = List[Dict[str, Union[str, int, None]]]
+
+class UrlRequest:
+    url: str = ...
+    data: Dict[str, str] = ...
+    headers: List[str] = ...
+    status: int = ...
+    message: str = ...
+    def __init__(
+        self,
+        url: Optional[str] = ...,
+        data: Optional[Dict[str, str]] = ...,
+        headers: Optional[List[str]] = ...,
+    ) -> None: ...
+    def request(
+        self,
+        url: Optional[str] = ...,
+        data: Optional[Dict[str, str]] = ...,
+        headers: Optional[List[str]] = ...,
+    ) -> List[str]: ...
+
+# from typing import Any, Optional
+
+# class UrlRequest:
+#    def __init__(self, url: Optional[Any] = ..., data: Optional[Any] = ..., headers: Optional[Any] = ...) -> None: ...
+#    def request(self, url: Optional[Any] = ..., data: Optional[Any] = ..., headers: Optional[Any] = ...) -> None: ...

@@ -2,15 +2,24 @@
  TabWidgetExtension
 """
 
-class TabWidgetExtension:
+from __future__ import annotations
 
-    def __init__(self, tabWidgetChild=None, tabWidget=None, **kwargs):
+from typing import Any, Optional, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from PySide2.QtWidgets import QTabWidget
+
+
+class TabWidgetExtension:
+    def __init__(
+        self, tabWidgetChild: Optional[object] = None, tabWidget: Optional[QTabWidget] = None, **kwargs: Any
+    ) -> None:
         super().__init__(**kwargs)
 
         self.__tabWidgetChild = tabWidgetChild
         self.__tabWidget = tabWidget
         self.__tab = None
-        self.__oldTab = (-1)
+        self.__oldTab = -1
         self.__title = None
         self.__toolTip = None
 
@@ -59,13 +68,15 @@ class TabWidgetExtension:
         tabIndex = self.tabWidget.indexOf(self.__tabWidgetChild)
         self.__oldTab = tabIndex
         self.tabWidget.removeTab(tabIndex)
-        self.tab = (-1)
+        self.tab = -1
 
     def unHideTab(self):
 
         if self.tabWidget is not None:
             if self.__oldTab >= 0:
-                tabIndex = self.tabWidget.insertTab(self.__oldTab, self.__tabWidgetChild, self.title)
+                tabIndex = self.tabWidget.insertTab(
+                    self.__oldTab, self.__tabWidgetChild, self.title
+                )
             else:
                 tabIndex = self.tabWidget.addTab(self.__tabWidgetChild, self.title)
             self.tabWidget.setTabToolTip(tabIndex, self.toolTip)

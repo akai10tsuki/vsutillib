@@ -4,14 +4,15 @@ it rotates at initialization
 this means by number of executions
 """
 
-
 import codecs
 import logging.handlers
 import re
 import sys
+
 from pathlib import Path
+from typing import Any, Optional, Union
 
-
+F = Union[Path, str]
 class LogRotateFileHandler(logging.handlers.RotatingFileHandler):
 
     """
@@ -27,7 +28,7 @@ class LogRotateFileHandler(logging.handlers.RotatingFileHandler):
             initialization
     """
 
-    def __init__(self, fileName, **kwargs):
+    def __init__(self, fileName: F, **kwargs: Any) -> None:
 
         # Python 3.5 open not compatible with pathlib
         if sys.version_info[:2] == (3, 5):
@@ -35,9 +36,28 @@ class LogRotateFileHandler(logging.handlers.RotatingFileHandler):
         else:
             f = fileName
 
-        super(LogRotateFileHandler, self).__init__(f, **kwargs)
+        super().__init__(f, **kwargs)
 
         self.doRollover()
+
+    def emit(self, record: str) -> None:
+        """
+        emit remove line feed character from strings type arguments
+
+        Args:
+            record (LogRecord): LogRecord argument for logger
+        """
+        args = []
+
+        for arg in record.args:
+            tmp = arg
+            if isinstance(arg, str):
+                tmp = tmp.replace("\n", " ")
+            args.append(tmp)
+
+        record.args = tuple(args)
+
+        super().emit(record)
 
 
 class LogRotateFileHandlerOriginal(logging.Handler):
@@ -50,15 +70,15 @@ class LogRotateFileHandlerOriginal(logging.Handler):
     :type backupCount: int
     """
 
-    def __init__(self, logFile, backupCount=0):
-        super(LogRotateFileHandlerOriginal, self).__init__()
+    def __init__(self, logFile: F, backupCount: Optional[int] = 0) -> None:
+        super().__init__()
 
         self.logFile = logFile
         self.backupCount = backupCount
         self._rollover()
         self.logFilePointer = None
 
-    def _rollover(self):
+    def _rollover(self) -> None:
         """Rollover log files"""
         regEx = re.compile(r".*\.log\.(\d+)")
 
@@ -99,7 +119,7 @@ class LogRotateFileHandlerOriginal(logging.Handler):
             logFile.replace(rollFile)
             # logFile.touch(exist_ok=True)
 
-    def emit(self, record):
+    def emit(self, record: str) -> None:
         """
         Write record entry to log file
         """

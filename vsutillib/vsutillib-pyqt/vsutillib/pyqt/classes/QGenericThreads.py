@@ -7,8 +7,9 @@ import logging
 import traceback
 import sys
 
+from typing import Any, Callable, Optional
 
-from PySide2.QtCore import QThread, QRunnable, Signal, Slot
+from PySide2.QtCore import QThread, QRunnable
 
 
 MODULELOG = logging.getLogger(__name__)
@@ -28,22 +29,20 @@ class QthThread(QThread):
 
     log = False
 
-    def __init__(self, function, *args, **kwargs):
+    def __init__(self, function: Callable[..., None], *args: Any, **kwargs: Any) -> None:
         super().__init__(self)
 
         self.function = function
         self.args = args
         self.kwargs = kwargs
 
-    def __del__(self):
+    def __del__(self) -> None:
         self.wait()
 
-    def run(self):
+    def run(self) -> None:
         """Override run and start function from argument"""
 
         self.function(*self.args, **self.kwargs)
-
-        return
 
 
 class QthThreadWorker(QRunnable):
@@ -65,12 +64,12 @@ class QthThreadWorker(QRunnable):
 
     def __init__(
         self,
-        function,
-        *args,
-        funcFinished=None,
-        funcError=None,
-        funcResult=None,
-        **kwargs
+        function: Callable[..., None],
+        *args: Any,
+        funcFinished: Optional[Callable[..., None]] = None,
+        funcError: Optional[Callable[..., None]] = None,
+        funcResult: Optional[Callable[..., None]] = None,
+        **kwargs: Any
     ):
         super().__init__()
 
@@ -82,7 +81,7 @@ class QthThreadWorker(QRunnable):
         self.error = funcError
         self.result = funcResult
 
-    def run(self):
+    def run(self) -> None:
         """
         Override run initialise and starts the worker function
         with passed args, kwargs.

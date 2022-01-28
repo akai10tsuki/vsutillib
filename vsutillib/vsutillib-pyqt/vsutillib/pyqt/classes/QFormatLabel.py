@@ -15,6 +15,8 @@ align:
 
 import random
 
+from typing import List
+
 from PySide2.QtWidgets import QWidget, QLabel
 from PySide2.QtCore import Slot, Signal
 
@@ -31,7 +33,7 @@ class QFormatLabel(QLabel):
     setValueSignal = Signal(int, object)
     setValuesSignal = Signal(list)
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: str, **kwargs: List[object]) -> None:
 
         template = kwargs.pop("template", None)
         initValues = kwargs.pop("init", None)
@@ -51,6 +53,8 @@ class QFormatLabel(QLabel):
         super().__init__(*args, **kwargs)
 
         self.setTemplateSignal.connect(self.setTemplate)
+        self.setValueSignal.connect(self.setValue)
+        self.setValuesSignal.connect(self.setValues)
 
         if template is None:
             self._template = (
@@ -63,40 +67,38 @@ class QFormatLabel(QLabel):
         self._values = initValues
         self._refresh()
 
-    def __getitem__(self, index):
+    def __getitem__(self, index: int) -> int:
         return self._values[index]
 
-    def __setitem__(self, index, value):
+    def __setitem__(self, index: int, value: object):
         self.setValueSignal.emit(index, value)
-        #self._values[index] = value
-        #self._refresh()
 
-    def _refresh(self):
+    def _refresh(self) -> None:
 
         strTmp = self._template
         strTmp = strTmp.format(*self._values)
         super().setText(strTmp)
 
     @property
-    def template(self):
+    def template(self) -> str:
         return self._template
 
     @template.setter
-    def template(self, value):
+    def template(self, value: str) -> None:
 
         if isinstance(value, str):
             self._template = value
             self._refresh()
 
     @Slot(str)
-    def setTemplate(self, value):
+    def setTemplate(self, value: str) -> None:
 
         if isinstance(value, str):
             self._template = value
             self._refresh()
 
     @Slot(list)
-    def setValues(self, args):
+    def setValues(self, args: List[object]) -> None:
         """
         Set Values
 
@@ -108,7 +110,7 @@ class QFormatLabel(QLabel):
         self._refresh()
 
     @Slot(int, object)
-    def setValue(self, index, value):
+    def setValue(self, index: int, value: object) -> None:
         """
         Set value index based
 
@@ -122,17 +124,17 @@ class QFormatLabel(QLabel):
         self._refresh()
 
     @property
-    def values(self):
+    def values(self) -> List[object]:
         """return current positional values"""
 
         return self._values
 
-    def valuesConnect(self, signal):
+    def valuesConnect(self, signal: Signal) -> None:
         """make connection to setValues Slot"""
 
         signal.connect(self.setValues)
 
-    def valueConnect(self, signal):
+    def valueConnect(self, signal: Signal) -> None:
         """make connection to setValues Slot"""
 
         signal.connect(self.setValue)
@@ -141,19 +143,20 @@ class QFormatLabel(QLabel):
 if __name__ == "__main__":
 
     import sys
+
     from PySide2.QtWidgets import QApplication, QGridLayout, QMainWindow, QPushButton
 
     class MainWindow(QMainWindow):
         """Test the progress bars"""
 
-        def __init__(self, *args, **kwargs):
-            super().__init__(*args, **kwargs)
+        def __init__(self) -> None:
+            super().__init__()
 
             l = QGridLayout()
 
-            self.jobInfo = FormatLabel()
-            self.formatLabel = FormatLabel(
-                "Random 1 = {0:>3d} -- Random 2 = {0:3d}", init=[0, 0]
+            self.jobInfo = QFormatLabel()
+            self.formatLabel = QFormatLabel(
+                "Random 1 = {0:>3d} -- Random 2 = {1:3d}", init=[10, 20]
             )
 
             b = QPushButton("Test 1")
@@ -172,7 +175,7 @@ if __name__ == "__main__":
 
             self.show()
 
-        def test(self):
+        def test(self) -> None:
             """Test"""
 
             r = random.randint
@@ -181,7 +184,7 @@ if __name__ == "__main__":
                 (r(1, 1001), r(1, 1001), r(1, 1001), r(1, 1001), r(1, 1001))
             )
 
-        def test1(self):
+        def test1(self) -> None:
             """Test FormatLabel"""
             r = random.randint
 

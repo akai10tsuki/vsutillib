@@ -8,7 +8,7 @@ import sys
 from vsutillib.process import RunCommand
 
 
-def isMacDarkMode():
+def isMacDarkMode() -> bool:
     """
     Test for macOS Mojave Dark Mode
 

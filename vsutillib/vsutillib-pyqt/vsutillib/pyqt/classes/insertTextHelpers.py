@@ -11,7 +11,7 @@ from vsutillib.macos import isMacDarkMode
 from .SvgColor import SvgColor
 
 
-def checkColor(color, isDarkMode=False):
+def checkColor(color: QColor, isDarkMode: bool = False) -> QColor:
     """
     checkColor change color according to dark or light mode
 
@@ -51,8 +51,8 @@ def checkColor(color, isDarkMode=False):
 
 class LineOutput:
 
-    Color = "color"
-    ReplaceLine = "replaceLine"
-    AppendLine = "appendLine"
-    AppendEnd = "appendEnd"
-    LogOnly = "logOnly"
+    Color: str = "color"
+    ReplaceLine: str = "replaceLine"
+    AppendLine: str = "appendLine"
+    AppendEnd: str = "appendEnd"
+    LogOnly: str = "logOnly"

@@ -14,6 +14,8 @@ to deal with start of execution, end of execution and
 get any result from function
 """
 
+from typing import Any, Callable
+
 from PySide2.QtCore import QObject, Signal
 
 from vsutillib.process import ThreadWorker, isThreadRunning
@@ -51,14 +53,14 @@ class QRunInThread(QObject):
     # Class logging state
     __log = False
 
-    def __init__(self, function, *args, **kwargs):
+    def __init__(self, function: Callable[..., None], *args: Any, **kwargs: Any) -> None:
         super().__init__()
 
         self.function = function
         self.args = args
         self.kwargs = kwargs
 
-    def run(self):
+    def run(self) -> None:
         """
         run summit jobs to worker
         """
@@ -84,19 +86,19 @@ class QRunInThread(QObject):
             jobsWorker.name = self.function.__name__
             jobsWorker.start()
 
-    def start(self):
+    def start(self) -> None:
         """
         start generate signal for start of run
         """
         self.startSignal.emit()
 
-    def finished(self):
+    def finished(self) -> None:
         """
         finished generate signal for finished run
         """
         self.finishedSignal.emit()
 
-    def result(self, funcResult):
+    def result(self, funcResult: object) -> None:
         """
         result from jobs queue process
 

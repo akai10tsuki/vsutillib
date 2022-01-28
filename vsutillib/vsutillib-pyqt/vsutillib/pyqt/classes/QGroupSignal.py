@@ -2,6 +2,8 @@
 class emit signal that can be received by many Slots
 """
 
+from typing import Callable, Optional
+
 from PySide2.QtCore import QObject, Signal
 
 class QGroupSignal(QObject):
@@ -14,17 +16,17 @@ class QGroupSignal(QObject):
 
     groupSignal = Signal()
 
-    def __init__(self, parent=None):
+    def __init__(self, parent: Optional[QObject] = None) -> None:
         super().__init__(parent)
 
         self.parent = parent
         self.functionSlots = []
 
-    def addSlot(self, function):
+    def addSlot(self, function: Callable[..., None]) -> None:
 
         self.groupSignal.connect(function)
         self.functionSlots.append(function)
 
-    def emitSignal(self):
+    def emitSignal(self) -> None:
 
         self.groupSignal.emit()

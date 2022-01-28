@@ -2,27 +2,30 @@
 
 import logging
 
+from typing import Any, Callable, Optional
+
 from PySide2.QtCore import QObject, Signal
 
 
 class Communicate(QObject):
-    logRecord = Signal(object)
+    logRecord: Signal = Signal(object)
 
 
 class QSignalLogHandler(logging.Handler):
 
     """
-    logging handler that rotate files at initialization time
-    this will create a new file each time is run against
-    the same log file.
+    logging using Qt for Python Signal to register records via signal to logger
+    slot function
 
     Args:
-        **kwargs: variable number of key value parameters
+        slotFunction (function):
+
+        **kwargs (dict): variable number of key value parameters
             that are passed to the super class on
             initialization
     """
 
-    def __init__(self, slotFunction=None, **kwargs):
+    def __init__(self, slotFunction: Optional[Callable[..., None]] = None, **kwargs: Any) -> None:
         super().__init__(**kwargs)
 
         self.signal = Communicate()
@@ -30,10 +33,10 @@ class QSignalLogHandler(logging.Handler):
         if slotFunction is not None:
             self.connect(slotFunction)
 
-    def emit(self, record):
+    def emit(self, record: str) -> None:
         msg = self.format(record)
         self.signal.logRecord.emit(msg)
 
-    def connect(self, slotFunction):
+    def connect(self, slotFunction: Callable[..., None]) -> None:
 
         self.signal.logRecord.connect(slotFunction)

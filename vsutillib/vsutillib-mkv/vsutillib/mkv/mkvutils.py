@@ -14,10 +14,35 @@ import shlex
 from pathlib import Path
 
 from vsutillib.files import findFileInPath
+from vsutillib.misc import XLate
 from vsutillib.process import RunCommand
 
 MODULELOG = logging.getLogger(__name__)
 MODULELOG.addHandler(logging.NullHandler())
+
+def generateCommand(template, keyDictionary, shell=False):
+    """
+    generateCommand replace keys on template using dictionary
+
+    Args:
+        template (str): command template
+        keyDictionary (dict): dictionary of keys in template
+        shell (bool, optional): return shlex list if True just the comand
+            if False. Defaults to False.
+
+    Returns:
+        (str|list): template with substitutions as string or shlex.split list
+    """
+
+    xLate = XLate(keyDictionary)  # instantiate regex dictionary translator
+    strCommand = xLate.xLate(template)
+
+    if shell:
+        strCommand = shlex.split(
+            strCommand
+        )  # save command as shlex.split to submit to Pipe
+
+    return strCommand
 
 
 def getMKVMerge():
@@ -112,6 +137,7 @@ def stripEncaseQuotes(strFile):
 
     return s
 
+
 def convertToBashStyle(strCommand):
     """
     Strip escape windows chars for the command line
@@ -162,6 +188,16 @@ def numberOfTracksInCommand(strCmd):
 
 
 def resolveOverwrite(fileName, strPrefix="new-"):
+    """
+    resolveOverwrite resolve overwrite collisions
+
+    Args:
+        fileName (Path): desired file name to use
+        strPrefix (str, optional): prefix to use for new name. Defaults to "new-".
+
+    Returns:
+        Path: Path object with the new file name.
+    """
 
     fileNameTmp = fileName
 
@@ -199,6 +235,13 @@ def unQuote(fileName):
 
     f = stripEncaseQuotes(fileName)
     f = f.replace(r"'\''", "'")
+
+    return f
+
+def quoteString(string):
+
+    f = string.replace("'", r"'\''")
+    f = "'" + f + "'"
 
     return f
 

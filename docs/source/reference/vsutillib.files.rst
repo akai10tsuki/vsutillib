@@ -19,4 +19,5 @@ The ``getExecutable`` function
 
 The ``getFileList`` function
 ----------------------------
+
 .. autofunction:: vsutillib.files.getFileList

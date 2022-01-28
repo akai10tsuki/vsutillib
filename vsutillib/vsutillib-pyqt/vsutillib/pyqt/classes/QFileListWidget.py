@@ -3,12 +3,15 @@ Sub-class of QTextEdit accepts drag and drop
 """
 import logging
 
+from typing import List, Optional
+
 from pathlib import Path
 
 from natsort import natsorted, ns
 
 from PySide2.QtCore import Slot, Signal
-from PySide2.QtWidgets import QMenu
+from PySide2.QtGui import QContextMenuEvent, QDragEnterEvent, QDragMoveEvent, QDropEvent
+from PySide2.QtWidgets import QMenu, QWidget
 
 
 from .QOutputTextWidget import QOutputTextWidget
@@ -27,7 +30,7 @@ class QFileListWidget(QOutputTextWidget):
 
     filesDroppedUpdateSignal = Signal(list)
 
-    def __init__(self, parent):
+    def __init__(self, parent: QWidget) -> None:
         super().__init__(parent)
 
         # self.setDragEnabled(True)
@@ -35,27 +38,27 @@ class QFileListWidget(QOutputTextWidget):
         self.bBlockDrops = False
         self.bFilesDropped = False
 
-    def clear(self):
+    def clear(self) -> None:
         self.fileList = []
         self.bBlockDrops = False
         self.bFilesDropped = False
         super().setAcceptDrops(True)
         super().clear()
 
-    def dragEnterEvent(self, event):
+    def dragEnterEvent(self, event: QDragEnterEvent) -> None:
 
         data = event.mimeData()
         urls = data.urls()
         if urls and urls[0].scheme() == "file":
             event.acceptProposedAction()
 
-    def dragMoveEvent(self, event):
+    def dragMoveEvent(self, event: QDragMoveEvent) -> None:
         data = event.mimeData()
         urls = data.urls()
         if urls and urls[0].scheme() == "file":
             event.acceptProposedAction()
 
-    def dropEvent(self, event):
+    def dropEvent(self, event: QDropEvent) -> None:
         data = event.mimeData()
         urls = data.urls()
 
@@ -84,7 +87,7 @@ class QFileListWidget(QOutputTextWidget):
             self._displayFiles()
             self.filesDroppedUpdateSignal.emit(self.fileList)
 
-    def contextMenuEvent(self, event):
+    def contextMenuEvent(self, event: QContextMenuEvent) -> None:
 
         if self.bFilesDropped and self.fileList:
             menu = QMenu(self)
@@ -100,14 +103,14 @@ class QFileListWidget(QOutputTextWidget):
                     self._displayFiles()
                     self.filesDroppedUpdateSignal.emit(self.fileList)
 
-    def setAcceptDrops(self, value):
+    def setAcceptDrops(self, value: bool) -> None:
 
         if not self.bBlockDrops:
             # don't check for type to raise error
             super().setAcceptDrops(value)
 
     @Slot(list)
-    def setFileList(self, filesList=None):
+    def setFileList(self, filesList: Optional[List[str]] = None):
         """
         Set the files manually
 
@@ -126,7 +129,7 @@ class QFileListWidget(QOutputTextWidget):
 
             self._displayFiles()
 
-    def _displayFiles(self):
+    def _displayFiles(self) -> None:
         """display the files on QTextEdit box"""
 
         super().clear()
@@ -140,5 +143,5 @@ class Actions:
     Actions labels for context menu
     """
 
-    Clear = "Clear"
-    Sort = "Sort"
+    Clear: str = "Clear"
+    Sort: str = "Sort"

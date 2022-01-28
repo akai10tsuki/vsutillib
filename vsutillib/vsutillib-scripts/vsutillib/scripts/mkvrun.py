@@ -7,30 +7,17 @@ use the linux bash one encased in double quotes
 """
 
 import argparse
+import sys
 
+from vsutillib import config
 from vsutillib.media import MediaFileInfo
+from vsutillib.misc import staticVars
 from vsutillib.mkv import MKVCommand, VerifyStructure
 from vsutillib.process import RunCommand
 
-VERSION = "1.5.0"
+VERSION = config.SCRIPTS_VERSION
 
-
-def displayMKVRun(line):
-    """
-    Convenience function used by mkvrun
-    to display lines of the mkvmerge
-    execution
-
-    Args:
-        line (str): line to display
-    """
-
-    if line.find("Progress:") >= 0:
-        print("\r" + line[:-1], end="")
-    elif line.find("The cue") == 0:
-        print("\n" + line, end="")
-    else:
-        print(line, end="")
+__version__ = VERSION
 
 
 def mkvVerifyStructure(lstBaseFiles, lstFiles, msgs):
@@ -117,7 +104,7 @@ def mkvrun():
     verify = VerifyStructure()
 
     cli = RunCommand(
-        processLine=displayMKVRun, commandShlex=True, universalNewLines=True
+        processLine=displayConoleOutput, commandShlex=True, universalNewLines=False
     )
 
     if mkv:
@@ -150,6 +137,33 @@ def mkvrun():
     else:
 
         print("Bummer...{}".format(mkv.error))
+
+
+@staticVars(line="")
+def displayConoleOutput(ch):
+    """
+    Convenience function that interprets lines in a stream of characters.
+
+    Args:
+        ch (str): characters to display
+
+    Returns:
+        str: Complete line including "\n" character when "\n" is received.
+        None if character received is not a newline.
+    """
+
+    displayConoleOutput.line += ch
+    sys.stdout.write(ch)
+    sys.stdout.flush()
+
+    if ch != "\n":
+        return None
+
+    line = displayConoleOutput.line
+
+    displayConoleOutput.line = ""
+
+    return line
 
 
 if __name__ == "__main__":

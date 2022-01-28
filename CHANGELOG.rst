@@ -10,6 +10,13 @@ Changed
 
 - modify library files to bump version to 1.5.0
 - Using some Python 3.8 specific features drop support versions less than 3.8
+- read media info only for files in the command line GUI was becoming
+  unresponsive
+
+Fixed
+******
+
+ - BUG #12 Abort Job buttons not working correctly
 
 files package
 ~~~~~~~~~~~~~
@@ -30,7 +37,6 @@ Changed
 
 Fixed
 ******
-
 
 pyqt package
 ~~~~~~~~~~~~
@@ -70,15 +76,17 @@ Fixed:
 ******
 - fix handling of files with single quotes
 
-scripts
--------
+scripts package
+~~~~~~~~~~~~~~~
 
 Changed
 *******
 
 - bump version
 - dsf2wv accepts wildcard on directory argument
+- dsf2wv uses binary output subprocess.Pipe
 - apply2files accepts wildcard on directory argument
+- mkvrun used binary output for subprocess.Pipe
 
 Fixed
 *****

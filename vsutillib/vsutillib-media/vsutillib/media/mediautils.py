@@ -5,7 +5,7 @@ import ctypes
 import platform
 
 
-def isMediaInfoLib():
+def isMediaInfoLib() -> bool:
     """
     Check if MediaInfo library is on the system
 

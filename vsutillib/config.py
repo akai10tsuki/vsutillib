@@ -28,26 +28,28 @@ from vsutillib.files import ConfigurationSettings
 from vsutillib.log import LogRotateFileHandler
 
 
-__VERSION = (1, 6, "4")
+__VERSION = (1, 6, "5", "dev5")
 
 
-FILES_VERSION = "1.6.3"
+FILES_VERSION = "1.6.5"  # 1.6.3
 LOG_VERSION = "1.6.0"
 MACOS_VERSION = "1.6.1"
-MEDIA_VERSION = "1.6.2"
-MISC_VERSION = "1.6.0"
-MKV_VERSION = "1.6.2"
+MEDIA_VERSION = "1.6.5"  # 1.6.2
+MISC_VERSION = "1.6.5"  # 1.6.0
+MKV_VERSION = "1.6.5"  # 1.6.2
 NETWORK_VERSION = "1.6.0"
-PROCESS_VERSION = "1.6.0"
-PYQT_VERSION = "1.6.2"
-SCRIPTS_VERSION = "1.6.2"
-SQL_VERSION = "1.6.2"
+PROCESS_VERSION = "1.6.5"  # 1.6.0
+PYQT_VERSION = "1.6.5"  # 1.6.2
+PYQT6_VERSION = "1.6.0"
+SCRIPTS_VERSION = "1.6.5"  # 1.6.2
+SQL_VERSION = "1.6.5"  # 1.6.2
 VSXML_VERSION = "1.6.0"
 
 LXML_VERSION = ">=4.5"
 NATSORT_VERSION = ">=7.0.1"
 PYMEDIAINFO_VERSION = ">=4.2.1"
-PYSIDE2_VERSION = ">=5.14"
+PYSIDE2_VERSION = ">=5.14.1"
+PYSIDE6_VERSION = ">=6.0.0"
 PYTHON_VERSION = ">=3.8.1, <3.9"
 PYTHONVERSIONS = ">=3.8.1, <3.9"
 
@@ -57,7 +59,7 @@ AUTHOR = "Efrain Vergara"
 EMAIL = "akai10tsuki@gmail.com"
 PACKAGES = [APPNAME]
 
-COPYRIGHT = "2018-2020, Efrain Vergara"
+COPYRIGHT = "2018-2021, Efrain Vergara"
 LICENSE = "MIT"
 DESCRIPTION = "Library module with miscellaneous convenience functions and classes"
 NAME = "vsutillib"

@@ -2,24 +2,32 @@
 
 # MKV0001
 
-#     MKVCommandNew,
-
+# Classes
 from .classes import (
+    IVerifyStructure,
+    MergeOptions,
     MKVAttachment,
     MKVAttachments,
-    MKVCommand,
-    MKVCommandParser,
     MKVParseKey,
+    MKVCommandParser,
     SourceFile,
     SourceFiles,
+    TrackOptions,
+    TracksOrder,
     VerifyMKVCommand,
     VerifyStructure,
 )
+
+# Functions
+from .adjustSources import adjustSources
+from .generateCommandTemplate import generateCommandTemplate
 from .mkvutils import (
     convertToBashStyle,
+    generateCommand,
     getMKVMerge,
     getMKVMergeVersion,
     numberOfTracksInCommand,
+    quoteString,
     resolveOverwrite,
     stripEncaseQuotes,
     unQuote,

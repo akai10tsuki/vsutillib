@@ -7,6 +7,8 @@ import logging
 import traceback
 import sys
 
+from typing import Any, Callable
+
 from PySide2.QtCore import QObject, QRunnable, Signal, Slot
 
 
@@ -29,9 +31,9 @@ class WorkerSignals(QObject):
     result
         `object` data returned from processing, anything
     '''
-    finished = Signal()
-    error = Signal(tuple)
-    result = Signal(object)
+    finished: Signal = Signal()
+    error: Signal = Signal(tuple)
+    result: Signal = Signal(object)
 
 class Worker(QRunnable):
     '''
@@ -46,9 +48,9 @@ class Worker(QRunnable):
     :param kwargs: Keywords to pass to the callback function
     '''
 
-    log = False
+    log: bool = False
 
-    def __init__(self, function, *args, **kwargs):
+    def __init__(self, function: Callable[..., None], *args: Any, **kwargs: Any) -> None:
         super().__init__()
 
         # Store constructor arguments (re-used for processing)
@@ -58,7 +60,7 @@ class Worker(QRunnable):
         self.signals = WorkerSignals()
 
     @Slot()
-    def run(self):
+    def run(self) -> None:
         '''
         Initialise the runner function with passed args, kwargs.
         '''

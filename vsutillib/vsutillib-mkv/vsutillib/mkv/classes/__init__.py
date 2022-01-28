@@ -1,9 +1,12 @@
 """VS module names"""
 
-from .mkvattachments import MKVAttachment, MKVAttachments
-from .mkvclassutil import SourceFile, SourceFiles
-from .mkvcommand import MKVCommand
-#from .mkvcommandNew import MKVCommandNew
-from .mkvcommandparser import MKVCommandParser, MKVParseKey
-from .verifystructure import VerifyStructure
-from .verifycommand import VerifyMKVCommand
+from .IVerifyStructure import IVerifyStructure
+from .MergeOptions import MergeOptions
+from .MKVAttachments import MKVAttachment, MKVAttachments
+from .MKVParseKey import MKVParseKey
+from .MKVCommandParser import MKVCommandParser
+from .SourceFiles import SourceFile, SourceFiles
+from .TrackOptions import TrackOptions
+from .TracksOrder import TracksOrder
+from .VerifyMKVCommand import VerifyMKVCommand
+from .VerifyStructure import VerifyStructure
