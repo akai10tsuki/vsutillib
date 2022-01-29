@@ -102,7 +102,7 @@ class ConfigurationSettings:
     """
 
     # log state
-    __log = False
+    __log: bool = False
 
     # data that can be treated as literal
     # theese are human readable easier
@@ -223,7 +223,10 @@ class ConfigurationSettings:
         if isinstance(value, bool) or value is None:
             self.__log = value
 
-    def set(self, key: str, value: object, valueType: Optional[str] = None) -> None:
+    def set(self,
+            key: str,
+            value: object,
+            valueType: Optional[str] = None) -> None:
         """
         set value at key in dictionary
 
@@ -242,10 +245,12 @@ class ConfigurationSettings:
             if valueType is not None:
                 _valueType = valueType
 
-            if not ((_valueType in self._pickable) or (_valueType in self._literal)):
+            if not ((_valueType in self._pickable)
+                    or (_valueType in self._literal)):
                 s = str(_valueType)
                 if self.log:
-                    MODULELOG.debug("CFG0003: value type not supported - %s", str(s))
+                    MODULELOG.debug(
+                        "CFG0003: value type not supported - %s", str(s))
                 raise TypeError("value type not supported - {}".format(s))
 
             self._configType[key] = _valueType
@@ -354,6 +359,8 @@ class ConfigurationSettings:
         Args:
             xmlDoc (xml.etree.ElementTree): xml document containing
             configuration data
+
+            name (str): name of file
         """
         self._config = {}
 
@@ -415,8 +422,8 @@ class ConfigurationSettings:
         self._configFile = xf
 
     def saveToFile(
-        self, xmlFile: Optional[Union[str, Path]] = None, rootName: Optional[str] = None
-    ) -> None:
+            self, xmlFile: Optional[Union[str, Path]] = None,
+            rootName: Optional[str] = None) -> None:
         """
         save configuration to file in xml format
 
@@ -503,14 +510,17 @@ def test() -> None:
     configuration.set("bool", True)
     configuration.set(
         "base64sting",
-        "AdnQywACAAAAAAHmAAAAoAAACM4AAAR5AAAB7wAAAMYAAAjFAAAEcAAAAAAAAAAACgA=",
+        (r"AdnQywACAAAAAAHmAAAAoAAACM4AAAR5AAAB7wAAAMYAAAj"
+         r"FAAAEcAAAAAAAAAAACgA="),
     )
     configuration.set(
         "base86bytes",
-        "AdnQywACAAAAAAHmAAAAoAAACM4AAAR5AAAB7wAAAMYAAAjFAAAEcAAAAAAAAAAACgA=".encode(),
+        (r"AdnQywACAAAAAAHmAAAAoAAACM4AAAR5AAAB7wAAAMYAAAj"
+         r"FAAAEcAAAAAAAAAAACgA=").encode(),
     )
     configuration.set("dict", {"key1": 1, "key2": 2, 3: b})
-    configuration.set("list", [2, 3, "list", {"key1": 1, 2: [2]}], valueType="pickle")
+    configuration.set(
+        "list", [2, 3, "list", {"key1": 1, 2: [2]}], valueType="pickle")
     configuration.set("int", 13)
     configuration.set("float", 1.3e200)
     configuration.set("complex", 1 + 3j)
@@ -519,7 +529,8 @@ def test() -> None:
     print("\nConfiguration set\n")
     for key, value in configuration:
         print(
-            "Key = {0}, type = {2} value = {1}".format(key, value, type(value).__name__)
+            "Key = {0}, type = {2} value = {1}".format(
+                key, value, type(value).__name__)
         )
 
     configuration.saveToFile()
