@@ -3,7 +3,6 @@ subclass of QAction to save text, shortcut and tooltip
 this information is used for internationalization
 """
 
-#from PySide2.QtWidgets import QAction
 from PySide6.QtGui import QAction
 
 
