@@ -18,8 +18,6 @@ from PySide6.QtWidgets import (
     QToolTip
 )
 
-#from vsutillib.macos import isMacDarkMode
-
 from .classes import SvgColor
 
 MODULELOG = logging.getLogger(__name__)
@@ -76,7 +74,7 @@ def darkPalette(app=None):
     disabledColor = QColor(127, 127, 127)
 
     palette.setColor(QPalette.AlternateBase, darkColor)
-    palette.setColor(QPalette.Base, QColor(18, 18, 18))
+    palette.setColor(QPalette.Base, QColor(36, 36, 36))
     palette.setColor(QPalette.BrightText, SvgColor.red)
     palette.setColor(QPalette.Button, darkColor)
     palette.setColor(QPalette.ButtonText, SvgColor.white)
@@ -108,6 +106,7 @@ def darkPalette(app=None):
         QToolTip.setPalette(toolTipPalette)
 
     return palette
+
 
 """
 def qtRunFunctionInThread(function, *args, **kwargs):
