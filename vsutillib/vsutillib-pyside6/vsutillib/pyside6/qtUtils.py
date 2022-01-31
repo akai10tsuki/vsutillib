@@ -6,28 +6,35 @@ utility functions that use PySide2
 
 
 import logging
-#import platform
+
+from typing import Any, Callable, Optional
 
 #from PySide6.QtCore import Qt
 from PySide6.QtGui import QPalette, QColor, QDesktopServices
-from PySide6.QtWidgets import QPushButton, QToolTip
+from PySide6.QtWidgets import (
+    QApplication,
+    QPushButton,
+    QWidget,
+    QToolTip
+)
 
 #from vsutillib.macos import isMacDarkMode
 
-from .classes import QRunInThread, SvgColor
+from .classes import SvgColor
 
 MODULELOG = logging.getLogger(__name__)
 MODULELOG.addHandler(logging.NullHandler())
 
 
-def centerWidget(widget, parent=None):
+def centerWidget(widget: QWidget, parent: Optional[QWidget] = None) -> None:
     """center widget based on parent or screen geometry"""
 
     if parent is None:
         parent = widget.parentWidget()
 
     if parent:
-        widget.move(parent.frameGeometry().center() - widget.frameGeometry().center())
+        widget.move(parent.frameGeometry().center() -
+                    widget.frameGeometry().center())
 
     else:
         widget.move(
@@ -36,7 +43,10 @@ def centerWidget(widget, parent=None):
         )
 
 
-def pushButton(label, function, tooltip):
+def pushButton(
+        label: str,
+        function: Callable[..., None],
+        tooltip: str) -> QPushButton:
     """
     pushButton convenience function for QPushButton definitions
 
@@ -71,7 +81,8 @@ def darkPalette(app=None):
     palette.setColor(QPalette.Button, darkColor)
     palette.setColor(QPalette.ButtonText, SvgColor.white)
     palette.setColor(QPalette.Disabled, QPalette.ButtonText, disabledColor)
-    palette.setColor(QPalette.Disabled, QPalette.HighlightedText, disabledColor)
+    palette.setColor(QPalette.Disabled,
+                     QPalette.HighlightedText, disabledColor)
     palette.setColor(QPalette.Disabled, QPalette.Text, disabledColor)
     palette.setColor(QPalette.Disabled, QPalette.WindowText, disabledColor)
     palette.setColor(QPalette.Highlight, QColor(42, 130, 218))
@@ -85,11 +96,12 @@ def darkPalette(app=None):
 
     if app is not None:
         app.setStyle("Fusion")
-        #app.setStyle("windowsvista")
+        # app.setStyle("windowsvista")
         app.setPalette(palette)
 
         toolTipPalette = QPalette()
-        toolTipPalette.setColor(QPalette.Inactive, QPalette.ToolTipText, SvgColor.white)
+        toolTipPalette.setColor(
+            QPalette.Inactive, QPalette.ToolTipText, SvgColor.white)
         toolTipPalette.setColor(
             QPalette.Inactive, QPalette.ToolTipBase, QColor(42, 130, 218)
         )
@@ -97,11 +109,12 @@ def darkPalette(app=None):
 
     return palette
 
+"""
 def qtRunFunctionInThread(function, *args, **kwargs):
-    """
+    " " "
     Pass the function to execute Other args,
     kwargs are passed to the run function
-    """
+    " " "
 
     funcStart = kwargs.pop("funcStart", None)
     funcFinished = kwargs.pop("funcFinished", None)
@@ -118,3 +131,4 @@ def qtRunFunctionInThread(function, *args, **kwargs):
 
     # Execute
     worker.run()
+"""

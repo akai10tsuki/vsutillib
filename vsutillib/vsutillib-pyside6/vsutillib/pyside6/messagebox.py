@@ -13,43 +13,57 @@ Returns:
 
 """
 
-from PySide6.QtWidgets import QMessageBox
+from PySide6.QtGui import QIcon
+from PySide6.QtWidgets import QAbstractButton, QMessageBox, QWidget
 
 
-def messageBox(self, title, text, icon=QMessageBox.Information):
+def messageBox(
+        widget: QWidget,
+        title: str,
+        text: str,
+        icon: QIcon = QMessageBox.Information) -> QAbstractButton:
     """
     Working on generic message box
     """
 
-    m = QMessageBox(self)
+    m = QMessageBox(widget)
     m.setWindowTitle(title)
     m.setText(text)
     m.setIcon(icon)
-    # yesButton = m.addButton('Yes', QMessageBox.ButtonRole.YesRole)
-    # noButton = m.addButton('No', QMessageBox.ButtonRole.NoRole)
     m.setDefaultButton(QMessageBox.Ok)
-    m.setFont(self.font())
+    m.setFont(widget.font())
     m.exec_()
 
     return QMessageBox.Ok
 
 
-def messageBoxYesNo(self, title, text, icon):
+def messageBoxYesNo(
+        widget: QWidget,
+        title: str,
+        text: str,
+        icon: QIcon) -> QAbstractButton:
     """
     Yes | No message box
     """
 
-    m = QMessageBox(self)
+    m = QMessageBox(widget)
     m.setWindowTitle(title)
     m.setText(text)
     m.setIcon(icon)
-    yesButton = m.addButton("Yes", QMessageBox.ButtonRole.YesRole)
-    noButton = m.addButton("No", QMessageBox.ButtonRole.NoRole)
+    yesButton = m.addButton(_("Yes"), QMessageBox.ButtonRole.YesRole)
+    noButton = m.addButton(_("No"), QMessageBox.ButtonRole.NoRole)
     m.setDefaultButton(noButton)
-    m.setFont(self.font())
+    m.setFont(widget.font())
     m.exec_()
 
     if m.clickedButton() == yesButton:
         return QMessageBox.Yes
 
     return QMessageBox.No
+
+
+def _(dummy):
+    return dummy
+
+
+del _
