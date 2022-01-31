@@ -3,8 +3,6 @@ subclass of QAction to save text, shortcut and tooltip
 this information is used for internationalization
 """
 
-from typing import Optional
-from PySide6.QtCore import Slot
 from PySide6.QtGui import QAction
 
 
