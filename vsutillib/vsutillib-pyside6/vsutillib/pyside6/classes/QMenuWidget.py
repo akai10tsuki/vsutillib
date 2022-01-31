@@ -5,6 +5,7 @@ used in internationalization
 
 from PySide6.QtWidgets import QMenu
 
+
 class QMenuWidget(QMenu):
     """Override QMenu __init__ to save title"""
 
@@ -15,6 +16,7 @@ class QMenuWidget(QMenu):
         titleSuffix = kwargs.pop("titleSuffix", None)
         margins = kwargs.pop("margins", None)
         # originalTitle = kwargs.pop("originalTitle", None)
+        
 
         self.__originalTitle = None
         self.titlePrefix = "" if titlePrefix is None else titlePrefix
@@ -30,6 +32,10 @@ class QMenuWidget(QMenu):
         newArgs = tuple(newArgs)
 
         super().__init__(*newArgs, **kwargs)
+
+        #self.setStyleSheet("""
+        #    border: 1px white
+        #    """)
 
     def setTitle(self, title: str, *args: str, **kwargs: str) -> None:
 
