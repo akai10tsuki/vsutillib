@@ -11,9 +11,13 @@ from .classes import (
     QActivityIndicator,
     QMenuWidget,
     QOutputTextWidget,
+    QPushButtonWidget,
     QSignalLogHandler,
     SvgColor,
     VerticalLine,
+    TabElement,
+    TabWidget,
+    TabWidgetExtension,
 )
 
 from .messagebox import messageBox, messageBoxYesNo
