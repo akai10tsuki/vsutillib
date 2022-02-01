@@ -5,7 +5,7 @@ Convenience functions
 import threading
 
 
-def isThreadRunning(threadName):
+def isThreadRunning(threadName: str) -> bool:
     """
     isThreadRunning check for named thread running
 
