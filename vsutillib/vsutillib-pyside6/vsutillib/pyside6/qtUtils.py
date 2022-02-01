@@ -18,7 +18,7 @@ from PySide6.QtWidgets import (
     QToolTip
 )
 
-from .classes import SvgColor
+from .classes import QRunInThread, SvgColor
 
 MODULELOG = logging.getLogger(__name__)
 MODULELOG.addHandler(logging.NullHandler())
@@ -108,16 +108,16 @@ def darkPalette(app=None):
     return palette
 
 
-"""
 def qtRunFunctionInThread(function, *args, **kwargs):
-    " " "
+    """
     Pass the function to execute Other args,
     kwargs are passed to the run function
-    " " "
+    """
 
     funcStart = kwargs.pop("funcStart", None)
     funcFinished = kwargs.pop("funcFinished", None)
     funcResult = kwargs.pop("funcResult", None)
+    funcError = kwargs.pop("funcError", None)
 
     worker = QRunInThread(function, *args, **kwargs)
 
@@ -127,7 +127,8 @@ def qtRunFunctionInThread(function, *args, **kwargs):
         worker.finishedSignal.connect(funcFinished)
     if funcResult is not None:
         worker.resultSignal.connect(funcResult)
+    if funcError is not None:
+        worker.errorSignal.connect(funcError)
 
     # Execute
     worker.run()
-"""
