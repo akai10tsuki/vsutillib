@@ -9,6 +9,7 @@ from .QLineFrame import HorizontalLine, VerticalLine
 from .QMenuWidget import QMenuWidget
 from .QOutputTextWidget import QOutputTextWidget
 from .QPushButtonWidget import QPushButtonWidget
+from .QRunInThread import QRunInThread
 from .QSignalLogHandler import QSignalLogHandler
 from .SvgColor import SvgColor
 from .TabWidget import TabWidget, TabElement

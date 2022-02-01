@@ -12,6 +12,7 @@ from .classes import (
     QMenuWidget,
     QOutputTextWidget,
     QPushButtonWidget,
+    QRunInThread,
     QSignalLogHandler,
     SvgColor,
     VerticalLine,
@@ -25,5 +26,6 @@ from .messagebox import messageBox, messageBoxYesNo
 from .qtUtils import (
     centerWidget,
     pushButton,
+    qtRunFunctionInThread,
     darkPalette,
 )
