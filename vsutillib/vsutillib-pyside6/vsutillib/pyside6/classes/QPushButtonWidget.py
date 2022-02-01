@@ -87,8 +87,8 @@ class QPushButtonWidget(QPushButton):
 
 
 # This if for Pylance _() is not defined
-#def _(dummy: str) -> str:
-#    return dummy
+def _(dummy: str) -> str:
+    return dummy
 
 
-#del _
+del _
