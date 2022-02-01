@@ -7,6 +7,9 @@ import sys
 import threading
 import traceback
 
+from queue import Queue
+from typing import Any, Callable
+
 MODULELOG = logging.getLogger(__name__)
 MODULELOG.addHandler(logging.NullHandler())
 
@@ -23,14 +26,18 @@ class GenericThreadWorker(threading.Thread):
 
     log = False
 
-    def __init__(self, function, *args, **kwargs):
-        super(GenericThreadWorker, self).__init__()
+    def __init__(
+            self,
+            function: Callable[..., None],
+            *args: Any,
+            **kwargs: Any):
+        super().__init__()
 
         self.function = function
         self.args = args
         self.kwargs = kwargs
 
-    def run(self):
+    def run(self) -> None:
         """
         Override run initialise and starts the worker function
         with passed args, kwargs.
@@ -40,8 +47,6 @@ class GenericThreadWorker(threading.Thread):
             self.function(*self.args, **self.kwargs)
         except:  # pylint: disable=bare-except
             traceback.print_exc()
-
-        return
 
 
 class QueueThreadWorker(threading.Thread):
@@ -57,15 +62,20 @@ class QueueThreadWorker(threading.Thread):
 
     log = False
 
-    def __init__(self, queue, function, *args, **kwargs):
-        super(QueueThreadWorker, self).__init__()
+    def __init__(
+        self,
+        queue: Queue,
+        function: Callable[..., None],
+        *args: Any,
+        **kwargs: Any):
+        super().__init__()
 
         self.queue = queue
         self.function = function
         self.args = args
         self.kwargs = kwargs
 
-    def run(self):
+    def run(self) -> None:
         """
         Override run gets next job from queue. The initialise and
         starts the worker function with passed args, kwargs and
@@ -91,7 +101,8 @@ class ThreadWorker(threading.Thread):
         function (function): Function to submit to Thread.
         funcFinished (function): Call back function when thread finishes.
         funcError (function): Call back function when an error occurs.
-        funcResult (function): Call back function with the result of the execution.
+        funcResult (function): Call back function called with result of the 
+            execution as parameter.
         funcStart (function): Call back function when an Thread is about to start.
         *args: Variable length argument list.
         **kwargs: Arbitrary keyword arguments.
@@ -100,10 +111,10 @@ class ThreadWorker(threading.Thread):
     log = False
 
     def __init__(self,
-                 function,
-                 *args,
-                 **kwargs):
-        super(ThreadWorker, self).__init__()
+                 function: Callable[..., None],
+                 *args: Any,
+                 **kwargs: Any):
+        super().__init__()
 
         # Store constructor arguments (re-used for processing)
         self.function = function
@@ -115,9 +126,9 @@ class ThreadWorker(threading.Thread):
         self.funcError = kwargs.pop('funcError', None)
         self.funcResult = kwargs.pop('funcResult', None)
 
-        self.kwargs = kwargs # pass rest of named parameters to self.function
+        self.kwargs = kwargs  # pass rest of named parameters to self.function
 
-    def run(self):
+    def run(self) -> None:
         """
         Override run initialise and starts the worker function
         with passed args, kwargs.
