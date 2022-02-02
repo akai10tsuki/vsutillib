@@ -7,8 +7,10 @@ PySide2 related classes and functions
 from .classes import (
     checkColor,
     HorizontalLine,
+    LineOutput,
     QActionWidget,
     QActivityIndicator,
+    QLabelWidget,
     QMenuWidget,
     QOutputTextWidget,
     QPushButtonWidget,
