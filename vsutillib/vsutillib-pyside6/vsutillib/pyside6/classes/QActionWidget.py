@@ -92,7 +92,7 @@ class QActionWidget(QAction):
             + self.margins
         )
 
-    def setLanguage(self) -> None:
+    def translate(self) -> None:
         """Set language for widget labels"""
 
         if self.toolTip is not None:

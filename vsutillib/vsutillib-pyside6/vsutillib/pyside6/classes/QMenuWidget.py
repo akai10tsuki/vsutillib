@@ -63,7 +63,7 @@ class QMenuWidget(QMenu):
         if isinstance(value, str):
             self.__originalTitle = value
 
-    def setLanguage(self) -> None:
+    def translate(self) -> None:
         if self.originalTitle is not None:
             super().setTitle(self.lTitle)
 

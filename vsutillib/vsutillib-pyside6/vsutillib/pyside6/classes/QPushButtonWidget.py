@@ -78,7 +78,7 @@ class QPushButtonWidget(QPushButton):
             + self.margins
         )
 
-    def setLanguage(self) -> None:
+    def translate(self) -> None:
         if self.toolTip is not None:
             super().setToolTip(_(self.toolTip))
 

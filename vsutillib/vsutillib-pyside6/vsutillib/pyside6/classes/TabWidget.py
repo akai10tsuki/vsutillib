@@ -148,9 +148,9 @@ class TabWidget(QTabWidget):
     def addTabs(self, tabWidgets: List[TabElement]) -> None:
         self._initUI(tabWidgets)
 
-    def setLanguage(self) -> None:
+    def translate(self) -> None:
         """
-        setLanguage set tabs labels according to locale
+        translate set tabs labels according to locale
         """
 
         for i, (__, label, tooltip) in enumerate(self.__tabWidgets):
