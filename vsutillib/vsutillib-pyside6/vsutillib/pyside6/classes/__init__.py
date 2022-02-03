@@ -12,6 +12,7 @@ from .QOutputTextWidget import QOutputTextWidget
 from .QPushButtonWidget import QPushButtonWidget
 from .QRunInThread import QRunInThread
 from .QSignalLogHandler import QSignalLogHandler
+from .QSystemTrayIconWidget import QSystemTrayIconWidget
 from .SvgColor import SvgColor
 from .TabWidget import TabWidget, TabElement
 from .TabWidgetExtension import TabWidgetExtension

@@ -16,6 +16,7 @@ from .classes import (
     QPushButtonWidget,
     QRunInThread,
     QSignalLogHandler,
+    QSystemTrayIconWidget,
     SvgColor,
     VerticalLine,
     TabElement,
