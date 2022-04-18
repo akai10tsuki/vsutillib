@@ -6,10 +6,12 @@ PySide2 related classes and functions
 
 from .classes import (
     checkColor,
+    DualProgressBar,
     HorizontalLine,
     LineOutput,
     QActionWidget,
     QActivityIndicator,
+    QFormatLabel,
     QLabelWidget,
     QMenuWidget,
     QOutputTextWidget,
