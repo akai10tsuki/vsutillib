@@ -18,6 +18,7 @@ from .classes import (
     QMenuWidget,
     QOutputTextWidget,
     QPushButtonWidget,
+    QProgressIndicator,
     QRunInThread,
     QSignalLogHandler,
     QSystemTrayIconWidget,

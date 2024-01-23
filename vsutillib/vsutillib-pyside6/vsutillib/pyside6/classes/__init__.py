@@ -15,7 +15,7 @@ from .QLineFrame import HorizontalLine, VerticalLine
 from .QMenuWidget import QMenuWidget
 from .QOutputTextWidget import QOutputTextWidget
 from .QProgressBar import DualProgressBar
-#from .QProgressIndicator import QProgressIndicator
+from .QProgressIndicator import QProgressIndicator
 from .QPushButtonWidget import QPushButtonWidget
 from .QRunInThread import QRunInThread
 from .QSignalLogHandler import QSignalLogHandler
