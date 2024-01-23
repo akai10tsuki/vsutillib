@@ -11,6 +11,8 @@ from .classes import (
     LineOutput,
     QActionWidget,
     QActivityIndicator,
+    QComboLineEdit,
+    QFileListWidget,
     QFormatLabel,
     QLabelWidget,
     QMenuWidget,

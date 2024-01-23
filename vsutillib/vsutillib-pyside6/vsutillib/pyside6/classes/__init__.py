@@ -5,9 +5,9 @@ PySide6 related classes package
 from .insertTextHelpers import LineOutput, checkColor
 from .QActionWidget import QActionWidget
 from .QActivityIndicator import QActivityIndicator
-#from .QComboLineEdit import QComboLineEdit
+from .QComboLineEdit import QComboLineEdit
 from .QFormatLabel import QFormatLabel
-#from .QFileListWidget import QFileListWidget
+from .QFileListWidget import QFileListWidget
 #from .QGenericThreads import QthThread, QthThreadWorker
 #from .QGroupSignal import QGroupSignal
 from .QLabelWidget import QLabelWidget
