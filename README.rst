@@ -16,9 +16,9 @@ it and install as a dependency of apps like mkvbatchmultiplex.
 
 For version 2.0.0 onwards will try to maintain it as a real library.
 Will try to maintain compatibility with interface for as long as
-possible. 
+possible.
 
-Still the recommendation is any o include any relevant code in
+Still the recommendation is to include any relevant code in
 your project and don't count on updates in the library will always
 be compatible with a previous version.
 
