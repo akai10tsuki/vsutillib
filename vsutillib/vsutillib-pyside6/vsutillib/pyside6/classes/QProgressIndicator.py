@@ -354,7 +354,7 @@ class QProgressIndicator(QWidget):
 
 if __name__ == "__main__":
 
-    from PySide2.QtWidgets import QGridLayout, QMainWindow, QPushButton
+    from PySide6.QtWidgets import QGridLayout, QMainWindow, QPushButton
 
     class MainWindow(QMainWindow):
         """Test the progress bars"""
