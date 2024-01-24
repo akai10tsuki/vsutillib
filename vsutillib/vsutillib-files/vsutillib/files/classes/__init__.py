@@ -7,5 +7,5 @@ ConfigurationSettings - read/save dictionary of terms
 
 """
 
-from .configurationsettings import ConfigurationSettings
+from .Configuration import ConfigurationSettings
 from .DisplayPath import DisplayPath

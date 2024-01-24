@@ -406,12 +406,15 @@ class RunCommand:
         else:
             cmd = shlex.split(self.__command)
         try:
+            cFlag = 0
+            if platform.system() == "Windows":
+                cFlag = subprocess.CREATE_NO_WINDOW
             with subprocess.Popen(
                 cmd,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.STDOUT,
                 universal_newlines=False,
-                creationflags=subprocess.CREATE_NO_WINDOW,
+                creationflags=cFlag,
             ) as p:
                 reader = io.TextIOWrapper(p.stdout, encoding="utf8")
                 try:
