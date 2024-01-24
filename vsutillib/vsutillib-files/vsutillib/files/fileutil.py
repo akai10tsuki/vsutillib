@@ -5,9 +5,20 @@ Convenience functions related to files and file system
 import os
 import platform
 import shlex
+import zlib
 
 from pathlib import Path, PurePath
 
+def crc32(fileName):
+
+    with open(fileName, 'rb') as fh:
+        hash = 0
+        while True:
+            s = fh.read(65536)
+            if not s:
+                break
+            hash = zlib.crc32(s, hash)
+        return "%08X" % (hash & 0xFFFFFFFF)
 
 def findFileInPath(element, dirPath=None):
     """
