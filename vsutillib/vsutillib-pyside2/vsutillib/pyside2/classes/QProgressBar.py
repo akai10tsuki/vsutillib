@@ -413,4 +413,4 @@ if __name__ == "__main__":
     # variables use to construct application not constants
     app = QApplication([])
     window = MainWindow()
-    sys.exit(app.exec_())
+    sys.exit(app.exec())

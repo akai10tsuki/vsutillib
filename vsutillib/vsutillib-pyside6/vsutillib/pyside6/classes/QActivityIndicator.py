@@ -41,7 +41,7 @@ from PyQt5.QtWidgets import *
 
 
 class QtWaitingSpinner(QWidget):
-    def __init__(self, parent, centerOnParent=True, 
+    def __init__(self, parent, centerOnParent=True,
             disableParentWhenSpinning=False, modality=Qt.NonModal):
         super().__init__(parent)
 
@@ -83,12 +83,12 @@ class QtWaitingSpinner(QWidget):
         painter.setPen(Qt.NoPen)
         for i in range(0, self._numberOfLines):
             painter.save()
-            painter.translate(self._innerRadius + self._lineLength, 
+            painter.translate(self._innerRadius + self._lineLength,
                 self._innerRadius + self._lineLength)
             rotateAngle = float(360 * i) / float(self._numberOfLines)
             painter.rotate(rotateAngle)
             painter.translate(self._innerRadius, 0)
-            distance = self.lineCountDistanceFromPrimary(i, 
+            distance = self.lineCountDistanceFromPrimary(i,
                 self._currentCounter, self._numberOfLines)
             color = self.currentLineColor(distance, self._numberOfLines, self._trailFadePercentage,
                                           self._minimumTrailOpacity, self._color)
@@ -397,4 +397,4 @@ if __name__ == "__main__":
     # pylint: disable=invalid-name
     app = QApplication([])
     window = MainWindow()
-    sys.exit(app.exec_())
+    sys.exit(app.exec())

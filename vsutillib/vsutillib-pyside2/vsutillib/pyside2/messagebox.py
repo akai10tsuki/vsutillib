@@ -30,7 +30,7 @@ def messageBox(
     m.setIcon(icon)
     m.setDefaultButton(QMessageBox.Ok)
     m.setFont(self.font())
-    m.exec_()
+    m.exec()
 
     return QMessageBox.Ok
 
@@ -50,7 +50,7 @@ def messageBoxYesNo(
     noButton = m.addButton("No", QMessageBox.ButtonRole.NoRole)
     m.setDefaultButton(noButton)
     m.setFont(self.font())
-    m.exec_()
+    m.exec()
 
     if m.clickedButton() == yesButton:
         return QMessageBox.Yes

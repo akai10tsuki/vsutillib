@@ -93,7 +93,7 @@ class QFileListWidget(QOutputTextWidget):
             menu = QMenu(self)
             clearAction = menu.addAction(Actions.Clear)
             sortAction = menu.addAction(Actions.Sort)
-            action = menu.exec_(self.mapToGlobal(event.pos()))
+            action = menu.exec(self.mapToGlobal(event.pos()))
             if action == clearAction:
                 self.clear()
                 self.filesDroppedUpdateSignal.emit(self.fileList)
