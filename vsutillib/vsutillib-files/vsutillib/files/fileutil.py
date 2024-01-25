@@ -251,6 +251,41 @@ def getExecutable(search):
     return None
 
 
+def resolveOverwrite(fileName, strPrefix="new-", adjustCRC=False):
+    """
+    resolveOverwrite resolve overwrite collisions. If adjustCRC is true
+    it will try to leave whatever is encloes in brackets at the end of
+    the file name.
+
+    Args:
+        fileName (Path): desired file name to use
+        strPrefix (str, optional): prefix to use for new name. Defaults to "new-".
+
+    Returns:
+        Path: Path object with the new file name.
+    """
+
+    fileNameTmp = fileName
+
+    # Check if destination file exist and add prefix if it does
+    if fileNameTmp.is_file():
+
+        strSuffix = ""
+        n = 1
+
+        while True:
+            fileNameTmp = fileNameTmp.parent.joinpath(
+                strPrefix + fileName.stem + strSuffix + fileName.suffix
+            )
+
+            if fileNameTmp.is_file():
+                strSuffix = " ({})".format(n)
+                n += 1
+            else:
+                break
+
+    return fileNameTmp
+
 def stripEncaseQuotes(strFile):
     """
     Strip single quote at start and end of file name
