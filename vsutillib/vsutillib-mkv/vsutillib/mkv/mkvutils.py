@@ -193,7 +193,8 @@ def resolveOverwrite(fileName, strPrefix="new-"):
 
     Args:
         fileName (Path): desired file name to use
-        strPrefix (str, optional): prefix to use for new name. Defaults to "new-".
+        strPrefix (str, optional): prefix to use for new name.
+            Defaults to "new-".
 
     Returns:
         Path: Path object with the new file name.
