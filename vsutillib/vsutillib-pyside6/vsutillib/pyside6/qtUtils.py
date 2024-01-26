@@ -10,9 +10,8 @@ import logging
 from typing import Any, Callable, Optional
 
 #from PySide6.QtCore import Qt
-from PySide6.QtGui import QPalette, QColor, QDesktopServices
+from PySide6.QtGui import QPalette, QColor, QScreen
 from PySide6.QtWidgets import (
-    QApplication,
     QPushButton,
     QWidget,
     QToolTip
@@ -36,7 +35,7 @@ def centerWidget(widget: QWidget, parent: Optional[QWidget] = None) -> None:
 
     else:
         widget.move(
-            QDesktopServices().availableGeometry().center()
+            QScreen().availableGeometry().center()
             - widget.frameGeometry().center()
         )
 
