@@ -2,7 +2,6 @@
 
 ln -s vsutillib-files/vsutillib/files/
 ln -s vsutillib-log/vsutillib/log/
-ln -s vsutillib-macos/vsutillib/macos/
 ln -s vsutillib-media/vsutillib/media/
 ln -s vsutillib-misc/vsutillib/misc/
 ln -s vsutillib-mkv/vsutillib/mkv/

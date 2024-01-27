@@ -6,7 +6,6 @@ REM cd D:\Projects\Python\Libs\vsutillib\vsutillib
 
 mklink /d files vsutillib-files\vsutillib\files
 mklink /d log vsutillib-log\vsutillib\log
-mklink /d macos vsutillib-macos\vsutillib\macos
 mklink /d media vsutillib-media\vsutillib\media
 mklink /d misc vsutillib-misc\vsutillib\misc
 mklink /d mkv vsutillib-mkv\vsutillib\mkv
