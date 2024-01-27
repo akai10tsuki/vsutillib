@@ -92,7 +92,7 @@ setup(
     keywords=config.KEYWORDS,  # Optional
     packages=config.PACKAGES,
     install_requires=config.REQUIRED,
-    python_requires=config.PYTHONVERSIONS,
+    python_requires=">=3.10.1, <3.13",
     include_package_data=True,
     project_urls=config.PROJECTURLS,
 )
