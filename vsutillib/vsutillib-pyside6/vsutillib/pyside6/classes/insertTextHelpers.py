@@ -6,7 +6,7 @@ utility functions that use PySide2
 
 from PySide6.QtGui import QColor
 
-from vsutillib.macos import isMacDarkMode
+from vsutillib.misc import  isSystemInDarkMode
 
 from .SvgColor import SvgColor
 
@@ -25,12 +25,12 @@ def checkColor(color: QColor, isDarkMode: bool = False) -> QColor:
 
     if color is None:
 
-        if isMacDarkMode() or isDarkMode:
+        if isSystemInDarkMode() or isDarkMode:
             color = SvgColor.white
         else:
             color = SvgColor.black
 
-    elif isMacDarkMode():
+    elif isSystemInDarkMode():
 
         if color == SvgColor.red:
             color = SvgColor.magenta
