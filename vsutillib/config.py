@@ -31,25 +31,25 @@ from vsutillib.log import LogRotateFileHandler
 __VERSION = (3, 0, "0b1", "dev0")
 
 
-FILES_VERSION = "1.7.0"  # 1.6.5
+FILES_VERSION = "1.7.0"
 LOG_VERSION = "1.7.0"
 MACOS_VERSION = "1.7.0"
-MEDIA_VERSION = "1.7.0"  # 1.6.2
-MISC_VERSION = "1.7.0"  # 1.6.0
-MKV_VERSION = "1.7.0"  # 1.6.2
+MEDIA_VERSION = "1.7.0"
+MISC_VERSION = "1.7.0"
+MKV_VERSION = "1.7.0"
 NETWORK_VERSION = "1.7.0"
-PROCESS_VERSION = "1.7.0"  # 1.6.0
-PYQT_VERSION = "1.7.0"  # 1.6.2
+PROCESS_VERSION = "1.7.0"
+PYQT_VERSION = "1.7.0"
 PYQT6_VERSION = "1.7.0"
-SCRIPTS_VERSION = "1.7.0"  # 1.6.2
-SQL_VERSION = "1.7.0"  # 1.6.2
+SCRIPTS_VERSION = "1.7.0"
+SQL_VERSION = "1.7.0"
 VSXML_VERSION = "1.7.0"
 
 LXML_VERSION = ">=4.5"
 NATSORT_VERSION = ">=7.0.1"
 PYMEDIAINFO_VERSION = ">=4.2.1"
 PYSIDE2_VERSION = ">=5.14.1"
-PYSIDE6_VERSION = ">=6.0.0"
+PYSIDE6_VERSION = ">=6.2.0"
 PYTHON_VERSION = ">=3.10.1, <3.13"
 PYTHONVERSIONS = ">=3.10.1, <3.13"
 
@@ -67,7 +67,7 @@ KEYWORDS = "mkv multimedia video audio configuration"
 REQUIRED = [
     "lxml" + LXML_VERSION,
     "pymediainfo" + PYMEDIAINFO_VERSION,
-    "PySide2" + PYSIDE2_VERSION,
+    "PySide6" + PYSIDE6_VERSION,
     "natsort" + NATSORT_VERSION,
 ]
 URL = "https://github.com/akai10tsuki/vsutillib"
