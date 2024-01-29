@@ -9,9 +9,3 @@ from .decorators import staticVars, callCounter
 from .iso639 import iso639
 from .regexutils import multipleReplace
 from .strFormatTimeDelta import strFormatTimeDelta
-from .darkModeTest import (
-    isLinuxDarkMode,
-    isMacDarkMode,
-    isSystemInDarkMode,
-    isWindowsDarkMode,
-)

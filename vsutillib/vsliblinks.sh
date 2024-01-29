@@ -12,3 +12,5 @@ ln -s vsutillib-pyside2/vsutillib/pyside2/
 ln -s vsutillib-pyside6/vsutillib/pyside6/
 ln -s vsutillib-scripts/vsutillib/scripts/
 ln -s vsutillib-sql/vsutillib/sql/
+ln -s vsutillib-system/vsutillib/system/
+ln -s vsutillib-vsxml/vsutillib/vsxml/

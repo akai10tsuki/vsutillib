@@ -16,4 +16,5 @@ mklink /d pyside2 vsutillib-pyside2\vsutillib\pyside2
 mklink /d pyside6 vsutillib-pyside6\vsutillib\pyside6
 mklink /d scripts vsutillib-scripts\vsutillib\scripts
 mklink /d sql vsutillib-sql\vsutillib\sql
+mklink /d system vsutillib-sql\vsutillib\system
 mklink /d vsxml vsutillib-vsxml\vsutillib\vsxml

@@ -6,7 +6,7 @@ utility functions that use PySide2
 
 from PySide6.QtGui import QColor
 
-from vsutillib.misc import  isSystemInDarkMode
+from vsutillib.system import isSystemInDarkMode
 
 from .SvgColor import SvgColor
 
