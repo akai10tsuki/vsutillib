@@ -4,10 +4,13 @@ Convenience functions related to files and file system
 
 import os
 import platform
+import re
 import shlex
 import zlib
 
 from pathlib import Path, PurePath
+
+_reCrcChars = re.compile('^[0123456789ABCDEF]+$', flags=re.IGNORECASE)
 
 def crc32(fileName):
 
@@ -250,6 +253,10 @@ def getExecutable(search):
 
     return None
 
+def possibleCRC(crc) -> bool:
+
+    return(bool(_reCrcChars.match(crc)))
+
 
 def resolveOverwrite(fileName, strPrefix="new-", adjustCRC=False):
     """
@@ -285,6 +292,7 @@ def resolveOverwrite(fileName, strPrefix="new-", adjustCRC=False):
                 break
 
     return fileNameTmp
+
 
 def stripEncaseQuotes(strFile):
     """

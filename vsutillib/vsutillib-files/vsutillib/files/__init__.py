@@ -18,6 +18,7 @@ from .fileutil import (
     getFileList,
     getDirectoryList,
     getExecutable,
+    possibleCRC,
     stripEncaseQuotes,
 )
 from .classes import ConfigurationSettings, DisplayPath
