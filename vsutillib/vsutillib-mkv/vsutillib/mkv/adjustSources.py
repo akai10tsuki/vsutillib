@@ -93,7 +93,7 @@ def adjustSources(oCommand, index, algorithm=1):
                         else:
                             savedScore = score
                     else:
-                        print("Not suppose to show..")
+                        #print("Not suppose to show..")
                         if algorithm == 2:
                             translate[track] = str(200 + i) # mkvmerge will ignore track
                         else:

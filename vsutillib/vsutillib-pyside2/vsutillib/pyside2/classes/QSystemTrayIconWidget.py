@@ -90,7 +90,7 @@ class QSystemTrayIconWidget(QSystemTrayIcon):
 
     @Slot(str)
     def iconActivated(self, reason: QSystemTrayIcon.ActivationReason) -> None:
-        print("iconActivated")
+        #print("iconActivated")
         if reason == QSystemTrayIcon.Trigger:
             print("Trigger")
         if reason == QSystemTrayIcon.DoubleClick:
@@ -102,7 +102,7 @@ class QSystemTrayIconWidget(QSystemTrayIcon):
 
     @Slot(int)
     def setVisible(self, visible: bool) -> None:
-        print("Visible")
+        #print("Visible")
         super().visible(visible)
 
     @Slot(int)
