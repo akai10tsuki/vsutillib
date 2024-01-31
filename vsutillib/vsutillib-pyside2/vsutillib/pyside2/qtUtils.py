@@ -18,7 +18,7 @@ from PySide2.QtWidgets import (
     QToolTip,
 )
 
-from vsutillib.macos import isMacDarkMode
+from vsutillib.system import isMacDarkMode
 
 from .classes import QRunInThread, SvgColor
 
