@@ -25,6 +25,7 @@ from .mkvutils import (
     convertToBashStyle,
     generateCommand,
     getMKVMerge,
+    getMKVMergeEmbedded,
     getMKVMergeVersion,
     numberOfTracksInCommand,
     quoteString,

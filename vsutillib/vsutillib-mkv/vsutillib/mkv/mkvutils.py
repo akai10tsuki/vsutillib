@@ -10,6 +10,7 @@ import os
 import platform
 import re
 import shlex
+import sys
 
 from pathlib import Path
 
@@ -89,6 +90,21 @@ def getMKVMerge():
     return None
 
 
+def getMKVMergeEmbedded(rootDir):
+
+    appDir = rootDir
+
+    if platform.system() == "Windows":
+        mkvMerge = appDir.joinpath("embed/mkvtoolnix/mkvmerge.exe")
+    else:
+        mkvMerge = appDir.joinpath("embed/mkvtoolnix/mkvmerge")
+
+    if mkvMerge.is_file():
+        return mkvMerge
+
+    return None
+
+
 def getMKVMergeVersion(mkvmerge):
     """
     get mkvmerge version
@@ -102,7 +118,10 @@ def getMKVMergeVersion(mkvmerge):
         version of mkvmerge
     """
 
-    s = mkvmerge
+    if mkvmerge is None:
+        return None
+
+    s = str(mkvmerge)
 
     if s[0:1] != "'" and s[-1:] != "'":
         s = shlex.quote(s)
