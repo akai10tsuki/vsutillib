@@ -1,5 +1,5 @@
 """
-PySide2 related classes and functions
+PySide6 related classes and functions
 """
 
 # classes
@@ -11,6 +11,7 @@ from .classes import (
     LineOutput,
     QActionWidget,
     QActivityIndicator,
+    QCheckBoxWidget,
     QComboLineEdit,
     QFileListWidget,
     QFormatLabel,
