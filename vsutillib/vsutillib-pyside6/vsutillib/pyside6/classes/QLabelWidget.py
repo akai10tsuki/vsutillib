@@ -1,9 +1,7 @@
 """
-subclass of QMenu to save text
+subclass of QLabel to save text
 used in internationalization
 """
-
-from typing import Any
 
 from PySide6.QtWidgets import QLabel
 
