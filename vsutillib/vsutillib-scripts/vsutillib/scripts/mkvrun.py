@@ -12,7 +12,7 @@ import sys
 from vsutillib import config
 from vsutillib.media import MediaFileInfo
 from vsutillib.misc import staticVars
-from vsutillib.mkv import MKVCommand, VerifyStructure
+from vsutillib.mkv import MKVCommandParser, VerifyStructure
 from vsutillib.process import RunCommand
 
 VERSION = config.SCRIPTS_VERSION
@@ -98,13 +98,13 @@ def mkvrun():
 
     f = open("log.txt", mode="w", encoding="utf-8")
 
-    mkv = MKVCommand()
+    mkv = MKVCommandParser()
     mkv.command = args.command
 
     verify = VerifyStructure()
 
     cli = RunCommand(
-        processLine=displayConoleOutput, commandShlex=True, universalNewLines=False
+        processLine=displayConsoleOutput, commandShlex=True, universalNewLines=False
     )
 
     if mkv:
@@ -140,7 +140,7 @@ def mkvrun():
 
 
 @staticVars(line="")
-def displayConoleOutput(ch):
+def displayConsoleOutput(ch):
     """
     Convenience function that interprets lines in a stream of characters.
 
@@ -152,16 +152,16 @@ def displayConoleOutput(ch):
         None if character received is not a newline.
     """
 
-    displayConoleOutput.line += ch
+    displayConsoleOutput.line += ch
     sys.stdout.write(ch)
     sys.stdout.flush()
 
     if ch != "\n":
         return None
 
-    line = displayConoleOutput.line
+    line = displayConsoleOutput.line
 
-    displayConoleOutput.line = ""
+    displayConsoleOutput.line = ""
 
     return line
 
