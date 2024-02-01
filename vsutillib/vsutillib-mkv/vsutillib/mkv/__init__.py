@@ -31,5 +31,6 @@ from .mkvutils import (
     quoteString,
     resolveOverwrite,
     stripEncaseQuotes,
+    setEncaseQuotes,
     unQuote,
 )

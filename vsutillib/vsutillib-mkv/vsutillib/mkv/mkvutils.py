@@ -156,6 +156,27 @@ def stripEncaseQuotes(strFile):
 
     return s
 
+def setEncaseQuotes(strFile):
+    """
+    Add single quote at start and end of file name
+    if they are not found
+
+    Args:
+        strFile (str): file name
+
+    Returns:
+        str:
+
+        file name with start and end single quoute
+    """
+
+    # Path or str should work
+    s = str(strFile)
+
+    if (s[0:1] != "'") and (s[-1:] != "'"):
+        s = f"'{s}'"
+
+    return s
 
 def convertToBashStyle(strCommand):
     """
@@ -179,9 +200,11 @@ def convertToBashStyle(strCommand):
         strTmp = (
             strTmp.replace("'", r"'\''")
             .replace("^", "")
-            .replace("/", "\\")
+            .replace("\\", "/")
             .replace('"', "'")
         )
+    elif platform.system() == "Windows":
+        strTmp = strTmp.replace("\\", "/")
 
     return str(strTmp)
 
