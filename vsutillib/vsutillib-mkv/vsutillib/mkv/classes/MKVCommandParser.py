@@ -106,6 +106,7 @@ from ..mkvutils import (
     getMKVMergeEmbedded,
     numberOfTracksInCommand,
     resolveOverwrite,
+    setEncaseQuotes,
     stripEncaseQuotes,
     unQuote,
 )
@@ -129,6 +130,10 @@ class MKVCommandParser:
 
     __log = False
 
+    # embedded
+    rgMkvmerge = r"^(.*?)\s--.*"
+    reMkvMergeEx = re.compile(rgMkvmerge)
+
     def __init__(
             self,
             strCommand: Optional[str] = None,
@@ -139,18 +144,18 @@ class MKVCommandParser:
         ) -> None:
 
         self.log = log
+        self.__useEmbedded = useEmbedded
+        self.__mkvmergeEmbedded = None
+        if appDir is not None:
+            self.__mkvmergeEmbedded = getMKVMergeEmbedded(appDir)
+        self.__mkvmergeSystem = getMKVMerge()
         self.command = strCommand
         if preserveTrackNames is not None:
             self.preserveTrackNames = preserveTrackNames
-        self.__mkvmergeEmbedded = None
-        if appDir is not None:
-
-            self.__mkvmergeEmbedded = getMKVMergeEmbedded(appDir)
-
-        self.__mkvmergeSystem = getMKVMerge()
 
     def _initVars(self) -> None:
         self.__bashCommand = None
+        self.__embeddedBashCommand = None
         self.__errorFound = False
         self.__log = None
         self.__lstAnalysis = None
@@ -290,8 +295,10 @@ class MKVCommandParser:
 
             if self.__strCommand:
                 strCommand = convertToBashStyle(self.__strCommand)
-
                 self.__bashCommand = strCommand
+                self.__embeddedBashCommand = embeddedBashCommand(
+                    strCommand,
+                    self.__mkvmergeEmbedded)
                 self._parse()
                 if not self.__errorFound:
                     self.translations = [None] * self.__totalSourceFiles
@@ -318,6 +325,10 @@ class MKVCommandParser:
             return self.filesInDirByKey[MKVParseKey.outputFile]
 
         return []
+
+    @property
+    def embeddedBashCommand(self):
+        return self.__embeddedBashCommand
 
     @property
     def oBaseFiles(self):
@@ -364,12 +375,24 @@ class MKVCommandParser:
     def shellCommands(self):
         return self.__shellCommands
 
+    @property
+    def useEmbedded(self):
+        return self.__useEmbedded
+
+    @useEmbedded.setter
+    def useEmbedded(self, value: bool) -> None:
+        if isinstance(value, bool):
+            self.__useEmbedded = value
+
     def _parse(self):
         """
         _parse parse command line
         """
 
         strCommand = self.__bashCommand
+        if self.useEmbedded:
+            strCommand = self.__embeddedBashCommand
+
         self.__lstAnalysis = []
 
         rg = r"^(.*?)\s--.*?--output.(.*?)\s--.*?\s'\('\s(.*?)\s'\)'.*?--track-order\s(.*)"
@@ -702,6 +725,20 @@ class MKVCommandParser:
             self.newNames = list(newNames)
             self.filesInDirByKey[MKVParseKey.outputFile] = self.newNames
             self.generateCommands()
+
+def embeddedBashCommand(strCommand: str, mkvmergeEmbedded) -> str:
+
+    strEmbeddedCommand = None
+    if (mkvmergeMatch:= MKVCommandParser.reMkvMergeEx.match(strCommand)):
+        # configure embedded variables
+        strEmbedded = setEncaseQuotes(mkvmergeEmbedded.as_posix())
+        strEmbeddedCommand = re.sub(
+            mkvmergeMatch[1],
+            strEmbedded,
+            strCommand
+        )
+
+    return strEmbeddedCommand
 
 
 def preserveNames(self):
