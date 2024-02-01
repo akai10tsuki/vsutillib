@@ -668,7 +668,7 @@ class MKVCommandParser:
 
     def generateCommands(self):
         """
-        generateCommands genrate and store all command lines needed
+        generateCommands generate and store all command lines needed
         """
 
         if not self.__errorFound:
