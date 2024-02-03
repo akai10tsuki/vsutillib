@@ -16,7 +16,7 @@ MODULELOG.addHandler(logging.NullHandler())
 
 def generateCommandTemplate(bashCommand, attachments=None, setTitle=False):
     """
-    commandTemplate creates templage of mkvtoolnix-gui command
+    commandTemplate creates template of mkvtoolnix-gui command
 
     Args:
         bashCommand (str): command in linux/unix bash format
