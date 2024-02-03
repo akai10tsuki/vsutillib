@@ -139,15 +139,21 @@ class MKVCommandParser:
             strCommand: Optional[str] = None,
             appDir: Optional[Path] = None,
             useEmbedded:  Optional[bool] = False,
+            verifyOnly: Optional[bool] = False,
             preserveTrackNames: Optional[bool] = None,
             log: Optional[bool] = None
         ) -> None:
 
         self.log = log
         self.__useEmbedded = useEmbedded
+        self.__verifyOnly = verifyOnly
+        print(f"Setting verifyOnly={self.__verifyOnly}")
         self.__mkvmergeEmbedded = None
         if appDir is not None:
             self.__mkvmergeEmbedded = getMKVMergeEmbedded(appDir)
+        else:
+            if self.__useEmbedded:
+                raise FileNotFoundError("useEmbedded=True but appDir=None.")
         self.__mkvmergeSystem = getMKVMerge()
         self.command = strCommand
         if preserveTrackNames is not None:
@@ -296,19 +302,25 @@ class MKVCommandParser:
             if self.__strCommand:
                 strCommand = convertToBashStyle(self.__strCommand)
                 self.__bashCommand = strCommand
-                self.__embeddedBashCommand = embeddedBashCommand(
-                    strCommand,
-                    self.__mkvmergeEmbedded)
+                if self.useEmbedded:
+                    self.__embeddedBashCommand = embeddedBashCommand(
+                        strCommand,
+                        self.__mkvmergeEmbedded)
                 self._parse()
                 if not self.__errorFound:
                     self.translations = [None] * self.__totalSourceFiles
-                self.__readFiles = True
-                self.readFiles()
-                self.generateCommands()
+                if not self.__verifyOnly:
+                    print(f"If Verify only={self.__verifyOnly}")
+                    self.__readFiles = True
+                    self.readFiles()
+                    self.generateCommands()
+                else:
+                    print(f"Else Verify only={self.__verifyOnly}")
+                    self.__readFiles = False
 
     @property
     def commandsGenerated(self):
-        return not self.__readFiles
+        return self.__readFiles
 
     @property
     def destinationFiles(self):
@@ -391,6 +403,7 @@ class MKVCommandParser:
 
         strCommand = self.__bashCommand
         if self.useEmbedded:
+            print("using embedded")
             strCommand = self.__embeddedBashCommand
 
         self.__lstAnalysis = []
@@ -425,10 +438,14 @@ class MKVCommandParser:
                 else:
                     self.__errorFound = True
                 if self.__errorFound:
+                    #self.__lstAnalysis.append(
+                    #    "err: Number of tracks {} and track order of {} don't match.".format(
+                    #        trackTotal, len(d)
+                    #    )
+                    #)
                     self.__lstAnalysis.append(
-                        "err: Number of tracks {} and track order of {} don't match.".format(
-                            trackTotal, len(d)
-                        )
+                        f"err: Number of tracks {trackTotal} and track order "
+                        f"of {len(d)} don't match."
                     )
             except SyntaxError:
                 self.__lstAnalysis.append("err: Command track order bad format.")
