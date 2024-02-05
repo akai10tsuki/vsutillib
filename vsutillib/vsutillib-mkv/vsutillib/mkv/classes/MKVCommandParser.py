@@ -147,7 +147,6 @@ class MKVCommandParser:
         self.log = log
         self.__useEmbedded = useEmbedded
         self.__verifyOnly = verifyOnly
-        print(f"Setting verifyOnly={self.__verifyOnly}")
         self.__mkvmergeEmbedded = None
         if appDir is not None:
             self.__mkvmergeEmbedded = getMKVMergeEmbedded(appDir)
@@ -310,12 +309,10 @@ class MKVCommandParser:
                 if not self.__errorFound:
                     self.translations = [None] * self.__totalSourceFiles
                 if not self.__verifyOnly:
-                    print(f"If Verify only={self.__verifyOnly}")
                     self.__readFiles = True
                     self.readFiles()
                     self.generateCommands()
                 else:
-                    print(f"Else Verify only={self.__verifyOnly}")
                     self.__readFiles = False
 
     @property
@@ -403,7 +400,6 @@ class MKVCommandParser:
 
         strCommand = self.__bashCommand
         if self.useEmbedded:
-            print("using embedded")
             strCommand = self.__embeddedBashCommand
 
         self.__lstAnalysis = []
