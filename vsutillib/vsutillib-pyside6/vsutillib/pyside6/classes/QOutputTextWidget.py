@@ -40,8 +40,6 @@ class QOutputTextWidget(QTextEdit):
 
         self.parent = parent
         self.__log = None
-        #self.__tab = None
-        #self.__tabWidget = None
         self.log = log
 
         self.insertTextSignal.connect(self.insertText)
