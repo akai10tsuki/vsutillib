@@ -46,7 +46,7 @@ def generateCommand(template, keyDictionary, shell=False):
     return strCommand
 
 
-def getMKVMerge():
+def getMKVMerge(gui=False):
     """
     get the name of the mkvmerge executable in the system
     search in the standard programs directories
@@ -59,9 +59,14 @@ def getMKVMerge():
 
     if (currentOS := platform.system()) == "Darwin":
 
+        if gui:
+            executable = "/Contents/MacOS/mkvtoolnix-gui"
+        else:
+            executable = "/Contents/MacOS/mkvmerge"
+
         if lstTest := glob.glob("/Applications/MKVToolNix*"):
 
-            f = lstTest[0] + "/Contents/MacOS/mkvmerge"
+            f = lstTest[0] + executable
 
             if (mkvmerge := Path(f)).is_file():
                 return mkvmerge
@@ -71,16 +76,25 @@ def getMKVMerge():
         dirs = []
         dirs.append(os.environ.get("ProgramFiles") or "")
         dirs.append(os.environ.get("ProgramFiles(x86)") or "")
+        if gui:
+            executable = "mkvtoolnix-gui.exe"
+        else:
+            executable = "mkvmerge.exe"
 
         for d in dirs:
-            if search := sorted(Path(d).rglob("mkvmerge.exe")):
+            if search := sorted(Path(d).rglob(executable)):
 
                 if (mkvmerge := Path(search[0])).is_file():
                     return mkvmerge
 
     elif currentOS == "Linux":
 
-        if search := findFileInPath("mkvmerge"):
+        if gui:
+            executable = "mkvtoolnix-gui"
+        else:
+            executable = "mkvmerge"
+
+        if search := findFileInPath(executable):
 
             for s in search:
 
@@ -90,20 +104,40 @@ def getMKVMerge():
     return None
 
 
-def getMKVMergeEmbedded(rootDir):
+def getMKVMergeEmbedded(rootDir, gui=False):
 
     appDir = rootDir
 
-    if platform.system() == "Windows":
-        mkvMerge = appDir.joinpath("embed/mkvtoolnix/mkvmerge.exe")
-    else:
-        mkvMerge = appDir.joinpath("embed/mkvtoolnix/mkvmerge")
+    if (currentOS := platform.system()) == "Darwin":
+
+        return None
+
+    elif currentOS == "Windows":
+        if gui:
+            executable = "mkvtoolnix-gui.exe"
+        else:
+            executable = "mkvmerge.exe"
+
+        mkvMerge = appDir.joinpath(F"embed/mkvtoolnix/{executable}")
+
+    elif currentOS == "Linux":
+        if gui:
+            executable = "mkvtoolnix"
+        else:
+            executable = "mkvmerge"
+
+        mkvMerge = appDir.joinpath(f"embed/mkvtoolnix/{executable}")
 
     if mkvMerge.is_file():
         return mkvMerge
 
     return None
 
+def getMKVToolnixGUI():
+    return getMKVMerge(gui=True)
+
+def getMKVToolnixGuiEmbedded():
+    return getMKVMergeEmbedded(gui=True)
 
 def getMKVMergeVersion(mkvmerge):
     """
