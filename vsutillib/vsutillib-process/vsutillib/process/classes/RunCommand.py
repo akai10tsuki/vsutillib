@@ -6,7 +6,7 @@ Run a command in a subprocess and capture any output
 if processLine function is provided it will be called
 with every line read
 
-if regexsearch regular expresion is provided the first
+if regexsearch regular expression is provided the first
 match will be set on regexmatch property
 """
 # RNC0004
@@ -32,7 +32,7 @@ class RunCommand:
     processLine function if provided it will be called
     with every line read.
 
-    regexsearch regular expresion if provided the first
+    regexsearch regular expression if provided the first
     match will be set on regexmatch property
 
     Args:
@@ -148,6 +148,7 @@ class RunCommand:
             return True
         return False
 
+    # region log setup
     @property
     def log(self):
         """
@@ -169,7 +170,9 @@ class RunCommand:
         """set instance log variable"""
         if isinstance(value, bool) or value is None:
             self.__log = value
+    # endregion log setup
 
+    # region properties
     @property
     def command(self):
         """return current command set in class"""
@@ -195,7 +198,7 @@ class RunCommand:
     @property
     def shlexCommand(self):
         """
-        command to submit to subproccess PIPE
+        command to submit to subprocess PIPE
 
         Returns:
             list:
@@ -229,7 +232,7 @@ class RunCommand:
         return self.__output
 
     @property
-    def parsedcommand(self):
+    def parsedCommand(self):
         """
         command parsed by shlex
         can be used for debugging
@@ -257,7 +260,7 @@ class RunCommand:
     @property
     def regexmatch(self):
         """
-        results of regular expresion search
+        results of regular expression search
 
         Returns:
             list|dict:
@@ -266,6 +269,7 @@ class RunCommand:
             with the regex as key if a list of regex is passed.
         """
         return self.__regexmatch
+    # endregion properties
 
     def run(self):
         """
