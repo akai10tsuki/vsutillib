@@ -65,6 +65,7 @@ def pushButton(
     return button
 
 def setAppStyle(app):
+    """Set style to Fusion that works with Dark/Light theme"""
 
     app.setStyle("Fusion")
 
