@@ -34,7 +34,8 @@ from .messagebox import messageBox, messageBoxYesNo
 
 from .qtUtils import (
     centerWidget,
-    pushButton,
-    qtRunFunctionInThread,
     darkPalette,
+    pushButton,
+    setAppStyle,
+    qtRunFunctionInThread,
 )

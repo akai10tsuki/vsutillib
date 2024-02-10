@@ -6,6 +6,7 @@ utility functions that use PySide2
 
 
 import logging
+import platform
 
 from typing import Any, Callable, Optional
 
@@ -63,6 +64,15 @@ def pushButton(
 
     return button
 
+def setAppStyle(app):
+
+    app.setStyle("Fusion")
+
+    if platform.system() == "Linux":
+        # On Linux the disabled color for text is the same for enabled
+        disabledColor = QColor(127, 127, 127)
+        palette = app.palette()
+        palette.setColor(QPalette.Disabled, QPalette.WindowText, disabledColor)
 
 def darkPalette(app=None):
     """Use dark theme on windows 10"""
