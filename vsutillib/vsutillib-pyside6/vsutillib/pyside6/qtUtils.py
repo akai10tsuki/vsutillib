@@ -83,7 +83,7 @@ def darkPalette(app=None):
     palette.setColor(QPalette.Disabled, QPalette.Text, disabledColor)
     palette.setColor(QPalette.Disabled, QPalette.WindowText, disabledColor)
     palette.setColor(QPalette.Highlight, QColor(42, 130, 218))
-    palette.setColor(QPalette.HighlightedText, SvgColor.black)
+    palette.setColor(QPalette.HighlightedText, SvgColor.white) # was black
     palette.setColor(QPalette.Link, QColor(42, 130, 218))
     palette.setColor(QPalette.Text, SvgColor.white)
     palette.setColor(QPalette.ToolTipBase, SvgColor.white)
