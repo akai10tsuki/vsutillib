@@ -73,7 +73,7 @@ def setAppStyle(app):
         # On Linux the disabled color for text is the same for enabled
         disabledColor = QColor(127, 127, 127)
         palette = app.palette()
-        palette.setColor(QPalette.Disabled, QPalette.WindowText, disabledColor)
+        palette.setColor(QPalette.Disabled, QPalette.ButtonText, disabledColor)
         app.setPalette(palette)
 
 def darkPalette(app=None):
