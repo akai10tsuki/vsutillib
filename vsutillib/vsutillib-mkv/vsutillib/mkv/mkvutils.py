@@ -122,7 +122,7 @@ def getMKVMergeEmbedded(rootDir, gui=False):
 
     elif currentOS == "Linux":
         if gui:
-            executable = "mkvtoolnix"
+            executable = "mkvtoolnix-gui"
         else:
             executable = "mkvmerge"
 
