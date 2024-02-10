@@ -74,6 +74,7 @@ def setAppStyle(app):
         disabledColor = QColor(127, 127, 127)
         palette = app.palette()
         palette.setColor(QPalette.Disabled, QPalette.WindowText, disabledColor)
+        app.setPalette(palette)
 
 def darkPalette(app=None):
     """Use dark theme on windows 10"""
