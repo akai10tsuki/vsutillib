@@ -6,6 +6,7 @@ Output widget form just to output text in color
 """
 # OTW0004 Next log ID
 
+import inspect
 import logging
 
 from typing import Dict, Optional, Union
@@ -16,6 +17,8 @@ from PySide6.QtWidgets import QTextEdit, QWidget
 
 from .insertTextHelpers import checkColor, LineOutput
 from .SvgColor import SvgColor
+
+from vsutillib.misc import callerName
 
 MODULELOG = logging.getLogger(__name__)
 MODULELOG.addHandler(logging.NullHandler())
@@ -30,6 +33,7 @@ class QOutputTextWidget(QTextEdit):
     insertTextSignal = Signal(str, dict)
     setCurrentIndexSignal = Signal()
     isDarkMode = False
+    logWithCaller = False
 
     def __init__(
             self,
@@ -110,7 +114,7 @@ class QOutputTextWidget(QTextEdit):
                            used like **kwargs
         """
 
-        strTmp = ""
+        #strTmp = ""
 
         color = kwargs.pop(LineOutput.Color, None)
         replaceLine = kwargs.pop(LineOutput.ReplaceLine, False)
@@ -151,7 +155,23 @@ class QOutputTextWidget(QTextEdit):
             log = overrideLog
 
         if log or logOnly:
-            strTmp = strTmp + strText
+
+            if self.logWithCaller:
+                caller = []
+                if caller2 := callerName():
+                    caller.append(caller2)
+
+                if caller3 := callerName(3):
+                    caller.append(caller3)
+
+                if caller:
+                    whoCalled = ".".join(caller)
+                    strTmp = f"[{whoCalled}] {strText}"
+                else:
+                    strTmp = strText
+            else:
+                strTmp = strText
+
             strTmp = strTmp.replace("\n", " ")
 
             if strTmp != "" and strTmp.find("Progress:") != 0:
