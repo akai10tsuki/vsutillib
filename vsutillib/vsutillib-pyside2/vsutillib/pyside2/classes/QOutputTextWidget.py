@@ -42,8 +42,8 @@ class QOutputTextWidget(QTextEdit):
 
         self.parent = parent
         self.__log = None
-        self.__tab = None
-        self.__tabWidget = None
+        #self.__tab = None
+        #self.__tabWidget = None
         self.log = log
 
         self.insertTextSignal.connect(self.insertText)
@@ -157,7 +157,9 @@ class QOutputTextWidget(QTextEdit):
             strTmp = strTmp + strText
             strTmp = strTmp.replace("\n", " ")
 
-            if strTmp != "" and strTmp.find(u"Progress:") != 0:
+            strNotEmpty = bool(strText.strip())
+
+            if strNotEmpty and strTmp.find(u"Progress:") != 0:
                 if strTmp.find(u"Warning") == 0:
                     MODULELOG.warning("OTW0001: %s", strTmp)
                 elif strTmp.find(u"Error") == 0 or color == Qt.red:
