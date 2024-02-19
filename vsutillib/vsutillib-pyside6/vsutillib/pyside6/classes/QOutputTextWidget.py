@@ -177,7 +177,6 @@ class QOutputTextWidget(QTextEdit):
             strNotEmpty = bool(strText.strip())
 
             if strNotEmpty and strTmp.find(u"Progress:") != 0:
-                #if strTmp != "" and strTmp.find("Progress:") != 0:
                 if strTmp.find("Warning") == 0:
                     MODULELOG.warning("OTW0001: %s", strTmp)
                 elif strTmp.find("Error") == 0 or color == Qt.red:
