@@ -157,11 +157,13 @@ class TabWidget(QTabWidget):
             self.setTabText(i, _(label))
             self.setTabToolTip(i, _(tooltip))
 
+
 class Key:
 
     Widget: ClassVar[int] = 0
     Title: ClassVar[int] = 1
     ToolTip: ClassVar[int] = 2
+
 
 def _(dummy: str) -> str:
     return dummy
