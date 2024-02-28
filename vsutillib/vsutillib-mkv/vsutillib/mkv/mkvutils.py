@@ -28,7 +28,7 @@ def generateCommand(template, keyDictionary, shell=False):
     Args:
         template (str): command template
         keyDictionary (dict): dictionary of keys in template
-        shell (bool, optional): return shlex list if True just the comand
+        shell (bool, optional): return shlex list if True just the command
             if False. Defaults to False.
 
     Returns:
@@ -179,7 +179,7 @@ def stripEncaseQuotes(strFile):
     Returns:
         str:
 
-        file name without start and end single quoute
+        file name without start and end single quote
     """
 
     # Path or str should work
@@ -201,7 +201,7 @@ def setEncaseQuotes(strFile):
     Returns:
         str:
 
-        file name with start and end single quoute
+        file name with start and end single quote
     """
 
     # Path or str should work
