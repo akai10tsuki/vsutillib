@@ -28,7 +28,7 @@ from vsutillib.files import ConfigurationSettings
 from vsutillib.log import LogRotateFileHandler
 
 
-__VERSION = (3, 0, "0b1", "dev0")
+__VERSION = (3, 0, "0", "0")
 
 
 FILES_VERSION = "1.7.0"
