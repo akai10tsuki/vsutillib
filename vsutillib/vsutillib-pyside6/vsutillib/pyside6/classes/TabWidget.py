@@ -71,10 +71,16 @@ class TabWidget(QTabWidget):
 
                 try:
                     widget.tab = tabIndex
+                except:
+                    MODULELOG.error("[TabWidget] Error initializing tab.")
+                try:
                     widget.title = tw[Key.Title]
+                except:
+                    MODULELOG.error("[TabWidget] Error initializing title.")
+                try:
                     widget.tabWidget = self
                 except:  # pylint: disable=bare-except
-                    MODULELOG.error("[TabWidget] Error during initialization.")
+                    MODULELOG.error("[TabWidget] Error initializing tabWidget.")
 
     # endregion Initialization
 
