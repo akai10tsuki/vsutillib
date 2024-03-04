@@ -8,7 +8,7 @@ from PySide6.QtWidgets import QTabWidget
 
 
 class TabWidgetExtension:
-    """Class to help manupulate widget in a QTabWidget"""
+    """Class to help manipulate widget in a QTabWidget"""
 
     def __init__(
             self,
@@ -21,7 +21,7 @@ class TabWidgetExtension:
         self.__tabWidget = tabWidget
         self.__tab = None
         self.__oldTab = -1
-        self.__title = None
+        self.__tabText = None
         self.__toolTip = None
 
     @property
@@ -41,14 +41,14 @@ class TabWidgetExtension:
         self.__tabWidget = value
 
     @property
-    def title(self):
-        return self.__title
+    def tabText(self):
+        return self.__tabText
 
-    @title.setter
-    def title(self, value):
-        self.__title = value
+    @tabText.setter
+    def tabText(self, value):
+        self.__tabText = value
         if self.tab >= 0:
-            self.tabWidget.setTabText(self.tab, self.title)
+            self.tabWidget.setTabText(self.tab, self.tabText)
 
     @property
     def toolTip(self):
