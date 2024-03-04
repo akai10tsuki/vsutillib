@@ -116,7 +116,8 @@ def verifyDirectories(args, logFile):
     for d in args.directory:
 
         p = Path(d)
-
+        print(f"directory={p}")
+        
         try:
             if not p.is_dir():
                 msg = "Invalid directory {}\n".format(str(p))

@@ -1,4 +1,5 @@
 """
+
  Parse mkvmerge into a class
 
 Track options assumed appear after --language
@@ -64,7 +65,7 @@ Flow:
         in case needed for adjustment
         - works with self.dirsByKey and self.filesByKey this means that the
         directory for every source dirsByKey and every file filesByKey are saved
-        the keys are <OUTPUTFILE> and <SOURCE0> ... <SOURCEN>. Collitions with
+        the keys are <OUTPUTFILE> and <SOURCE0> ... <SOURCEN>. Collision with
         the output file are solved for no overwrite
     - from commandTemplate resolve chapter file in command line
 
@@ -82,8 +83,6 @@ corrects a problem the test functions can re-read the files.
     - self._filesInDirByKey()
         - fill the attachment, titles and chapters file by key
 10. generate the commands self.generateCommands()
-
-
 """
 # MCP0003
 
@@ -93,6 +92,7 @@ import re
 import shlex
 
 from pathlib import Path
+from typing import Optional
 
 from natsort import natsorted, ns
 
@@ -102,8 +102,11 @@ from ..generateCommandTemplate import generateCommandTemplate
 from ..mkvutils import (
     convertToBashStyle,
     generateCommand,
+    getMKVMerge,
+    getMKVMergeEmbedded,
     numberOfTracksInCommand,
     resolveOverwrite,
+    setEncaseQuotes,
     stripEncaseQuotes,
     unQuote,
 )
@@ -127,15 +130,37 @@ class MKVCommandParser:
 
     __log = False
 
-    def __init__(self, strCommand=None, preserveTrackNames=None, log=None):
+    # embedded
+    rgMkvmerge = r"^(.*?)\s--.*"
+    reMkvMergeEx = re.compile(rgMkvmerge)
+
+    def __init__(
+            self,
+            strCommand: Optional[str] = None,
+            appDir: Optional[Path] = None,
+            useEmbedded:  Optional[bool] = False,
+            verifyOnly: Optional[bool] = False,
+            preserveTrackNames: Optional[bool] = None,
+            log: Optional[bool] = None
+        ) -> None:
 
         self.log = log
+        self.__useEmbedded = useEmbedded
+        self.__verifyOnly = verifyOnly
+        self.__mkvmergeEmbedded = None
+        if appDir is not None:
+            self.__mkvmergeEmbedded = getMKVMergeEmbedded(appDir)
+        else:
+            if self.__useEmbedded:
+                raise FileNotFoundError("useEmbedded=True but appDir=None.")
+        self.__mkvmergeSystem = getMKVMerge()
         self.command = strCommand
         if preserveTrackNames is not None:
             self.preserveTrackNames = preserveTrackNames
 
-    def _initVars(self):
+    def _initVars(self) -> None:
         self.__bashCommand = None
+        self.__embeddedBashCommand = None
         self.__errorFound = False
         self.__log = None
         self.__lstAnalysis = None
@@ -144,7 +169,7 @@ class MKVCommandParser:
         self.__strCommand = None
         self.__shellCommands = []
         self.__strCommands = []
-        self.__strOCommands = []
+        # self.__strOCommands = []
         self.__setTitles = True
         self.__preserveTrackNames = False
 
@@ -170,10 +195,10 @@ class MKVCommandParser:
         self.oAttachments = MKVAttachments()
         self.oSourceFiles = SourceFiles()
 
-    def __bool__(self):
+    def __bool__(self) -> bool:
         return not self.__errorFound
 
-    def __contains__(self, item):
+    def __contains__(self, item) -> bool:
         return item in self.__strCommands
 
     def __getitem__(self, index):
@@ -187,14 +212,14 @@ class MKVCommandParser:
             None if not self.cliChaptersFile else self.chaptersFiles[index],
         )
 
-    def __len__(self):
+    def __len__(self) -> int:
         return self.__totalSourceFiles
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.__strCommand
 
     @classmethod
-    def classLog(cls, setLogging=None):
+    def classLog(cls, setLogging: Optional[bool] = None) -> bool:
         """
         get/set logging at class level
         every class instance will log
@@ -219,7 +244,7 @@ class MKVCommandParser:
         return cls.__log
 
     @property
-    def log(self):
+    def log(self) -> bool:
         """
         class property can be used to override the class global
         logging setting
@@ -234,7 +259,7 @@ class MKVCommandParser:
         return MKVCommandParser.classLog()
 
     @log.setter
-    def log(self, value):
+    def log(self, value: bool) -> None:
         """set instance log variable"""
         if isinstance(value, bool) or value is None:
             self.__log = value
@@ -275,18 +300,24 @@ class MKVCommandParser:
 
             if self.__strCommand:
                 strCommand = convertToBashStyle(self.__strCommand)
-
                 self.__bashCommand = strCommand
+                if self.useEmbedded:
+                    self.__embeddedBashCommand = embeddedBashCommand(
+                        strCommand,
+                        self.__mkvmergeEmbedded)
                 self._parse()
                 if not self.__errorFound:
                     self.translations = [None] * self.__totalSourceFiles
-                self.__readFiles = True
-                self.readFiles()
-                self.generateCommands()
+                if not self.__verifyOnly:
+                    self.__readFiles = True
+                    self.readFiles()
+                    self.generateCommands()
+                else:
+                    self.__readFiles = False
 
     @property
     def commandsGenerated(self):
-        return not self.__readFiles
+        return self.__readFiles
 
     @property
     def destinationFiles(self):
@@ -303,6 +334,10 @@ class MKVCommandParser:
             return self.filesInDirByKey[MKVParseKey.outputFile]
 
         return []
+
+    @property
+    def embeddedBashCommand(self):
+        return self.__embeddedBashCommand
 
     @property
     def oBaseFiles(self):
@@ -324,6 +359,24 @@ class MKVCommandParser:
             self.__preserveTrackNames = value
 
     @property
+    def mkvmergeSystem(self):
+        return self.__mkvmergeSystem
+
+    @mkvmergeSystem.setter
+    def mkvmergeSystem(self, value):
+        if isinstance(value, Path):
+            self.__mkvmergeSystem = value
+
+    @property
+    def mkvmergeEmbedded(self):
+        return self.__mkvmergeEmbedded
+
+    @mkvmergeEmbedded.setter
+    def mkvmergeEmbedded(self, value):
+        if isinstance(value, Path):
+            self.__mkvmergeEmbedded = value
+
+    @property
     def strCommands(self):
         return self.__strCommands
 
@@ -331,12 +384,24 @@ class MKVCommandParser:
     def shellCommands(self):
         return self.__shellCommands
 
+    @property
+    def useEmbedded(self):
+        return self.__useEmbedded
+
+    @useEmbedded.setter
+    def useEmbedded(self, value: bool) -> None:
+        if isinstance(value, bool):
+            self.__useEmbedded = value
+
     def _parse(self):
         """
         _parse parse command line
         """
 
         strCommand = self.__bashCommand
+        if self.useEmbedded:
+            strCommand = self.__embeddedBashCommand
+
         self.__lstAnalysis = []
 
         rg = r"^(.*?)\s--.*?--output.(.*?)\s--.*?\s'\('\s(.*?)\s'\)'.*?--track-order\s(.*)"
@@ -369,10 +434,14 @@ class MKVCommandParser:
                 else:
                     self.__errorFound = True
                 if self.__errorFound:
+                    #self.__lstAnalysis.append(
+                    #    "err: Number of tracks {} and track order of {} don't match.".format(
+                    #        trackTotal, len(d)
+                    #    )
+                    #)
                     self.__lstAnalysis.append(
-                        "err: Number of tracks {} and track order of {} don't match.".format(
-                            trackTotal, len(d)
-                        )
+                        f"err: Number of tracks {trackTotal} and track order "
+                        f"of {len(d)} don't match."
                     )
             except SyntaxError:
                 self.__lstAnalysis.append("err: Command track order bad format.")
@@ -612,7 +681,7 @@ class MKVCommandParser:
 
     def generateCommands(self):
         """
-        generateCommands genrate and store all command lines needed
+        generateCommands generate and store all command lines needed
         """
 
         if not self.__errorFound:
@@ -669,6 +738,20 @@ class MKVCommandParser:
             self.newNames = list(newNames)
             self.filesInDirByKey[MKVParseKey.outputFile] = self.newNames
             self.generateCommands()
+
+def embeddedBashCommand(strCommand: str, mkvmergeEmbedded) -> str:
+
+    strEmbeddedCommand = None
+    if (mkvmergeMatch:= MKVCommandParser.reMkvMergeEx.match(strCommand)):
+        # configure embedded variables
+        strEmbedded = setEncaseQuotes(mkvmergeEmbedded.as_posix())
+        strEmbeddedCommand = re.sub(
+            mkvmergeMatch[1],
+            strEmbedded,
+            strCommand
+        )
+
+    return strEmbeddedCommand
 
 
 def preserveNames(self):

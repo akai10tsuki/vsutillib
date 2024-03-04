@@ -25,10 +25,12 @@ from .mkvutils import (
     convertToBashStyle,
     generateCommand,
     getMKVMerge,
+    getMKVMergeEmbedded,
     getMKVMergeVersion,
     numberOfTracksInCommand,
     quoteString,
     resolveOverwrite,
     stripEncaseQuotes,
+    setEncaseQuotes,
     unQuote,
 )

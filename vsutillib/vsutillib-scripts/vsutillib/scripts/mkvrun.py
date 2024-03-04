@@ -10,49 +10,13 @@ import argparse
 import sys
 
 from vsutillib import config
-from vsutillib.media import MediaFileInfo
-from vsutillib.misc import staticVars
-from vsutillib.mkv import MKVCommand, VerifyStructure
+from vsutillib.mkv import MKVCommandParser, VerifyStructure
 from vsutillib.process import RunCommand
+
 
 VERSION = config.SCRIPTS_VERSION
 
 __version__ = VERSION
-
-
-def mkvVerifyStructure(lstBaseFiles, lstFiles, msgs):
-    """
-    Convenience function used by mkvrun
-    verify the file structure against
-    the base files
-
-    Args:
-        lstBaseFiles (list): list files parsed from command
-
-        lstFiles (list): list of files read from directories
-    """
-
-    msg = "Error: In structure \n\nSource:\n{}\nBase Source:\n{}\n"
-
-    for strSource, strFile in zip(lstBaseFiles, lstFiles):
-
-        try:
-            objSource = MediaFileInfo(strSource)
-            objFile = MediaFileInfo(strFile)
-
-        except OSError:
-
-            msg = msg.format(str(objFile), str(objSource))
-            msgs.append(msg)
-            return False
-
-        if objSource != objFile:
-
-            msg = msg.format(str(objFile), str(objSource))
-            msgs.append(msg)
-            return False
-
-    return True
 
 
 def mkvrun():
@@ -64,7 +28,7 @@ def mkvrun():
 
     ::
 
-        usage: mkvrun.py [-h] [--version] command
+        usage: mkvRun.py [-h] [--version] command
 
         mkvmerge-gui generated command line batch run utility
 
@@ -84,7 +48,6 @@ def mkvrun():
     parser = argparse.ArgumentParser(
         description="mkvmerge-gui generated command line batch run utility"
     )
-
     parser.add_argument(
         "command",
         help='mkvmerge-gui "command" line - used Linux/Unix shell enclose it in double quotes',
@@ -98,26 +61,28 @@ def mkvrun():
 
     f = open("log.txt", mode="w", encoding="utf-8")
 
-    mkv = MKVCommand()
+    mkv = MKVCommandParser()
     mkv.command = args.command
 
     verify = VerifyStructure()
 
     cli = RunCommand(
-        processLine=displayConoleOutput, commandShlex=True, universalNewLines=False
+        processLine=displayConsoleOutput,
+        commandShlex=True,
+        universalNewLines=True
     )
 
     if mkv:
-
-        for cmd, baseFiles, sourceFiles, destinationFiles, _ in mkv:
+        for cmd, baseFiles, sourceFiles, destinationFiles, _, _, _ in mkv:
 
             verify.verifyStructure(baseFiles, sourceFiles)
 
             if verify:
-
-                msg = "\nCommand: {}\nBase Files: {}\nSource Files: {}\nDestination Files: {}\n\n".format(  # pylint: disable=line-too-long
-                    cmd, baseFiles, sourceFiles, destinationFiles
+                msg = ( f"\nCommand: {cmd}\nBase Files: {baseFiles}\n"
+                       f"Source Files: {sourceFiles}\n"
+                       f"Destination Files: {destinationFiles}\n\n"
                 )
+
                 print(msg)
                 f.write(msg)
 
@@ -128,7 +93,7 @@ def mkvrun():
                     f.write(str(l))
 
             else:
-                msg = "\nDestination Files: {}\n".format(destinationFiles)
+                msg = f"\nDestination Files: {destinationFiles}\n"
                 f.write(msg)
                 for m in verify.analysis:
                     print(m)
@@ -139,31 +104,25 @@ def mkvrun():
         print("Bummer...{}".format(mkv.error))
 
 
-@staticVars(line="")
-def displayConoleOutput(ch):
+def displayConsoleOutput(line):
     """
     Convenience function that interprets lines in a stream of characters.
 
     Args:
-        ch (str): characters to display
-
-    Returns:
-        str: Complete line including "\n" character when "\n" is received.
-        None if character received is not a newline.
+        line (str): character line to display
     """
 
-    displayConoleOutput.line += ch
-    sys.stdout.write(ch)
+    tmpLine = line
+
+    if line[0:9] == "Progress:":
+        lastChar = line[-1]
+        if lastChar == "\n":
+            tmpLine = line[0:-1] + "\r"
+
+    sys.stdout.write(tmpLine)
     sys.stdout.flush()
 
-    if ch != "\n":
-        return None
-
-    line = displayConoleOutput.line
-
-    displayConoleOutput.line = ""
-
-    return line
+    return
 
 
 if __name__ == "__main__":

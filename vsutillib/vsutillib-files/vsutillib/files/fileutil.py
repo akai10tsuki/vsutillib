@@ -4,10 +4,24 @@ Convenience functions related to files and file system
 
 import os
 import platform
+import re
 import shlex
+import zlib
 
 from pathlib import Path, PurePath
 
+_reCrcChars = re.compile('^[0123456789ABCDEF]+$', flags=re.IGNORECASE)
+
+def crc32(fileName):
+
+    with open(fileName, 'rb') as fh:
+        hash = 0
+        while True:
+            s = fh.read(65536)
+            if not s:
+                break
+            hash = zlib.crc32(s, hash)
+        return "%08X" % (hash & 0xFFFFFFFF)
 
 def findFileInPath(element, dirPath=None):
     """
@@ -238,6 +252,46 @@ def getExecutable(search):
                 return executable
 
     return None
+
+def possibleCRC(crc) -> bool:
+
+    return(bool(_reCrcChars.match(crc)))
+
+
+def resolveOverwrite(fileName, strPrefix="new-", adjustCRC=False):
+    """
+    resolveOverwrite resolve overwrite collisions. If adjustCRC is true
+    it will try to leave whatever is encloes in brackets at the end of
+    the file name.
+
+    Args:
+        fileName (Path): desired file name to use
+        strPrefix (str, optional): prefix to use for new name. Defaults to "new-".
+
+    Returns:
+        Path: Path object with the new file name.
+    """
+
+    fileNameTmp = fileName
+
+    # Check if destination file exist and add prefix if it does
+    if fileNameTmp.is_file():
+
+        strSuffix = ""
+        n = 1
+
+        while True:
+            fileNameTmp = fileNameTmp.parent.joinpath(
+                strPrefix + fileName.stem + strSuffix + fileName.suffix
+            )
+
+            if fileNameTmp.is_file():
+                strSuffix = " ({})".format(n)
+                n += 1
+            else:
+                break
+
+    return fileNameTmp
 
 
 def stripEncaseQuotes(strFile):

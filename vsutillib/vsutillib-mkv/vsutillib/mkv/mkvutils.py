@@ -10,6 +10,7 @@ import os
 import platform
 import re
 import shlex
+import sys
 
 from pathlib import Path
 
@@ -27,7 +28,7 @@ def generateCommand(template, keyDictionary, shell=False):
     Args:
         template (str): command template
         keyDictionary (dict): dictionary of keys in template
-        shell (bool, optional): return shlex list if True just the comand
+        shell (bool, optional): return shlex list if True just the command
             if False. Defaults to False.
 
     Returns:
@@ -45,7 +46,7 @@ def generateCommand(template, keyDictionary, shell=False):
     return strCommand
 
 
-def getMKVMerge():
+def getMKVMerge(gui=False):
     """
     get the name of the mkvmerge executable in the system
     search in the standard programs directories
@@ -58,9 +59,14 @@ def getMKVMerge():
 
     if (currentOS := platform.system()) == "Darwin":
 
+        if gui:
+            executable = "/Contents/MacOS/mkvtoolnix-gui"
+        else:
+            executable = "/Contents/MacOS/mkvmerge"
+
         if lstTest := glob.glob("/Applications/MKVToolNix*"):
 
-            f = lstTest[0] + "/Contents/MacOS/mkvmerge"
+            f = lstTest[0] + executable
 
             if (mkvmerge := Path(f)).is_file():
                 return mkvmerge
@@ -70,16 +76,25 @@ def getMKVMerge():
         dirs = []
         dirs.append(os.environ.get("ProgramFiles") or "")
         dirs.append(os.environ.get("ProgramFiles(x86)") or "")
+        if gui:
+            executable = "mkvtoolnix-gui.exe"
+        else:
+            executable = "mkvmerge.exe"
 
         for d in dirs:
-            if search := sorted(Path(d).rglob("mkvmerge.exe")):
+            if search := sorted(Path(d).rglob(executable)):
 
                 if (mkvmerge := Path(search[0])).is_file():
                     return mkvmerge
 
     elif currentOS == "Linux":
 
-        if search := findFileInPath("mkvmerge"):
+        if gui:
+            executable = "mkvtoolnix-gui"
+        else:
+            executable = "mkvmerge"
+
+        if search := findFileInPath(executable):
 
             for s in search:
 
@@ -88,6 +103,41 @@ def getMKVMerge():
 
     return None
 
+
+def getMKVMergeEmbedded(rootDir, gui=False):
+
+    appDir = rootDir
+
+    if (currentOS := platform.system()) == "Darwin":
+
+        return None
+
+    elif currentOS == "Windows":
+        if gui:
+            executable = "mkvtoolnix-gui.exe"
+        else:
+            executable = "mkvmerge.exe"
+
+        mkvMerge = appDir.joinpath(F"embed/mkvtoolnix/{executable}")
+
+    elif currentOS == "Linux":
+        if gui:
+            executable = "mkvtoolnix-gui"
+        else:
+            executable = "mkvmerge"
+
+        mkvMerge = appDir.joinpath(f"embed/mkvtoolnix/{executable}")
+
+    if mkvMerge.is_file():
+        return mkvMerge
+
+    return None
+
+def getMKVToolnixGUI():
+    return getMKVMerge(gui=True)
+
+def getMKVToolnixGuiEmbedded():
+    return getMKVMergeEmbedded(gui=True)
 
 def getMKVMergeVersion(mkvmerge):
     """
@@ -102,7 +152,10 @@ def getMKVMergeVersion(mkvmerge):
         version of mkvmerge
     """
 
-    s = mkvmerge
+    if mkvmerge is None:
+        return None
+
+    s = str(mkvmerge)
 
     if s[0:1] != "'" and s[-1:] != "'":
         s = shlex.quote(s)
@@ -126,7 +179,7 @@ def stripEncaseQuotes(strFile):
     Returns:
         str:
 
-        file name without start and end single quoute
+        file name without start and end single quote
     """
 
     # Path or str should work
@@ -137,6 +190,27 @@ def stripEncaseQuotes(strFile):
 
     return s
 
+def setEncaseQuotes(strFile):
+    """
+    Add single quote at start and end of file name
+    if they are not found
+
+    Args:
+        strFile (str): file name
+
+    Returns:
+        str:
+
+        file name with start and end single quote
+    """
+
+    # Path or str should work
+    s = str(strFile)
+
+    if (s[0:1] != "'") and (s[-1:] != "'"):
+        s = f"'{s}'"
+
+    return s
 
 def convertToBashStyle(strCommand):
     """
@@ -160,9 +234,11 @@ def convertToBashStyle(strCommand):
         strTmp = (
             strTmp.replace("'", r"'\''")
             .replace("^", "")
-            .replace("/", "\\")
+            .replace("\\", "/")
             .replace('"', "'")
         )
+    elif platform.system() == "Windows":
+        strTmp = strTmp.replace("\\", "/")
 
     return str(strTmp)
 
@@ -193,7 +269,8 @@ def resolveOverwrite(fileName, strPrefix="new-"):
 
     Args:
         fileName (Path): desired file name to use
-        strPrefix (str, optional): prefix to use for new name. Defaults to "new-".
+        strPrefix (str, optional): prefix to use for new name.
+            Defaults to "new-".
 
     Returns:
         Path: Path object with the new file name.

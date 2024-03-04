@@ -85,14 +85,14 @@ setup(
         "Operating System :: POSIX :: Linux",
         # Specify the Python versions you support here. In particular, ensure
         # that you indicate whether you support Python 2, Python 3 or both.
-        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.10",
         # Implementation
         "Programming Language :: Python :: Implementation :: CPython",
     ],
     keywords=config.KEYWORDS,  # Optional
     packages=config.PACKAGES,
     install_requires=config.REQUIRED,
-    python_requires=config.PYTHONVERSIONS,
+    python_requires=">=3.10.1, <3.13",
     include_package_data=True,
     project_urls=config.PROJECTURLS,
 )

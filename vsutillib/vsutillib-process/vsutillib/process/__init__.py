@@ -11,4 +11,4 @@ from .classes import (
     ThreadWorker
 )
 
-from .utils import isThreadRunning
+from .processUtils import isThreadRunning

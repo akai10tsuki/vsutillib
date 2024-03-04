@@ -12,11 +12,13 @@ getFilesList - get list of files in a directory
 """
 
 from .fileutil import (
+    crc32,
     fileQuote,
     findFileInPath,
     getFileList,
     getDirectoryList,
     getExecutable,
+    possibleCRC,
     stripEncaseQuotes,
 )
 from .classes import ConfigurationSettings, DisplayPath

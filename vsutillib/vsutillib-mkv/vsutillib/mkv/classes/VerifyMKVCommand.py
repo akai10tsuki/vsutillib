@@ -14,6 +14,7 @@ import logging
 import re
 
 from pathlib import Path
+from typing import Optional
 
 from ..mkvutils import stripEncaseQuotes
 
@@ -46,7 +47,7 @@ class VerifyMKVCommand:
     __log = False
 
     @classmethod
-    def classLog(cls, setLogging=None):
+    def classLog(cls, setLogging: Optional[bool] = None):
         """
         get/set logging at class level
         every class instance will log
@@ -71,7 +72,10 @@ class VerifyMKVCommand:
 
         return cls.__log
 
-    def __init__(self, strCommand=None, log=None):
+    def __init__(
+            self,
+            strCommand: Optional[str] = None,
+            log: Optional[bool] = None) -> None:
 
         self.__lstAnalysis = None
         self.__errorFound = False
@@ -110,23 +114,12 @@ class VerifyMKVCommand:
         rgOneTrack = r"^(.*?)\s--.*?--output.(.*?)\s--.*?\s'\('\s(.*?)\s'\)'.*?"
 
         regCommandEx = re.compile(rg)
-        matchCommand = regCommandEx.match(strCommand)
         reCommandOneTrackEx = re.compile(rgOneTrack)
-
         reExecutableEx = re.compile(r"^(.*?)\s\-\-")
-        matchExecutable = reExecutableEx.match(strCommand)
-
         reOutputFileEx = re.compile(r".*?\-\-output\s(.*?)\s\-\-")
-        matchOutputFile = reOutputFileEx.match(strCommand)
-
         reSourcesEx = re.compile(r"'\('\s(.*?)\s'\)'")
-        matchSources = reSourcesEx.finditer(strCommand)
-
         reChaptersFileEx = re.compile(r".*?\-\-chapters\s(.*?)\s\-\-")
-        matchChaptersFile = reChaptersFileEx.match(strCommand)
-
         reAttachmentsEx = re.compile(r"\-\-attach-file.(.*?)\s\-\-")
-        matchAttachments = reAttachmentsEx.finditer(strCommand)
 
         bOk = True
         trackOrder = None
@@ -137,7 +130,8 @@ class VerifyMKVCommand:
         # 2: output file
         # 3: at list one source
         # 4: track order
-        if matchCommand and (len(matchCommand.groups()) == 4):
+        if ((matchCommand := regCommandEx.match(strCommand))
+                and (len(matchCommand.groups()) == 4)):
             self.__lstAnalysis.append("chk: Command seems ok.")
             trackOrder = matchCommand.group(4)
         elif (matchCommand := reCommandOneTrackEx.match(strCommand)) and (
@@ -147,130 +141,124 @@ class VerifyMKVCommand:
             self.__lstAnalysis.append("chk: Command seems ok.")
         else:
             self.__lstAnalysis.append("err: Command bad format.")
-            bOk=False
+            bOk = False
 
         if trackOrder is not None:
             try:
-                d=ast.literal_eval("{" + trackOrder + "}")
-                trackTotal=_numberOfTracksInCommand(strCommand)
+                d = ast.literal_eval("{" + trackOrder + "}")
+                trackTotal = _numberOfTracksInCommand(strCommand)
 
-                s=trackOrder.split(",")
+                s = trackOrder.split(",")
                 if trackTotal == len(s):
                     for e in s:
                         if not e.find(":") > 0:
-                            bOk=False
+                            bOk = False
                 else:
-                    bOk=False
+                    bOk = False
 
                 if not bOk:
                     self.__lstAnalysis.append(
-                        "err: Number of tracks {} and track order of {} don't match.".format(
-                            trackTotal, len(d)
-                        )
+                        f"err: Number of tracks {trackTotal} and track order "
+                        f"of {len(d)} don't match."
                     )
             except SyntaxError:
                 self.__lstAnalysis.append(
                     "err: Command track order bad format.")
-                bOk=False
+                bOk = False
 
-        if matchExecutable:
-            f=stripEncaseQuotes(matchExecutable.group(1))
-            p=Path(f)
+        if matchExecutable := reExecutableEx.match(strCommand):
+            # Executable tests
+            f = stripEncaseQuotes(matchExecutable.group(1))
+            p = Path(f)
             try:
-                test=p.is_file()
+                test = p.is_file()
             except OSError:
                 self.__lstAnalysis.append(
-                    "err: mkvmerge incorrect syntax: - {}.".format(str(p))
-                )
-                bOk=False
+                    f"err: mkvmerge incorrect syntax: - {str(p)}.")
+                bOk = False
             else:
                 if test:
                     self.__lstAnalysis.append(
-                        "chk: mkvmerge ok - {}".format(str(p)))
+                        f"chk: mkvmerge ok - {str(p)}")
                 else:
                     self.__lstAnalysis.append(
-                        "err: mkvmerge not found - {}.".format(str(p))
-                    )
-                    bOk=False
+                        "err: mkvmerge not found - {str(p)}.")
+                    bOk = False
         else:
             self.__lstAnalysis.append("err: mkvmerge not found.")
-            bOk=False
+            bOk = False
 
-        if matchOutputFile:
-            f=stripEncaseQuotes(matchOutputFile.group(1))
-            f=f.replace(r"'\''", "'")
-            p=Path(f)
-            self.__outputFile=None
+        if matchOutputFile := reOutputFileEx.match(strCommand):
+            f = stripEncaseQuotes(matchOutputFile.group(1))
+            f = f.replace(r"'\''", "'")
+            p = Path(f)
+            self.__outputFile = None
 
             try:
-                test=Path(p.parent).is_dir()
+                test = Path(p.parent).is_dir()
             except OSError:
                 self.__lstAnalysis.append(
-                    "err: Destination directory incorrect syntax - {}.".format(
-                        str(p.parent))
+                    f"err: Destination directory incorrect "
+                    f"syntax - {str(p.parent)}."
                 )
-                bOk=False
+                bOk = False
             else:
                 if test:
                     self.__lstAnalysis.append(
-                        "chk: Destination directory ok = {}".format(
-                            str(p.parent))
+                        f"chk: Destination directory ok = {str(p.parent)}"
                     )
-                    self.__outputFile=p
+                    self.__outputFile = p
                 else:
                     self.__lstAnalysis.append(
-                        "err: Destination directory not found - {}.".format(
-                            str(p.parent))
+                        f"err: Destination directory not found - "
+                        f"{str(p.parent)}."
                     )
-                    bOk=False
+                    bOk = False
         else:
             self.__lstAnalysis.append("err: Destination directory not found.")
-            bOk=False
+            bOk = False
 
-        if matchSources:
-            n=1
+        if matchSources := reSourcesEx.finditer(strCommand):
+            n = 1
 
             for match in matchSources:
-                f=_unQuote(match.group(1))
-                p=Path(f)
+                f = _unQuote(match.group(1))
+                p = Path(f)
 
                 try:
-                    test=Path(p.parent).is_dir()
+                    test = Path(p.parent).is_dir()
                 except OSError:
                     self.__lstAnalysis.append(
-                        "err: Source directory {} bad syntax {}".format(
-                            n, str(p.parent))
+                        f"err: Source directory {n} bad syntax {str(p.parent)}"
                     )
-                    bOk=False
+                    bOk = False
                 else:
                     if not test:
                         self.__lstAnalysis.append(
-                            "err: Source directory {} not found {}".format(
-                                n, str(p.parent))
+                            f"err: Source directory {n} not found "
+                            f"{str(p.parent)}"
                         )
-                        bOk=False
+                        bOk = False
                     else:
                         self.__lstAnalysis.append(
-                            "chk: Source directory {} ok = {}".format(
-                                n, str(p.parent))
+                            f"chk: Source directory {n} ok = {str(p.parent)}"
                         )
                 try:
-                    test=Path(p).is_file()
+                    test = Path(p).is_file()
                 except OSError:
                     self.__lstAnalysis.append(
-                        "err: Source file {} bad syntax {}".format(n, str(p))
+                        f"err: Source file {n} bad syntax {str(p)}"
                     )
-                    bOk=False
+                    bOk = False
                 else:
                     if not test:
                         self.__lstAnalysis.append(
-                            "err: Source file {} not found {}".format(
-                                n, str(p))
+                            f"err: Source file {n} not found {str(p)}"
                         )
-                        bOk=False
+                        bOk = False
                     else:
                         self.__lstAnalysis.append(
-                            "chk: Source file {} ok = {}".format(n, str(p))
+                            f"chk: Source file {n} ok = {str(p)}"
                         )
 
                 n += 1
@@ -278,61 +266,62 @@ class VerifyMKVCommand:
             if n == 1:
                 # if the command is so bad matchSources for loop won't run
                 self.__lstAnalysis.append("err: Source directory not found.")
-                bOk=False
+                bOk = False
         else:
             self.__lstAnalysis.append("err: Source directory not found.")
-            bOk=False
+            bOk = False
 
         # Check for optional chapters file
-        if matchChaptersFile:
-            f=_unQuote(matchChaptersFile.group(1))
-            p=Path(f)
-            self.__chaptersFile=None
+        if matchChaptersFile := reChaptersFileEx.match(strCommand):
+            f = _unQuote(matchChaptersFile.group(1))
+            p = Path(f)
+            self.__chaptersFile = None
 
             try:
-                test=p.is_file()
+                test = p.is_file()
             except OSError:
                 self.__lstAnalysis.append(
-                    "err: Chapters file incorrect syntax - {}.".format(str(p))
+                    f"err: Chapters file incorrect syntax - {str(p)}."
                 )
-                bOk=False
+                bOk = False
             else:
                 if not test:
                     self.__lstAnalysis.append(
-                        "err: Chapters file not found - {}.".format(str(p))
+                        f"err: Chapters file not found - {str(p)}."
                     )
-                    bOk=False
+                    bOk = False
                 else:
                     self.__lstAnalysis.append(
-                        "chk: Chapters file ok - {}".format(str(p)))
-                    self.__chaptersFile=p
-
-        # This check if for optional attachments files
-        n=1
-        for match in matchAttachments:
-            f=_unQuote(match.group(1))
-            p=Path(f)
-            try:
-                test=p.is_file()
-            except OSError:
-                self.__lstAnalysis.append(
-                    "err: Attachment file {} incorrect syntax - {}".format(
-                        n, str(p))
-                )
-                bOk=False
-            else:
-                if not test:
-                    self.__lstAnalysis.append(
-                        "err: Attachment {} not found - {}".format(n, str(p))
+                       f"chk: Chapters file ok - {str(p)}"
                     )
-                    bOk=False
+                    self.__chaptersFile = p
+
+        if matchAttachments := reAttachmentsEx.finditer(strCommand):
+            # This check if for optional attachments files
+            n = 1
+            for match in matchAttachments:
+                f = _unQuote(match.group(1))
+                p = Path(f)
+                try:
+                    test = p.is_file()
+                except OSError:
+                    self.__lstAnalysis.append(
+                        f"err: Attachment file {n} incorrect syntax - {str(p)}"
+                    )
+                    bOk = False
                 else:
-                    self.__lstAnalysis.append(
-                        "chk: Attachment {} ok = {}".format(n, str(p))
-                    )
-            n += 1
+                    if not test:
+                        self.__lstAnalysis.append(
+                            f"err: Attachment {n} not found - {str(p)}"
+                        )
+                        bOk = False
+                    else:
+                        self.__lstAnalysis.append(
+                            "chk: Attachment {n} ok = {str(p)}"
+                        )
+                n += 1
 
-        self.__errorFound=not bOk
+        self.__errorFound = not bOk
 
         if self.log:
 
@@ -359,10 +348,14 @@ class VerifyMKVCommand:
         return VerifyMKVCommand.classLog()
 
     @ log.setter
-    def log(self, value):
+    def log(self, value: bool):
         """set instance log variable"""
         if isinstance(value, bool) or value is None:
-            self.__log=value
+            self.__log = value
+
+    def setLog(self, bLogging: bool) -> None:
+        """Slot for setting loggin through signal"""
+        self.log = bLogging
 
     @ property
     def analysis(self):
@@ -404,7 +397,7 @@ class VerifyMKVCommand:
     def command(self, value):
         if isinstance(value, str):
             self.__reset()
-            self.__strCommand=value
+            self.__strCommand = value
             self.__analyse()
 
     @ property
@@ -443,11 +436,11 @@ def _convertToBashStyle(strCommand):
         cli command converted to bash style
     """
 
-    strTmp=strCommand
+    strTmp = strCommand
 
     if strTmp.find(r'^"^(^"') >= 0:
         # This is for cmd in Windows
-        strTmp=(
+        strTmp = (
             strTmp.replace("'", r"'\''")
             .replace("^", "")
             .replace("/", "\\")
@@ -471,8 +464,8 @@ def _numberOfTracksInCommand(strCmd):
         total number of tracks
     """
 
-    reLanguageEx=re.compile(r"\-\-language (.*?)\s")
-    matchLanguage=reLanguageEx.findall(strCmd)
+    reLanguageEx = re.compile(r"\-\-language (.*?)\s")
+    matchLanguage = reLanguageEx.findall(strCmd)
 
     return len(matchLanguage)
 
@@ -489,7 +482,7 @@ def _unQuote(fileName):
         file name without quotes if found
     """
 
-    f=stripEncaseQuotes(fileName)
-    f=f.replace(r"'\''", "'")
+    f = stripEncaseQuotes(fileName)
+    f = f.replace(r"'\''", "'")
 
     return f
