@@ -65,16 +65,22 @@ class TabWidget(QTabWidget):
             self.__tabWidgets.extend(tabWidgets)
 
             for tw in tabWidgets:
-                tabIndex = self.addTab(tw[Key.Widget], tw[Key.Title])
+                tabIndex = self.addTab(tw[Key.Widget], tw[Key.TabText])
                 self.setTabToolTip(tabIndex, tw[Key.ToolTip])
                 widget = tw[Key.Widget]
 
                 try:
-                    widget.tab = tabIndex
-                    widget.title = tw[Key.Title]
                     widget.tabWidget = self
-                except:  # pylint: disable=bare-except
-                    MODULELOG.error("[TabWidget] Error during initialization.")
+                except:
+                    MODULELOG.error("[TabWidget] Error initializing tabWidget.")
+                try:
+                    widget.tab = tabIndex
+                except:
+                    MODULELOG.error("[TabWidget] Error initializing tab.")
+                try:
+                    widget.tabText = tw[Key.TabText]
+                except:
+                    MODULELOG.error("[TabWidget] Error initializing tabText.")
 
     # endregion Initialization
 
@@ -164,7 +170,7 @@ class TabWidget(QTabWidget):
 class Key:
 
     Widget: ClassVar[int] = 0
-    Title: ClassVar[int] = 1
+    TabText: ClassVar[int] = 1
     ToolTip: ClassVar[int] = 2
 
 
