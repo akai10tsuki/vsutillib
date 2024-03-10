@@ -232,13 +232,16 @@ def convertToBashStyle(strCommand):
     if strTmp.find(r'^"^(^"') >= 0:
         # This is for cmd in Windows
         strTmp = (
-            strTmp.replace("'", r"'\''")
-            .replace("^", "")
+            strTmp.replace("^", "")
             .replace("\\", "/")
+            .replace("'", r"'\''")
             .replace('"', "'")
+
         )
-    elif platform.system() == "Windows":
-        strTmp = strTmp.replace("\\", "/")
+    #elif platform.system() == "Windows":
+    #    strTmp = strTmp.replace("\\", "/")
+
+    #strTmp = restoreEscapeQuote(strTmp)
 
     return str(strTmp)
 
@@ -312,6 +315,22 @@ def unQuote(fileName):
 
     f = stripEncaseQuotes(fileName)
     f = f.replace(r"'\''", "'")
+
+    return f
+
+def restoreEscapeQuote(fileName):
+    """
+    Remove start end quotes and escape ones
+    Args:
+        fileName (str): file name
+
+    Returns:
+        str:
+
+        file name without quotes if found
+    """
+
+    f = fileName.replace(r"'\''", "'")
 
     return f
 
