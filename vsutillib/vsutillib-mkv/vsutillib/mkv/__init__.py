@@ -30,6 +30,7 @@ from .mkvutils import (
     numberOfTracksInCommand,
     quoteString,
     resolveOverwrite,
+    restoreEscapeQuote,
     stripEncaseQuotes,
     setEncaseQuotes,
     unQuote,

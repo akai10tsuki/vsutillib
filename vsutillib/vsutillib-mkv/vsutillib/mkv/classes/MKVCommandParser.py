@@ -106,6 +106,7 @@ from ..mkvutils import (
     getMKVMergeEmbedded,
     numberOfTracksInCommand,
     resolveOverwrite,
+    restoreEscapeQuote,
     setEncaseQuotes,
     stripEncaseQuotes,
     unQuote,
@@ -300,7 +301,9 @@ class MKVCommandParser:
 
             if self.__strCommand:
                 strCommand = convertToBashStyle(self.__strCommand)
-                self.__bashCommand = strCommand
+                self.__bashCommand = restoreEscapeQuote(strCommand)
+                print(self.__bashCommand)
+                #self.__bashCommand = strCommand
                 if self.useEmbedded:
                     self.__embeddedBashCommand = embeddedBashCommand(
                         strCommand,
